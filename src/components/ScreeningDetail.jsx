@@ -3,6 +3,9 @@ import useAppStore from '../store/useAppStore'
 import { statusColor, statusLabel } from '../utils/score'
 import { TIME_OPTIONS } from '../utils/engine'
 
+// Unicode superscript karakterleri (akademik footnote için)
+const SUPERSCRIPTS = ['¹','²','³','⁴','⁵','⁶','⁷','⁸','⁹']
+
 export default function ScreeningDetail({ screening, onBack }) {
   const markDone = useAppStore(s => s.markDone)
   const setCustomNextDate = useAppStore(s => s.setCustomNextDate)
@@ -15,6 +18,7 @@ export default function ScreeningDetail({ screening, onBack }) {
 
   const dates = screeningDates[screening.id] || {}
   const color = statusColor(screening.status)
+  const sources = screening.sources || []
 
   const handleMarkDone = () => {
     if (!selectedTime) return
@@ -34,7 +38,8 @@ export default function ScreeningDetail({ screening, onBack }) {
   }
 
   return (
-    <div className="min-h-dvh flex flex-col pb-24 page-enter">
+    <div className="min-h-dvh flex flex-col pb-8 page-enter">
+
       {/* Header */}
       <div className="px-5 pt-6 pb-4 flex items-center gap-3">
         <button onClick={onBack} className="w-10 h-10 rounded-2xl bg-white border border-gray-200 flex items-center justify-center text-gray-600 font-bold">
@@ -43,8 +48,10 @@ export default function ScreeningDetail({ screening, onBack }) {
         <span className="font-bold text-gray-900">Detay</span>
       </div>
 
-      {/* Card */}
+      {/* Ana Kart */}
       <div className="mx-5 rounded-3xl p-5 bg-white border border-gray-200 mb-4" style={{boxShadow:'0 4px 20px rgba(0,0,0,0.06)'}}>
+
+        {/* Başlık */}
         <div className="flex items-center gap-3 mb-3">
           <span className="text-3xl">{screening.icon}</span>
           <div>
@@ -52,46 +59,50 @@ export default function ScreeningDetail({ screening, onBack }) {
             <div className="text-xs text-gray-400">{screening.enName}</div>
           </div>
         </div>
+
+        {/* Durum rozeti */}
         <div className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4" style={{background:`${color}18`, color}}>
           {statusLabel(screening.status, screening.daysUntil)}
         </div>
+
+        {/* Açıklama */}
         <div className="text-sm text-gray-600 leading-relaxed mb-4">{screening.explanation}</div>
 
-        {/* Clinical recommendation */}
+        {/* Klinik Öneri — footnote superscriptleriyle */}
         {screening.recommendation && (
-          <div className="mb-4 p-3 rounded-2xl" style={{background:'#e8f4f5', border:'1px solid #b2d8da'}}>
-            <div className="text-xs font-bold mb-1" style={{color:'#0A5C5F'}}>🩺 Klinik Öneri</div>
-            <div className="text-xs leading-relaxed" style={{color:'#0D7377'}}>{screening.recommendation}</div>
+          <div className="mb-4 p-4 rounded-2xl" style={{background:'#e8f4f5', border:'1px solid #b2d8da'}}>
+            <div className="text-xs font-bold mb-2" style={{color:'#0A5C5F'}}>🩺 Klinik Öneri</div>
+            <div className="text-xs leading-relaxed" style={{color:'#0D7377'}}>
+              {screening.recommendation}
+              {/* Footnote süperskriptleri — her kaynak için */}
+              {sources.length > 0 && (
+                <span className="ml-1">
+                  {sources.map((_, i) => (
+                    <sup
+                      key={i}
+                      className="font-extrabold"
+                      style={{color:'#C8102E', fontSize:'0.7em', marginLeft:'1px'}}
+                    >
+                      {SUPERSCRIPTS[i]}
+                    </sup>
+                  ))}
+                </span>
+              )}
+            </div>
           </div>
         )}
+
+        {/* Bilgi kutuları */}
         <div className="grid grid-cols-2 gap-3">
           <InfoBox label="Sıklık" value={`Her ${screening.frequencyMonths} ayda bir`} />
           <InfoBox label="Son Yapılan" value={dates.lastDoneDate ? formatDate(dates.lastDoneDate) : 'Bilinmiyor'} />
           <InfoBox label="Sonraki Kontrol" value={screening.nextDate ? formatDate(screening.nextDate) : 'Belirsiz'} />
           <InfoBox label="Uzman" value={screening.doctor || '—'} />
         </div>
-
-        {/* Guideline Sources */}
-        {screening.sources && screening.sources.length > 0 && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">📚 Kaynak Kılavuzlar</div>
-            {screening.sources.map((src, i) => (
-              <a key={i} href={src.url} target="_blank" rel="noopener noreferrer"
-                className="flex items-center gap-2 mb-2 p-3 rounded-xl bg-gray-50 border border-gray-200 no-underline"
-                style={{textDecoration:'none'}}>
-                <span className="text-xs flex-1 font-semibold leading-tight" style={{color:'#0D7377'}}>{src.name}</span>
-                <span className="text-xs font-bold flex-shrink-0" style={{color:'#E8963E'}}>↗</span>
-              </a>
-            ))}
-            <p className="text-xs leading-relaxed mt-1" style={{color:'#9CA3AF'}}>
-              Bu öneri uluslararası kanıta dayalı kılavuzlara dayanmaktadır. Bireysel kararlar için doktorunuza danışın.
-            </p>
-          </div>
-        )}
       </div>
 
-      {/* Actions */}
-      <div className="px-5 flex flex-col gap-3">
+      {/* Aksiyon butonları */}
+      <div className="px-5 flex flex-col gap-3 mb-6">
         <button
           onClick={() => { setShowMarkDone(true); setShowCustomDate(false) }}
           className="w-full py-4 rounded-2xl text-white font-bold text-base"
@@ -108,9 +119,9 @@ export default function ScreeningDetail({ screening, onBack }) {
         </button>
       </div>
 
-      {/* Mark done sheet */}
+      {/* Yapıldı paneli */}
       {showMarkDone && (
-        <div className="mx-5 mt-4 p-5 bg-white rounded-3xl border border-gray-200">
+        <div className="mx-5 mb-6 p-5 bg-white rounded-3xl border border-gray-200">
           <h3 className="font-bold text-gray-900 mb-3">Ne zaman yapıldı?</h3>
           <div className="flex flex-wrap gap-2 mb-4">
             {TIME_OPTIONS.filter(o => o.value !== 'unknown').map(opt => (
@@ -138,9 +149,9 @@ export default function ScreeningDetail({ screening, onBack }) {
         </div>
       )}
 
-      {/* Custom date sheet */}
+      {/* Tarih paneli */}
       {showCustomDate && (
-        <div className="mx-5 mt-4 p-5 bg-white rounded-3xl border border-gray-200">
+        <div className="mx-5 mb-6 p-5 bg-white rounded-3xl border border-gray-200">
           <h3 className="font-bold text-gray-900 mb-3">Sonraki kontrol tarihi</h3>
           <input
             type="date"
@@ -158,6 +169,74 @@ export default function ScreeningDetail({ screening, onBack }) {
           </button>
         </div>
       )}
+
+      {/* ── FOOTNOTE REFERANS BÖLÜMÜ ────────────────────────────────────────────
+          Sayfanın en altında, akademik makale stili footnote listesi.
+          Her kaynak numaralandırılmış, tıklanabilir, tam isim + bağlantı.
+      ──────────────────────────────────────────────────────────────────────── */}
+      {sources.length > 0 && (
+        <div className="mx-5 mb-6 pt-5" style={{borderTop:'1.5px solid #e5e7eb'}}>
+
+          {/* Başlık çizgisi */}
+          <div className="flex items-center gap-2 mb-4">
+            <div className="h-px flex-1" style={{background:'#C8102E', opacity:0.3}} />
+            <span className="text-xs font-extrabold uppercase tracking-widest" style={{color:'#C8102E'}}>
+              Kaynaklar
+            </span>
+            <div className="h-px flex-1" style={{background:'#C8102E', opacity:0.3}} />
+          </div>
+
+          {/* Footnote listesi */}
+          <ol className="space-y-3" style={{listStyle:'none', padding:0, margin:0}}>
+            {sources.map((src, i) => (
+              <li key={i} className="flex gap-3 items-start">
+                {/* Numara */}
+                <span
+                  className="flex-shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-xs font-extrabold mt-0.5"
+                  style={{background:'#C8102E', color:'white', fontSize:'0.6rem', minWidth:'1.25rem'}}
+                >
+                  {i + 1}
+                </span>
+                {/* Kaynak bilgisi */}
+                <div className="flex-1 min-w-0">
+                  <a
+                    href={src.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-xs font-semibold leading-snug mb-0.5"
+                    style={{color:'#0D7377', textDecoration:'none'}}
+                  >
+                    {src.name}
+                  </a>
+                  <span
+                    className="text-xs break-all"
+                    style={{color:'#9CA3AF', fontSize:'0.6rem'}}
+                  >
+                    {src.url}
+                  </span>
+                </div>
+                {/* Dış link oku */}
+                <a
+                  href={src.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-shrink-0 text-xs font-bold mt-0.5"
+                  style={{color:'#E8963E'}}
+                >
+                  ↗
+                </a>
+              </li>
+            ))}
+          </ol>
+
+          {/* Alt not */}
+          <p className="text-xs mt-4 leading-relaxed" style={{color:'#9CA3AF'}}>
+            Bu öneriler uluslararası kanıta dayalı kılavuzlara dayanmaktadır.
+            Bireysel kararlar için doktorunuza danışın.
+          </p>
+        </div>
+      )}
+
     </div>
   )
 }
