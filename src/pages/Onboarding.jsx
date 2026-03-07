@@ -97,50 +97,96 @@ export default function Onboarding() {
   )
 
   // ── STEP 1: Disease selection ───────────────────────────────────────────────
-  if (step === 1) return (
-    <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-      <button onClick={() => setStep(0)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
-      <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 2 / 3</div>
-      <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sağlık Durumunuz</h1>
-      <p className="text-gray-500 text-sm mb-6">Hangi sağlık sorunlarınız var?<br/>Birden fazla seçebilirsiniz.</p>
+  if (step === 1) {
+    const chronicDiseases = DISEASE_LIST.filter(d => !d.group)
+    const kanserDiseases  = DISEASE_LIST.filter(d => d.group === 'kanser')
 
-      <div className="grid grid-cols-2 gap-3 mb-6 flex-1">
-        {DISEASE_LIST.map(d => (
-          <button
-            key={d.id}
-            onClick={() => setDiseases(prev =>
-              prev.includes(d.id) ? prev.filter(x => x !== d.id) : [...prev, d.id]
-            )}
-            className={`flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-2xl border-2 font-semibold text-sm transition-all active:scale-95 ${
-              diseases.includes(d.id)
-                ? 'border-teal bg-teal-pale text-teal'
-                : 'border-gray-200 bg-white text-gray-700'
-            }`}
-          >
-            <span className="text-2xl">{d.icon}</span>
-            <span className="text-xs text-center leading-tight">{d.label}</span>
-            {diseases.includes(d.id) && (
-              <span className="text-xs font-black">✓</span>
-            )}
-          </button>
-        ))}
+    const toggleDisease = id => setDiseases(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    )
+
+    return (
+      <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
+        <button onClick={() => setStep(0)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 2 / 3</div>
+        <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sağlık Durumunuz</h1>
+        <p className="text-gray-500 text-sm mb-6">Hangi sağlık sorunlarınız var?<br/>Birden fazla seçebilirsiniz.</p>
+
+        <div className="flex-1 overflow-y-auto -mx-6 px-6">
+
+          {/* ── Kronik Hastalıklar ── */}
+          <div className="mb-2 flex items-center gap-2">
+            <span className="text-base">💊</span>
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Kronik Hastalıklar</span>
+          </div>
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            {chronicDiseases.map(d => (
+              <button
+                key={d.id}
+                onClick={() => toggleDisease(d.id)}
+                className={`flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-2xl border-2 font-semibold transition-all active:scale-95 ${
+                  diseases.includes(d.id)
+                    ? 'border-teal bg-teal-pale text-teal'
+                    : 'border-gray-200 bg-white text-gray-700'
+                }`}
+              >
+                <span className="text-2xl">{d.icon}</span>
+                <span className="text-xs text-center leading-tight">{d.label}</span>
+                {diseases.includes(d.id) && (
+                  <span className="text-xs font-black">✓</span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          {/* ── Ailede Kanser Öyküsü ── */}
+          <div className="mb-2 flex items-center gap-2">
+            <span className="text-base">🧬</span>
+            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Ailede Kanser Öyküsü</span>
+          </div>
+          <div className="mb-3 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200">
+            <p className="text-xs text-amber-700 leading-snug">
+              Ailenizde kanser öyküsü varsa lütfen aşağıdan ilgili seçenekleri belirtin. Hangi kanser türü ve akrabanızın tanı yaşı önemlidir.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 gap-2 mb-6 pl-2">
+            {kanserDiseases.map(d => (
+              <button
+                key={d.id}
+                onClick={() => toggleDisease(d.id)}
+                className={`flex items-center gap-3 py-3 px-3 rounded-xl border-2 font-semibold transition-all active:scale-98 ${
+                  diseases.includes(d.id)
+                    ? 'border-teal bg-teal-pale text-teal'
+                    : 'border-gray-200 bg-white text-gray-600'
+                }`}
+              >
+                <span className="text-xl shrink-0">{d.icon}</span>
+                <span className="text-xs text-left leading-tight flex-1">{d.label}</span>
+                {diseases.includes(d.id) && (
+                  <span className="text-xs font-black shrink-0">✓</span>
+                )}
+              </button>
+            ))}
+          </div>
+
+        </div>
+
+        <div className="mb-4 p-4 rounded-2xl bg-gray-50 border border-gray-200">
+          <p className="text-xs text-gray-500 text-center">
+            Hiçbir hastalığınız yoksa boş bırakın — yaş ve cinsiyete göre temel taramalarınız oluşturulur.
+          </p>
+        </div>
+
+        <button
+          onClick={() => setStep(2)}
+          className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98"
+          style={{background:'#0D7377'}}
+        >
+          Devam →
+        </button>
       </div>
-
-      <div className="mb-4 p-4 rounded-2xl bg-gray-50 border border-gray-200">
-        <p className="text-xs text-gray-500 text-center">
-          Hiçbir hastalığınız yoksa boş bırakın — yaş ve cinsiyete göre temel taramalarınız oluşturulur.
-        </p>
-      </div>
-
-      <button
-        onClick={() => setStep(2)}
-        className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98"
-        style={{background:'#0D7377'}}
-      >
-        Devam →
-      </button>
-    </div>
-  )
+    )
+  }
 
   // ── STEP 2: Last checkup dates ─────────────────────────────────────────────
   if (step === 2) {

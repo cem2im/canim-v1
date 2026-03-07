@@ -479,19 +479,88 @@ export const DISEASE_SCREENINGS = {
 
   // tiroid kaldırıldı — USPSTF Grade I, uygulama kapsamı dışı (Cem 07.03.2026)
 
-  kolon_kanseri_riski: {
-    // Ailede herhangi bir kanser öyküsü — aile öyküsüne göre değişen yoğunlaştırılmış tarama
-    label: 'Ailede Kanser Öyküsü',
+  // ── AİLEDE KANSER ÖYKÜSÜ — kanser türü ve akrabalık derecesine göre ────────
+
+  aile_meme_yuksek: {
+    // 1. derece akraba, 50 yaş altı meme kanseri — YÜKSEK RİSK
+    // ACS/NCCN: yıllık mamografi + yıllık MRI, 30 yaşında başla (veya tanıdan 10 yıl önce)
+    label: 'Ailede Meme Kanseri (Yüksek Risk)',
     screenings: [
-      // ZORUNLU: Genetik danışmanlık / BRCA-Lynch değerlendirmesi (USPSTF Grade B)
-      { id: 'genetik_danisman', months: 999 },
-      // Kolorektal kanser: aile öyküsünde her 5 yılda bir (ACS/NCCN), 40 yaşında başla
-      { id: 'kolonoskopi', months: 60 },
-      // Meme kanseri: aile öyküsünde yıllık mamografi (ACS/NCCN) + gerekirse MRI
-      { id: 'mamografi', months: 12 },
-      // Prostat kanseri: 1. derece akraba öyküsünde 45 yaşında tartışma (ACS)
-      { id: 'prostat', months: 24 },
-      // Genel: kan sayımı kanser izlemi için
+      { id: 'genetik_danisman', months: 999 },   // USPSTF Grade B — BRCA değerlendirmesi zorunlu
+      { id: 'mamografi', months: 12 },            // ACS/NCCN: yılda bir (biennial değil)
+      { id: 'kan_sayimi', months: 12 },
+    ]
+  },
+
+  aile_meme_orta: {
+    // 1. derece akraba, 50 yaş ve üstü meme kanseri — ORTA RİSK
+    // ACS: yıllık mamografi 40 yaşından itibaren (ortalama riskten daha erken)
+    label: 'Ailede Meme Kanseri (Orta Risk)',
+    screenings: [
+      { id: 'genetik_danisman', months: 999 },   // USPSTF Grade B
+      { id: 'mamografi', months: 12 },            // ACS: yıllık (USPSTF 2 yıllık yerine)
+    ]
+  },
+
+  aile_krc_yuksek: {
+    // 1. derece akraba <60 yaşında KRK VEYA ≥2 birinci derece akraba — YÜKSEK RİSK
+    // NCCN/ACS: 40 yaşında başla veya tanıdan 10 yıl önce; her 5 yılda bir kolonoskopi
+    label: 'Ailede Kolorektal Kanser (Yüksek Risk)',
+    screenings: [
+      { id: 'genetik_danisman', months: 999 },   // Lynch sendromu / FAP dışlaması için
+      { id: 'kolonoskopi', months: 60 },          // 5 yılda bir (ortalama 10 değil)
+      { id: 'kan_sayimi', months: 12 },
+    ]
+  },
+
+  aile_krc_orta: {
+    // 1. derece akraba ≥60 yaşında KRK — ORTA RİSK
+    // NCCN: 40 yaşında başla, 10 yılda bir kolonoskopi
+    label: 'Ailede Kolorektal Kanser (Orta Risk)',
+    screenings: [
+      { id: 'kolonoskopi', months: 120 },         // 10 yılda bir ama 40 yaşında başla
+      { id: 'kan_sayimi', months: 12 },
+    ]
+  },
+
+  aile_krc_dusuk: {
+    // 2. derece akraba (büyükanne/büyükbaba/hala/teyze/dayı/amca) — DÜŞÜK-ORTA RİSK
+    // Kılavuzlar: 45 yaşında ortalama risk protokolü (2. derece için başlangıç yaşı değişmez)
+    label: 'Ailede Kolorektal Kanser (Düşük-Orta Risk)',
+    screenings: [
+      { id: 'kolonoskopi', months: 120 },         // Ortalama risk gibi — 45 yaşında başla
+    ]
+  },
+
+  aile_prostat: {
+    // 1. derece akraba 65 yaş altında prostat kanseri — ACS yüksek risk
+    // ACS: 45 yaşında PSA tartışması başlatılmalı
+    label: 'Ailede Prostat Kanseri (Yüksek Risk)',
+    screenings: [
+      { id: 'prostat', months: 12 },              // ACS: 45 yaşında tartışma, yıllık izlem
+      { id: 'genetik_danisman', months: 999 },    // BRCA2 dışlaması için
+    ]
+  },
+
+  aile_yumurtalik: {
+    // Ailede yumurtalık kanseri — USPSTF Grade D genel popülasyon için
+    // BRCA değerlendirmesi zorunlu; RRSO tek kanıtlanmış korunma yöntemi
+    label: 'Ailede Yumurtalık Kanseri',
+    screenings: [
+      { id: 'genetik_danisman', months: 999 },    // ACİL — BRCA/RRSO kararı için
+      { id: 'mamografi', months: 12 },            // BRCA riski yüksek olduğundan meme taraması da
+    ]
+  },
+
+  brca_lynch: {
+    // Bilinen BRCA1/2 mutasyonu veya Lynch sendromu
+    // En yoğun tarama protokolü
+    label: 'BRCA/Lynch Sendromu',
+    screenings: [
+      { id: 'genetik_danisman', months: 60 },     // Periyodik genetik takip
+      { id: 'mamografi', months: 12 },            // ACS/NCCN: yıllık, 30 yaşından
+      { id: 'kolonoskopi', months: 24 },          // Lynch: her 1-2 yılda bir, 20-25 yaşından
+      { id: 'prostat', months: 12 },              // BRCA2 erkekler: 40 yaşında yıllık PSA
       { id: 'kan_sayimi', months: 12 },
     ]
   },
@@ -499,12 +568,20 @@ export const DISEASE_SCREENINGS = {
 
 // ── AVAILABLE DISEASES (for onboarding selection) ───────────────────────────
 export const DISEASE_LIST = [
-  { id: 'hipertansiyon',       label: 'Yüksek Tansiyon',      icon: '🫀' },
-  { id: 'diyabet',             label: 'Diyabet',              icon: '🍬' },
-  { id: 'hiperlipidemi',       label: 'Yüksek Kolesterol',    icon: '🩸' },
-  { id: 'obezite',             label: 'Aşırı Kilo / Obezite', icon: '⚖️' },
-  { id: 'yagli_karaciger',     label: 'Yağlı Karaciğer',     icon: '🫘' },
-  { id: 'kalp_damar',          label: 'Kalp Damar Hastalığı', icon: '❤️' },
-  { id: 'kemik_erimesi',       label: 'Kemik Erimesi',        icon: '🦴' },
-  { id: 'kolon_kanseri_riski', label: 'Ailede Kanser Öyküsü', icon: '🧬' },
+  { id: 'hipertansiyon',       label: 'Yüksek Tansiyon',       icon: '🫀' },
+  { id: 'diyabet',             label: 'Diyabet',               icon: '🍬' },
+  { id: 'hiperlipidemi',       label: 'Yüksek Kolesterol',     icon: '🩸' },
+  { id: 'obezite',             label: 'Aşırı Kilo / Obezite',  icon: '⚖️' },
+  { id: 'yagli_karaciger',     label: 'Yağlı Karaciğer',      icon: '🫘' },
+  { id: 'kalp_damar',          label: 'Kalp Damar Hastalığı',  icon: '❤️' },
+  { id: 'kemik_erimesi',       label: 'Kemik Erimesi',         icon: '🦴' },
+  // ── Ailede Kanser Öyküsü (grouped under a header in onboarding) ──
+  { id: 'aile_meme_yuksek',    label: 'Meme Kanseri — 1. derece akraba (50 yaş altında)', icon: '🩷', group: 'kanser' },
+  { id: 'aile_meme_orta',      label: 'Meme Kanseri — 1. derece akraba (50 yaş ve üstü)', icon: '🩷', group: 'kanser' },
+  { id: 'aile_krc_yuksek',     label: 'Kolorektal Kanser — 1. derece akraba (60 yaş altında) veya 2+ akraba', icon: '🟠', group: 'kanser' },
+  { id: 'aile_krc_orta',       label: 'Kolorektal Kanser — 1. derece akraba (60 yaş ve üstü)', icon: '🟠', group: 'kanser' },
+  { id: 'aile_krc_dusuk',      label: 'Kolorektal Kanser — 2. derece akraba', icon: '🟡', group: 'kanser' },
+  { id: 'aile_prostat',        label: 'Prostat Kanseri — 1. derece akraba (65 yaş altında)', icon: '🔵', group: 'kanser' },
+  { id: 'aile_yumurtalik',     label: 'Yumurtalık Kanseri — herhangi bir akraba', icon: '🟣', group: 'kanser' },
+  { id: 'brca_lynch',          label: 'BRCA1/2 Mutasyonu veya Lynch Sendromu', icon: '🧬', group: 'kanser' },
 ]
