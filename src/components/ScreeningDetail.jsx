@@ -62,6 +62,24 @@ export default function ScreeningDetail({ screening, onBack }) {
           <InfoBox label="Sonraki Kontrol" value={screening.nextDate ? formatDate(screening.nextDate) : 'Belirsiz'} />
           <InfoBox label="Uzman" value={screening.doctor || '—'} />
         </div>
+
+        {/* Guideline Sources */}
+        {screening.sources && screening.sources.length > 0 && (
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">📚 Kaynak Kılavuzlar</div>
+            {screening.sources.map((src, i) => (
+              <a key={i} href={src.url} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 mb-2 p-3 rounded-xl bg-gray-50 border border-gray-200 no-underline"
+                style={{textDecoration:'none'}}>
+                <span className="text-xs flex-1 font-semibold leading-tight" style={{color:'#0D7377'}}>{src.name}</span>
+                <span className="text-xs font-bold flex-shrink-0" style={{color:'#E8963E'}}>↗</span>
+              </a>
+            ))}
+            <p className="text-xs leading-relaxed mt-1" style={{color:'#9CA3AF'}}>
+              Bu öneri uluslararası kanıta dayalı kılavuzlara dayanmaktadır. Bireysel kararlar için doktorunuza danışın.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Actions */}
