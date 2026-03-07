@@ -384,7 +384,7 @@ export const DISEASE_SCREENINGS = {
   },
 
   diyabet: {
-    label: 'Şeker Hastalığı',
+    label: 'Diyabet',
     screenings: [
       { id: 'tansiyon_olcumu', months: 6 },
       { id: 'depresyon_tarama', months: 12 },
@@ -401,15 +401,7 @@ export const DISEASE_SCREENINGS = {
     ]
   },
 
-  prediyabet: {
-    label: 'Gizli Şeker (Prediyabet)',
-    screenings: [
-      { id: 'hba1c', months: 6 },
-      { id: 'biyokimya', months: 6 },
-      { id: 'lipid', months: 6 },
-      { id: 'vitamin_d', months: 12 },
-    ]
-  },
+  // prediyabet kaldırıldı — bu hastalar artık 'diyabet' grubunu seçmeli (Cem 07.03.2026)
 
   hiperlipidemi: {
     label: 'Yüksek Kolesterol',
@@ -470,13 +462,7 @@ export const DISEASE_SCREENINGS = {
     ]
   },
 
-  tiroid: {
-    label: 'Tiroid Hastalığı',
-    screenings: [
-      { id: 'tsh', months: 6 },
-      { id: 'biyokimya', months: 12 },
-    ]
-  },
+  // tiroid kaldırıldı — USPSTF Grade I, uygulama kapsamı dışı (Cem 07.03.2026)
 
   kolon_kanseri_riski: {
     label: 'Kolon Kanseri Riski',
@@ -489,14 +475,12 @@ export const DISEASE_SCREENINGS = {
 
 // ── AVAILABLE DISEASES (for onboarding selection) ───────────────────────────
 export const DISEASE_LIST = [
-  { id: 'hipertansiyon', label: 'Yüksek Tansiyon',      icon: '🫀' },
-  { id: 'diyabet',       label: 'Şeker Hastalığı',      icon: '🍬' },
-  { id: 'prediyabet',    label: 'Gizli Şeker',          icon: '⚠️' },
-  { id: 'hiperlipidemi', label: 'Yüksek Kolesterol',    icon: '🩸' },
-  { id: 'obezite',       label: 'Aşırı Kilo',           icon: '⚖️' },
-  { id: 'yagli_karaciger', label: 'Yağlı Karaciğer',   icon: '🫘' },
-  { id: 'kalp_damar',    label: 'Kalp Damar Hastalığı', icon: '❤️' },
-  { id: 'kemik_erimesi', label: 'Kemik Erimesi',        icon: '🦴' },
-  { id: 'tiroid',        label: 'Tiroid Hastalığı',     icon: '🦋' },
-  { id: 'kolon_kanseri_riski', label: 'Kolon Kanseri Riski', icon: '🔭' },
+  { id: 'hipertansiyon',       label: 'Yüksek Tansiyon',      icon: '🫀' },
+  { id: 'diyabet',             label: 'Diyabet',              icon: '🍬' },
+  { id: 'hiperlipidemi',       label: 'Yüksek Kolesterol',    icon: '🩸' },
+  { id: 'obezite',             label: 'Aşırı Kilo / Obezite', icon: '⚖️' },
+  { id: 'yagli_karaciger',     label: 'Yağlı Karaciğer',     icon: '🫘' },
+  { id: 'kalp_damar',          label: 'Kalp Damar Hastalığı', icon: '❤️' },
+  { id: 'kemik_erimesi',       label: 'Kemik Erimesi',        icon: '🦴' },
+  { id: 'kolon_kanseri_riski', label: 'Kolon Kanseri Riski',  icon: '🔭' },
 ]
