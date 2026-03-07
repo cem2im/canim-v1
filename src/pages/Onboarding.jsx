@@ -127,23 +127,25 @@ export default function Onboarding() {
           />
         </div>
 
-        {/* Birth year */}
+        {/* Birth year — direct number input */}
         <div className="mb-6">
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Doğum Yılınız</label>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => setBirthYear(y => y - 1)}
-              className="w-14 h-14 rounded-2xl border-2 border-gray-200 bg-white text-2xl font-bold text-gray-700 flex items-center justify-center active:scale-95"
-            >−</button>
-            <div className="flex-1 text-center">
-              <div className="text-3xl font-black text-gray-900">{birthYear}</div>
-              <div className="text-sm text-gray-400">{age} yaşında</div>
-            </div>
-            <button
-              onClick={() => setBirthYear(y => Math.min(y + 1, new Date().getFullYear() - 1))}
-              className="w-14 h-14 rounded-2xl border-2 border-gray-200 bg-white text-2xl font-bold text-gray-700 flex items-center justify-center active:scale-95"
-            >+</button>
-          </div>
+          <input
+            type="number"
+            inputMode="numeric"
+            className="w-full px-4 py-4 rounded-2xl border-2 border-gray-200 bg-white text-gray-900 text-3xl font-black text-center outline-none focus:border-teal transition-colors"
+            value={birthYear}
+            onChange={e => {
+              const y = parseInt(e.target.value)
+              if (!isNaN(y)) setBirthYear(Math.max(1920, Math.min(y, new Date().getFullYear() - 1)))
+            }}
+            min="1920"
+            max={new Date().getFullYear() - 1}
+            placeholder="1985"
+          />
+          {age > 0 && age < 120 && (
+            <div className="text-center text-sm text-gray-500 mt-2 font-medium">{age} yaşında</div>
+          )}
         </div>
 
         {/* Sex */}
@@ -260,18 +262,26 @@ export default function Onboarding() {
             <span className="text-base">💊</span>
             <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Kronik Hastalıklar</span>
           </div>
-          <div className="grid grid-cols-2 gap-3 mb-6">
+          <div className="flex flex-col gap-2 mb-6">
             {chronicDiseases.map(d => (
               <button
                 key={d.id}
                 onClick={() => toggleDisease(d.id)}
-                className={`flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-2xl border-2 font-semibold transition-all active:scale-95 ${
-                  diseases.includes(d.id) ? 'border-teal bg-teal-pale text-teal' : 'border-gray-200 bg-white text-gray-700'
-                }`}
+                className="flex items-center gap-3 py-3.5 px-4 rounded-2xl border-2 font-semibold transition-all active:scale-98 text-left"
+                style={diseases.includes(d.id)
+                  ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377'}
+                  : {borderColor:'#E5E7EB', background:'white', color:'#374151'}}
               >
-                <span className="text-2xl">{d.icon}</span>
-                <span className="text-xs text-center leading-tight">{d.label}</span>
-                {diseases.includes(d.id) && <span className="text-xs font-black">✓</span>}
+                <span className="text-2xl shrink-0">{d.icon}</span>
+                <span className="text-sm flex-1 leading-snug">{d.label}</span>
+                <div
+                  className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
+                  style={diseases.includes(d.id)
+                    ? {borderColor:'#0D7377', background:'#0D7377'}
+                    : {borderColor:'#D1D5DB', background:'white'}}
+                >
+                  {diseases.includes(d.id) && <span className="text-white text-xs font-black">✓</span>}
+                </div>
               </button>
             ))}
           </div>
@@ -402,61 +412,72 @@ export default function Onboarding() {
     )
   }
 
-  // ── STEP 3: Smart Summary Screen ─────────────────────────────────────────
+  // ── STEP 3: Summary Screen — counts only, no full list ──────────────────
   if (step === 3) {
     const allList = buildScreeningList(diseases, profile)
       .filter(s => !HIDDEN_FROM_SUMMARY.has(s.id))
     const groupedList = buildGroupedScreenings(diseases, allList)
     const total = allList.length
 
+    // Category counts for quick stats
+    const catCounts = {}
+    for (const s of allList) {
+      const cat = SCREENING_CATEGORY[s.id] || 'other'
+      catCounts[cat] = (catCounts[cat] || 0) + 1
+    }
+    const catDisplay = CATEGORIES.filter(c => catCounts[c.key] > 0)
+
     return (
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
         <button onClick={() => setStep(2)} className="text-teal font-semibold text-sm mb-4 self-start">← Geri</button>
 
-        {/* BIG notice — top */}
-        <div className="mb-5 px-5 py-4 rounded-2xl" style={{background:'linear-gradient(135deg,#0D7377,#14919B)'}}>
-          <div className="text-white text-base font-extrabold mb-1">Sonraki adımda bu taramaları en son ne zaman yaptırdığınızı soracağız.</div>
-          <div className="text-white/80 text-xs">Tarihleri bilmiyorsanız "Hatırlamıyorum" diyebilirsiniz — sorun değil.</div>
-        </div>
-
         <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sizin İçin Belirlendi</h1>
-        <p className="text-gray-500 text-sm mb-4">
+        <p className="text-gray-500 text-sm mb-5">
           {name && <span className="font-semibold text-gray-700">{name}, </span>}
           {age} yaş · {sex === 'F' ? 'Kadın' : 'Erkek'}
           {diseases.length > 0 && <span> · {diseases.length} tanı</span>}
-          {' '}· <span className="font-semibold text-teal">{total} tarama</span>
         </p>
 
-        <div className="flex-1 overflow-y-auto -mx-6 px-6 space-y-5 pb-4">
+        {/* Hero stat */}
+        <div className="mb-5 rounded-3xl p-6 text-white text-center" style={{background:'linear-gradient(135deg,#0D7377,#14919B)'}}>
+          <div className="text-6xl font-black mb-1">{total}</div>
+          <div className="text-lg font-bold opacity-90">kişisel tarama belirlendi</div>
+          <div className="mt-3 pt-3 border-t border-white/20 grid grid-cols-2 gap-2">
+            {catDisplay.map(c => (
+              <div key={c.key} className="flex items-center justify-center gap-2 py-2 rounded-xl" style={{background:'rgba(255,255,255,0.12)'}}>
+                <span className="text-base">{c.icon}</span>
+                <span className="text-sm font-bold">{catCounts[c.key]} {c.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Group summary rows — title + count only */}
+        <div className="flex flex-col gap-2 mb-5">
           {groupedList.map(({ key, label, icon, items }) => (
-            <div key={key}>
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-base">{icon}</span>
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{label}</span>
-                <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'#e8f4f5', color:'#0D7377'}}>{items.length}</span>
-              </div>
-              <div className="flex flex-col gap-2">
-                {items.map(s => (
-                  <div key={s.id} className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white border border-gray-100">
-                    <span className="text-xl shrink-0">{s.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-semibold text-gray-900 text-sm leading-tight">{screeningDisplayName(s)}</div>
-                      {s.why && <div className="text-xs text-gray-400 mt-0.5 line-clamp-1">{s.why}</div>}
-                    </div>
-                    <div className="text-xs font-bold shrink-0 px-2 py-1 rounded-xl" style={{background:'#f3f4f6', color:'#6B7280'}}>
-                      {freqLabel(s.frequencyMonths)}
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div key={key} className="flex items-center gap-3 px-4 py-3.5 bg-white rounded-2xl border border-gray-100"
+              style={{boxShadow:'0 1px 6px rgba(0,0,0,0.04)'}}>
+              <span className="text-xl shrink-0">{icon}</span>
+              <span className="text-sm font-semibold text-gray-800 flex-1">{label}</span>
+              <span className="text-sm font-black px-3 py-1 rounded-full" style={{background:'#e8f4f5', color:'#0D7377'}}>
+                {items.length}
+              </span>
             </div>
           ))}
         </div>
 
+        {/* Info note */}
+        <div className="mb-5 px-4 py-3 rounded-2xl flex items-start gap-3" style={{background:'#fffbeb', border:'1px solid #fde68a'}}>
+          <span className="text-base shrink-0">💡</span>
+          <p className="text-sm text-amber-800 leading-relaxed">
+            <strong>Sonraki adımda</strong> bu taramaları en son ne zaman yaptırdığınızı soracağız. Tarihleri bilmiyorsanız "Hatırlamıyorum" diyebilirsiniz — sorun değil. Tüm detaylar <strong>Taramalar sekmesinde</strong> görünecek.
+          </p>
+        </div>
+
         <button
           onClick={() => setStep(4)}
-          className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98 mt-4"
+          className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98"
           style={{background:'#0D7377'}}
         >
           Devam — Tarihleri Belirle →
