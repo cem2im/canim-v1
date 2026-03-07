@@ -39,17 +39,9 @@ export function buildScreeningList(diseases, profile) {
     addSet(d)
   }
 
-  // Age-based automatic cancer screenings
-  if (age >= 45 && age <= 75) addSet('kolon_kanseri_riski')
-  if (sex === 'F' && age >= 40 && age <= 74) {
-    if (!map['mamografi']) map['mamografi'] = 24
-  }
-  if (sex === 'F' && age >= 21 && age <= 65) {
-    if (!map['pap_smear']) map['pap_smear'] = 36
-  }
-  if (sex === 'M' && age >= 50 && age <= 75) {
-    if (!map['prostat']) map['prostat'] = 12
-  }
+  // Cancer screenings (kolonoskopi, mamografi, pap_smear, prostat) are data-driven:
+  // They live in DISEASE_SCREENINGS['healthy'] with age/sex filters on each SCREENINGS entry.
+  // No hardcoded additions needed here.
 
   // Age-based automatic vaccine additions
   if (age >= 50 && !map['asi_zona'])   map['asi_zona']   = 999  // ACIP Grade A ≥50

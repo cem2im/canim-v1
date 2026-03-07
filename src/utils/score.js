@@ -16,10 +16,10 @@ export function calcScore(screeningCards) {
     const multiplier = {
       ok:       1.0,
       upcoming: 1.0,
-      soon:     0.75,
+      soon:     1.0,   // within range — still compliant
       overdue:  0.0,
-      unknown:  0.5,
-    }[card.status] ?? 0.5
+      unknown:  0.3,   // never done / forgotten — significant penalty
+    }[card.status] ?? 0.3
 
     earnedWeight += w * multiplier
   }

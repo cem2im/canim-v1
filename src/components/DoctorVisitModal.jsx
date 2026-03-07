@@ -13,9 +13,8 @@ function getDateFromOption(option, customDate) {
   const today = new Date()
   if (option === 'today') return today.toISOString().slice(0,10)
   if (option === 'week') {
-    const d = new Date(today)
-    d.setDate(d.getDate() - 3)
-    return d.toISOString().slice(0,10)
+    // Use today as the date — user was there this week, today is close enough
+    return today.toISOString().slice(0,10)
   }
   if (option === 'month') {
     const d = new Date(today)
