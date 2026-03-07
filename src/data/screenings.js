@@ -454,6 +454,32 @@ export const SCREENINGS = {
     ],
   },
 
+  // ── SOLUNUM / GÖĞÜS ──────────────────────────────────────────────────────────
+
+  sft: {
+    id: 'sft', trName: 'Solunum Fonksiyon Testi (Spirometre)', enName: 'Pulmonary Function Test (Spirometry)',
+    nameMedical: 'Spirometri (FEV1, FVC, FEV1/FVC Oranı)',
+    why: 'Akciğer kapasitesini ölçer. FEV1/FVC <0.70 ise KOAH tanısı konur; yıllık takip hastalık ilerlemesini ve tedavi etkinliğini gösterir.',
+    layer: 2, guideline: 'GOLD 2024 KOAH Kılavuzu',
+    explanation: 'Nefes verme hızını ve akciğer kapasitesini ölçen basit bir testtir. KOAH şiddetini (GOLD Evre 1-4) belirler ve tedavi planını yönlendirir.',
+    recommendation: 'GOLD 2024: Tüm KOAH hastalarında yılda bir spirometri. Akut alevlenmeden ≥8 hafta sonra ölçüm yapılmalı. Semptomsuz dönemde bile FEV1 her yıl %30 daha hızlı düşebilir — erken saptama hayat kalitesini korur.',
+    frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 3,
+    doctor: 'Göğüs Hastalıkları · Pulmonoloji', icon: '🫁',
+    sources: [{ name: 'GOLD 2024 — Global Strategy for Prevention, Diagnosis and Management of COPD', url: 'https://goldcopd.org/2024-gold-report/' }],
+  },
+
+  akciger_bt: {
+    id: 'akciger_bt', trName: 'Akciğer BT (Düşük Doz)', enName: 'Low-Dose CT Lung Cancer Screening (LDCT)',
+    nameMedical: 'Düşük Doz Toraks Bilgisayarlı Tomografisi (LDCT)',
+    why: 'Akciğer kanseri erken evrede belirti vermez. KOAH\'lı bireylerde akciğer kanseri riski 3-5 kat yüksektir; yıllık düşük doz BT erken saptama ile hayat kurtarır.',
+    layer: 2, guideline: 'USPSTF 2021 Grade B',
+    explanation: 'Yıllık düşük doz BT ile akciğer nodülleri erken saptanır. Radyasyon dozu standat BT\'nin onda biridir.',
+    recommendation: 'USPSTF 2021 Grade B: 50-80 yaş, ≥20 paket-yıl sigara öyküsü olan veya son 15 yıl içinde bırakmış bireylerde yıllık LDCT. KOAH\'ta sigara bağımsız yüksek risk nedeniyle tarama önceliklidir.',
+    frequencyMonths: 12, ageMin: 50, ageMax: 80, sex: 'both', weight: 3,
+    doctor: 'Göğüs Hastalıkları · Radyoloji', icon: '🫁',
+    sources: [{ name: 'USPSTF — Lung Cancer Screening (2021, Grade B)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/lung-cancer-screening' }],
+  },
+
   // ── AŞILAR ──────────────────────────────────────────────────────────────────
 
   asi_grip: {
@@ -674,6 +700,23 @@ export const DISEASE_SCREENINGS = {
     ]
   },
 
+  koah: {
+    // GOLD 2024 COPD Management
+    label: 'KOAH',
+    screenings: [
+      { id: 'sft', months: 12 },            // GOLD 2024: yıllık spirometri zorunlu
+      { id: 'kan_sayimi', months: 12 },     // Polisitemi (kronik hipoksi), anemi
+      { id: 'biyokimya', months: 12 },      // Genel metabolik panel
+      { id: 'ekg', months: 12 },            // Kor pulmonale, aritmiler
+      { id: 'ekokardiyografi', months: 24 }, // Pulmoner hipertansiyon değerlendirmesi
+      { id: 'akciger_bt', months: 12 },     // USPSTF Grade B: 50-80 yaş akciğer kanseri taraması
+      { id: 'asi_grip', months: 12 },       // GOLD 2024: KOAH'ta yıllık grip aşısı (Grade A)
+      { id: 'asi_pnomoni', months: 999 },   // GOLD 2024: KOAH'ta pnömokok aşısı (Grade A)
+      { id: 'asi_td_tdap', months: 120 },   // ACIP: tetanos 10 yılda bir
+      { id: 'vitamin_d', months: 12 },      // KOAH'ta D vitamini eksikliği yaygın
+    ]
+  },
+
   // tiroid kaldırıldı — USPSTF Grade I, uygulama kapsamı dışı (Cem 07.03.2026)
 
   // ── AİLEDE KANSER ÖYKÜSÜ — kanser türü ve akrabalık derecesine göre ────────
@@ -772,6 +815,7 @@ export const DISEASE_LIST = [
   { id: 'yagli_karaciger',     label: 'Yağlı Karaciğer',      icon: '🫘' },
   { id: 'kalp_damar',          label: 'Kalp Damar Hastalığı',  icon: '❤️' },
   { id: 'kemik_erimesi',       label: 'Kemik Erimesi',         icon: '🦴' },
+  { id: 'koah',               label: 'KOAH (Akciğer)',        icon: '🫁' },
   // ── Ailede Kanser Öyküsü (grouped under a header in onboarding) ──
   { id: 'aile_meme_yuksek',    label: 'Meme Kanseri — 1. derece akraba (50 yaş altında)', icon: '🩷', group: 'kanser' },
   { id: 'aile_meme_orta',      label: 'Meme Kanseri — 1. derece akraba (50 yaş ve üstü)', icon: '🩷', group: 'kanser' },
@@ -798,7 +842,7 @@ export const DOCTOR_SCREENING_MAP = {
   'Tıbbi Genetik': ['genetik_danisman'],
   'Psikiyatri': ['depresyon_tarama'],
   'Diş Hekimi': ['dis_kontrol'],
-  'Göğüs Hastalıkları': ['akci_bt'],
+  'Göğüs Hastalıkları': ['sft', 'akciger_bt', 'kan_sayimi', 'ekg'],
   'Vasküler Cerrahi': ['karotis_usg', 'aort_anevrizması'],
 }
 
@@ -967,6 +1011,25 @@ export const DISEASE_DOCTOR_SCHEDULE = {
         'Boy kısalması',
       ],
       guideline: 'IOF + USPSTF Osteoporoz Kılavuzu 2025',
+    },
+  ],
+
+  koah: [
+    {
+      id: 'koah_gogus',
+      doctor: 'Göğüs Hastalıkları',
+      intervalMonths: 6,
+      purpose: 'Spirometri (FEV1), semptom skoru (mMRC/CAT), inhaler tekniği, alevlenme değerlendirmesi',
+      screenings: ['sft', 'kan_sayimi', 'ekg', 'akciger_bt'],
+      earlyTriggers: [
+        'Nefes darlığında ani veya belirgin artış',
+        'Balgam miktarında veya renginde değişim (sarı/yeşil)',
+        'Yeni başlayan göğüs ağrısı veya sıkışma',
+        'Dudaklarda veya parmaklarda morarma (siyanoz)',
+        'Konfüzyon, uyuklama veya bilinç bulanıklığı',
+        'Günlük aktivitelerde ani kısıtlanma',
+      ],
+      guideline: 'GOLD 2024 KOAH Kılavuzu',
     },
   ],
 
