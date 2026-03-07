@@ -2,6 +2,7 @@ import { useState } from 'react'
 import useAppStore from '../store/useAppStore'
 import { DISEASE_LIST } from '../data/screenings'
 import { supabase } from '../lib/supabase'
+import { generateHealthReport } from '../utils/generatePdf'
 import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
 
@@ -11,11 +12,39 @@ export default function Profile() {
   const diseases = useAppStore(s => s.diseases)
   const medications = useAppStore(s => s.medications)
   const emergency = useAppStore(s => s.emergency)
+  const visitHistory = useAppStore(s => s.visitHistory)
   const updateProfile  = useAppStore(s => s.updateProfile)
   const updateDiseases = useAppStore(s => s.updateDiseases)
   const updateEmergency = useAppStore(s => s.updateEmergency)
   const addMedication  = useAppStore(s => s.addMedication)
   const removeMedication = useAppStore(s => s.removeMedication)
+  const getScreeningCards  = useAppStore(s => s.getScreeningCards)
+  const getDoctorVisitCards = useAppStore(s => s.getDoctorVisitCards)
+  const getScore = useAppStore(s => s.getScore)
+
+  const [generatingPdf, setGeneratingPdf] = useState(false)
+
+  const handleGeneratePdf = () => {
+    setGeneratingPdf(true)
+    setTimeout(() => {
+      try {
+        const score = getScore()
+        const scoreLabel = score >= 85 ? 'Harika' : score >= 65 ? 'İyi' : score >= 50 ? 'Dikkat' : 'Acil Eylem'
+        generateHealthReport({
+          profile,
+          diseases,
+          screeningCards: getScreeningCards(),
+          doctorCards: getDoctorVisitCards(),
+          score,
+          scoreLabel,
+          visitHistory,
+        })
+      } catch (e) {
+        console.error('PDF error:', e)
+      }
+      setGeneratingPdf(false)
+    }, 50)
+  }
 
   const [editingMed, setEditingMed] = useState(null)
   const [medForm, setMedForm] = useState({ name:'', dose:'', timing:'sabah' })
@@ -114,12 +143,24 @@ export default function Profile() {
         <EditField label="Telefon" value={emergency.contactPhone} onSave={v => saveEmergency('contactPhone', v)} placeholder="05XX XXX XX XX" type="tel" />
       </Section>
 
-      {/* WhatsApp Share */}
+      {/* PDF Report + WhatsApp Share */}
       <div className="mb-5 bg-white rounded-2xl border border-gray-100 overflow-hidden p-4" style={{boxShadow:'0 1px 8px rgba(0,0,0,0.04)'}}>
-        <h2 className="text-sm font-bold text-gray-700 mb-3">Arkadaşlarına Öner</h2>
-        <p className="text-xs text-gray-500 mb-3 leading-relaxed">
-          Canım'ı faydalı buluyorsan arkadaşlarınla paylaş. Tarama hatırlatıcısı herkese lazım!
+        <h2 className="text-sm font-bold text-gray-700 mb-3">Raporlar & Paylaşım</h2>
+
+        {/* PDF Report */}
+        <button
+          onClick={handleGeneratePdf}
+          disabled={generatingPdf}
+          className="w-full py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-all mb-3 disabled:opacity-60"
+          style={{background: generatingPdf ? '#6B7280' : 'linear-gradient(135deg, #0D7377, #14919B)'}}
+        >
+          {generatingPdf ? '⏳ Hazırlanıyor…' : '📄 Sağlık Raporumu İndir (PDF)'}
+        </button>
+        <p className="text-xs text-gray-500 mb-4 leading-relaxed">
+          Tarama durumunuzu, doktor takvimini ve uyum puanınızı içeren kişisel rapor. Doktorunuza göstermek için kullanabilirsiniz.
         </p>
+
+        {/* WhatsApp share */}
         <button
           onClick={() => {
             const text = `Canım uygulamasını dene — yaşına ve hastalıklarına göre hangi taramaları ne zaman yaptırman gerektiğini gösteriyor! https://cem2im.github.io/canim-v1/`
@@ -128,7 +169,7 @@ export default function Profile() {
           className="w-full py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-all"
           style={{background:'#25D366'}}
         >
-          📤 Arkadaşlarına Öner (WhatsApp)
+          💬 Arkadaşlarına Öner (WhatsApp)
         </button>
       </div>
 

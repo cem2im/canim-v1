@@ -24,6 +24,7 @@ import ScreeningDetail from '../components/ScreeningDetail'
 import DoctorVisitModal from '../components/DoctorVisitModal'
 import DoctorVisitCard from '../components/DoctorVisitCard'
 import DoctorVisitDetail from '../components/DoctorVisitDetail'
+import ShareCardModal from '../components/ShareCardModal'
 import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
 
@@ -35,6 +36,7 @@ export default function Today() {
   const [selected, setSelected] = useState(null)
   const [selectedDoctor, setSelectedDoctor] = useState(null)
   const [showDoctorModal, setShowDoctorModal] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
 
   const score = getScore()
   const animatedScore = useCountUp(score, 950)
@@ -122,14 +124,21 @@ export default function Today() {
         </p>
       </div>
 
-      {/* Kontrole Gittim button */}
-      <div className="mx-5 mb-5">
+      {/* Action buttons row */}
+      <div className="mx-5 mb-5 flex gap-2">
         <button
           onClick={() => setShowDoctorModal(true)}
-          className="w-full py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-transform"
+          className="flex-1 py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-1.5 active:scale-98 transition-transform"
           style={{background:'linear-gradient(135deg, #14919B, #0D7377)'}}
         >
-          🏥 Kontrole Gittim — Taramaları Kaydet
+          🏥 Kontrole Gittim
+        </button>
+        <button
+          onClick={() => setShowShareModal(true)}
+          className="py-3.5 px-4 rounded-2xl font-bold text-sm flex items-center gap-1.5 active:scale-98 transition-transform"
+          style={{background:'rgba(13,115,119,0.1)', color:'#0D7377', border:'1.5px solid rgba(13,115,119,0.2)'}}
+        >
+          📤 Paylaş
         </button>
       </div>
 
@@ -195,6 +204,17 @@ export default function Today() {
       {/* Doctor Visit Modal */}
       {showDoctorModal && (
         <DoctorVisitModal onClose={() => setShowDoctorModal(false)} />
+      )}
+
+      {/* Share Card Modal */}
+      {showShareModal && (
+        <ShareCardModal
+          onClose={() => setShowShareModal(false)}
+          score={score}
+          label={label}
+          name={profile?.name}
+          cards={cards}
+        />
       )}
     </div>
   )
