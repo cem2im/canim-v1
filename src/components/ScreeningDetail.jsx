@@ -105,7 +105,7 @@ export default function ScreeningDetail({ screening, onBack }) {
 
         {/* Bilgi kutuları */}
         <div className="grid grid-cols-2 gap-3 mb-3">
-          <InfoBox label="Tarama Sıklığı" value={`Her ${screening.frequencyMonths} ayda bir`} />
+          <InfoBox label="Tarama Sıklığı" value={screening.frequencyMonths >= 999 ? 'Bir defaya mahsus' : `Her ${screening.frequencyMonths} ayda bir`} />
           <InfoBox label="Son Yapılan" value={dates.lastDoneDate ? formatDate(dates.lastDoneDate) : 'Bilinmiyor'} />
         </div>
         <div className="mb-3">

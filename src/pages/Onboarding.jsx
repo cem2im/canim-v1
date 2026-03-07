@@ -21,7 +21,7 @@ const CATEGORIES = [
   { key:'other',  label:'Özel Taramalar',     icon:'📋' },
 ]
 function freqLabel(months) {
-  if (months >= 999) return 'Defaya mahsus'
+  if (months >= 999) return 'Bir defaya mahsus'
   const map = {1:'Ayda bir',3:'3 ayda bir',6:'6 ayda bir',12:'Yılda bir',
     24:'2 yılda bir',36:'3 yılda bir',60:'5 yılda bir',120:'10 yılda bir'}
   return map[months] || `${months} ayda bir`
