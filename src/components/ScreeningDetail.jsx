@@ -15,6 +15,7 @@ export default function ScreeningDetail({ screening, onBack }) {
   const [showCustomDate, setShowCustomDate] = useState(false)
   const [selectedTime, setSelectedTime] = useState(null)
   const [customDate, setCustomDate] = useState('')
+  const [showClinical, setShowClinical] = useState(false)
 
   const dates = screeningDates[screening.id] || {}
   const color = statusColor(screening.status)
@@ -60,29 +61,39 @@ export default function ScreeningDetail({ screening, onBack }) {
           </div>
         </div>
 
-        {/* Durum rozeti */}
-        <div className="inline-block px-3 py-1 rounded-full text-xs font-bold mb-4" style={{background:`${color}18`, color}}>
-          {statusLabel(screening.status, screening.daysUntil)}
+        {/* Durum rozeti + Bilgi butonu */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="inline-block px-3 py-1 rounded-full text-xs font-bold" style={{background:`${color}18`, color}}>
+            {statusLabel(screening.status, screening.daysUntil)}
+          </div>
+          {(screening.recommendation || sources.length > 0) && (
+            <button
+              onClick={() => setShowClinical(v => !v)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all"
+              style={showClinical
+                ? {background:'#C8102E', color:'white'}
+                : {background:'#f3f4f6', color:'#6B7280', border:'1px solid #E5E7EB'}
+              }
+            >
+              <span>{showClinical ? '✕' : 'ℹ'}</span>
+              <span>{showClinical ? 'Kapat' : 'Klinik Bilgi'}</span>
+            </button>
+          )}
         </div>
 
         {/* Açıklama */}
         <div className="text-sm text-gray-600 leading-relaxed mb-4">{screening.explanation}</div>
 
-        {/* Klinik Öneri — footnote superscriptleriyle */}
-        {screening.recommendation && (
+        {/* Klinik Öneri — yalnızca bilgi butonuna basılınca görünür */}
+        {showClinical && screening.recommendation && (
           <div className="mb-4 p-4 rounded-2xl" style={{background:'#e8f4f5', border:'1px solid #b2d8da'}}>
             <div className="text-xs font-bold mb-2" style={{color:'#0A5C5F'}}>🩺 Klinik Öneri</div>
             <div className="text-xs leading-relaxed" style={{color:'#0D7377'}}>
               {screening.recommendation}
-              {/* Footnote süperskriptleri — her kaynak için */}
               {sources.length > 0 && (
                 <span className="ml-1">
                   {sources.map((_, i) => (
-                    <sup
-                      key={i}
-                      className="font-extrabold"
-                      style={{color:'#C8102E', fontSize:'0.7em', marginLeft:'1px'}}
-                    >
+                    <sup key={i} className="font-extrabold" style={{color:'#C8102E', fontSize:'0.7em', marginLeft:'1px'}}>
                       {SUPERSCRIPTS[i]}
                     </sup>
                   ))}
@@ -193,11 +204,8 @@ export default function ScreeningDetail({ screening, onBack }) {
         </div>
       )}
 
-      {/* ── FOOTNOTE REFERANS BÖLÜMÜ ────────────────────────────────────────────
-          Sayfanın en altında, akademik makale stili footnote listesi.
-          Her kaynak numaralandırılmış, tıklanabilir, tam isim + bağlantı.
-      ──────────────────────────────────────────────────────────────────────── */}
-      {sources.length > 0 && (
+      {/* ── FOOTNOTE REFERANS BÖLÜMÜ — yalnızca Klinik Bilgi açıkken görünür ── */}
+      {showClinical && sources.length > 0 && (
         <div className="mx-5 mb-6 pt-5" style={{borderTop:'1.5px solid #e5e7eb'}}>
 
           {/* Başlık çizgisi */}
