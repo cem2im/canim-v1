@@ -454,6 +454,80 @@ export const SCREENINGS = {
     ],
   },
 
+  // ── AŞILAR ──────────────────────────────────────────────────────────────────
+
+  asi_grip: {
+    id: 'asi_grip', trName: 'Grip Aşısı (İnfluenza)', enName: 'Influenza Vaccine',
+    nameMedical: 'İnaktif İnfluenza Aşısı (IIV4)',
+    why: 'Grip komplikasyonları (pnömoni, hastaneye yatış) önlenebilir. Her yıl virüs suşu değiştiği için yıllık aşı gerekir.',
+    layer: 1, guideline: 'ACIP 2024-2025',
+    explanation: 'Her yıl güncellenen grip virüsü suşlarına karşı yıllık aşı. Kronik hastalığı olanlarda hastaneye yatış riskini %40-60 azaltır.',
+    recommendation: 'ACIP Grade A: ≥6 ay tüm bireyler için yıllık influenza aşısı. ≥65 yaş için yüksek doz (HD-IIV4) veya adjuvanlı (aIIV4) tercih edilir.',
+    frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 2,
+    doctor: 'Aile Hekimi', icon: '💉',
+    sources: [{ name: 'ACIP — Influenza Vaccine Recommendations 2024-2025', url: 'https://www.cdc.gov/vaccines/hcp/acip-recs/general-recs/influenza.html' }],
+  },
+
+  asi_td_tdap: {
+    id: 'asi_td_tdap', trName: 'Tetanos Takviye Aşısı (Td/Tdap)', enName: 'Tetanus Booster (Td/Tdap)',
+    nameMedical: 'Tetanos-Difteri ± Boğmaca Aşısı (Td/Tdap)',
+    why: 'Tetanos bağışıklığı 10 yılda azalır. Tdap aynı zamanda boğmacaya karşı da koruma sağlar.',
+    layer: 1, guideline: 'ACIP Td/Tdap Tavsiyesi',
+    explanation: 'Hayatında bir kez Tdap (boğmaca korumalı), ardından her 10 yılda bir Td hatırlatma dozası. Yaralanmada ≥5 yıl geçmişse ek doz.',
+    recommendation: 'ACIP: Tüm yetişkinler için hayatında bir kez Tdap, ardından her 10 yılda bir Td booster. Gebelikte 27-36. haftada Tdap (her gebelikte).',
+    frequencyMonths: 120, ageMin: 18, ageMax: 120, sex: 'both', weight: 2,
+    doctor: 'Aile Hekimi', icon: '💉',
+    sources: [{ name: 'ACIP — Td/Tdap Recommendations', url: 'https://www.cdc.gov/vaccines/vpd/tetanus/hcp/recommendations.html' }],
+  },
+
+  asi_zona: {
+    id: 'asi_zona', trName: 'Zona Aşısı (Shingrix)', enName: 'Herpes Zoster Vaccine (RZV)',
+    nameMedical: 'Rekombinant Zoster Aşısı (Shingrix, RZV)',
+    why: '50 yaş sonrası her 3 kişiden 1\'i zona geçirir. Postherpetik nevralji aylarca süren ağrı yaratabilir; aşı bu riski >90% azaltır.',
+    layer: 2, guideline: 'ACIP 2022 Grade A',
+    explanation: '2 doz seri (2-6 ay arayla). Önceki zona geçirenler ve Zostavax alanlara da uygulanır.',
+    recommendation: 'ACIP Grade A: ≥50 yaş tüm yetişkinler, bağışıklık durumundan bağımsız. 2 doz: ilk doz ardından 2-6 ay sonra ikinci doz. İmmünsuprese hastalarda da güvenli.',
+    frequencyMonths: 999, ageMin: 50, ageMax: 120, sex: 'both', weight: 3,
+    doctor: 'Aile Hekimi · İç Hastalıkları', icon: '💉',
+    sources: [{ name: 'ACIP — Recombinant Zoster Vaccine Recommendations (2022)', url: 'https://www.cdc.gov/vaccines/vpd/shingles/hcp/shingrix/recommendations.html' }],
+  },
+
+  asi_pnomoni: {
+    id: 'asi_pnomoni', trName: 'Pnömokok Aşısı (PCV20)', enName: 'Pneumococcal Vaccine (PCV20)',
+    nameMedical: 'Pnömokok Konjuge Aşısı 20-valanlı (PCV20)',
+    why: 'Pnömokok pnömoni, menenjit ve sepsise yol açar. Kronik hastalık ve ≥65 yaşta ağır seyredebilir; aşı ciddi enfeksiyonu önler.',
+    layer: 2, guideline: 'ACIP 2022 Pnömokok Tavsiyesi',
+    explanation: 'Tek doz PCV20 veya PCV15+PPSV23 serisi. Kronik hastalıklarda (diyabet, kalp, karaciğer) ≥65 beklenmeden önerilir.',
+    recommendation: 'ACIP 2022: ≥65 yaş için tek doz PCV20 (tercihli). 19-64 yaş; diyabet, kronik kalp/akciğer/karaciğer/böbrek hastalığı, sigara, immünsupresyon durumunda PCV20.',
+    frequencyMonths: 999, ageMin: 19, ageMax: 120, sex: 'both', weight: 2,
+    doctor: 'Aile Hekimi · İç Hastalıkları', icon: '💉',
+    sources: [{ name: 'ACIP — Pneumococcal Vaccine Recommendations (2022)', url: 'https://www.cdc.gov/vaccines/vpd/pneumo/hcp/recommendations.html' }],
+  },
+
+  asi_hpv: {
+    id: 'asi_hpv', trName: 'HPV Aşısı (Gardasil-9)', enName: 'HPV Vaccine (9vHPV)',
+    nameMedical: '9-Valanlı HPV Aşısı (Gardasil-9)',
+    why: 'HPV rahim ağzı, anüs, penis ve baş-boyun kanserlerinin en önemli nedenidir. Aşı bu kanserleri büyük ölçüde önler.',
+    layer: 2, guideline: 'ACIP 2022 HPV Tavsiyesi',
+    explanation: '≤26 yaş rutin (Grade A). 27-45 yaş paylaşımlı karar (Grade B). 2 doz (erken başlandıysa) veya 3 doz serisi.',
+    recommendation: 'ACIP: ≤26 yaş için rutin 9vHPV aşısı. 27-45 yaş için daha önce aşılanmamış veya eksik seride paylaşımlı karar. HPV enfeksiyonu öyküsü dışlamaz.',
+    frequencyMonths: 999, ageMin: 9, ageMax: 45, sex: 'both', weight: 2,
+    doctor: 'Aile Hekimi · Kadın Doğum', icon: '💉',
+    sources: [{ name: 'ACIP — HPV Vaccine Recommendations (2022)', url: 'https://www.cdc.gov/vaccines/vpd/hpv/hcp/recommendations.html' }],
+  },
+
+  asi_hepatit_b: {
+    id: 'asi_hepatit_b', trName: 'Hepatit B Aşısı', enName: 'Hepatitis B Vaccine',
+    nameMedical: 'Rekombinant Hepatit B Aşısı (Heplisav-B / Engerix-B)',
+    why: 'Hepatit B kronik enfeksiyona, karaciğer sirozuna ve karaciğer kanserine yol açabilir. Aşılanmamış yetişkinlerde seri tamamlanması önerilir.',
+    layer: 2, guideline: 'ACIP 2022 Hepatit B Tavsiyesi',
+    explanation: '2-doz Heplisav-B veya 3-doz klasik seri. ACIP 2022 güncellemesiyle ≤59 yaş tüm yetişkinlere rutin önerilmektedir.',
+    recommendation: 'ACIP 2022: ≤59 yaş tüm yetişkinler için rutin HepB aşısı. ≥60 yaş: kronik hastalık, sağlık personeli, seyahat durumunda önerilir. Heplisav-B (2 doz, 1 ay ara) veya klasik 3-doz serisi.',
+    frequencyMonths: 999, ageMin: 18, ageMax: 60, sex: 'both', weight: 2,
+    doctor: 'Aile Hekimi · Gastroenteroloji', icon: '💉',
+    sources: [{ name: 'ACIP — Hepatitis B Vaccination of Adults (2022)', url: 'https://www.cdc.gov/vaccines/vpd/hepb/hcp/recommendations.html' }],
+  },
+
   obezite_tarama: {
     id: 'obezite_tarama', trName: 'Obezite / BMI Taraması', enName: 'Obesity and BMI Screening',
     nameMedical: 'Vücut Kitle İndeksi (VKİ/BMI) Değerlendirmesi',
@@ -489,6 +563,11 @@ export const DISEASE_SCREENINGS = {
       { id: 'dexa', months: 24 },             // USPSTF Grade B — 65+ kadın
       { id: 'prostat', months: 24 },          // USPSTF Grade C — 55–69 erkek (paylaşımlı karar)
       { id: 'aort_anevrizması', months: 999 }, // USPSTF Grade B — 65–75 yaş sigara içen erkek
+      // ── Aşılar ──
+      { id: 'asi_grip', months: 12 },         // ACIP Grade A — tüm yetişkinler, yılda bir
+      { id: 'asi_td_tdap', months: 120 },     // ACIP — hayatında bir Tdap, sonra 10 yılda bir Td
+      { id: 'asi_hpv', months: 999 },         // ACIP Grade A ≤26, Grade B 27-45 (engine ageMax:45)
+      { id: 'asi_hepatit_b', months: 999 },   // ACIP 2022 — ≤59 yaş rutin (engine ageMax:60)
     ]
   },
 
@@ -525,6 +604,8 @@ export const DISEASE_SCREENINGS = {
       { id: 'vitamin_d', months: 12 },
       { id: 'b12', months: 12 },
       { id: 'dis_kontrol', months: 6 },
+      { id: 'asi_pnomoni', months: 999 },  // ACIP 2022: diyabette PCV20 (19-64 yaş dahil)
+      { id: 'asi_grip', months: 12 },      // ACIP: diyabette grip komplikasyon riski yüksek
     ]
   },
 
@@ -553,6 +634,7 @@ export const DISEASE_SCREENINGS = {
       { id: 'ekg', months: 24 },
       { id: 'vitamin_d', months: 12 },
       { id: 'tsh', months: 12 },
+      { id: 'asi_pnomoni', months: 999 },  // ACIP 2022: obezite (BMI≥40) pnömokok endikasyonu
     ]
   },
 
@@ -564,6 +646,7 @@ export const DISEASE_SCREENINGS = {
       { id: 'fibroscan', months: 12 },
       { id: 'lipid', months: 6 },
       { id: 'hba1c', months: 6 },
+      { id: 'asi_hepatit_b', months: 999 }, // EASL 2024: karaciğer hastasında HepB aşısı zorunlu
     ]
   },
 
@@ -577,6 +660,8 @@ export const DISEASE_SCREENINGS = {
       { id: 'lipid', months: 6 },
       { id: 'karotis_usg', months: 12 },
       { id: 'biyokimya', months: 6 },
+      { id: 'asi_pnomoni', months: 999 },  // ACIP 2022: kronik kalp hastalığında PCV20
+      { id: 'asi_grip', months: 12 },      // AHA: kardiyovasküler hastalıkta yıllık grip aşısı
     ]
   },
 
