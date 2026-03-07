@@ -78,13 +78,12 @@ export const SCREENINGS = {
 
   b12: {
     id: 'b12', trName: 'B12 Vitamini', enName: 'Vitamin B12',
-    explanation: 'Sinir sistemi ve kan hücreleri için gerekli. Eksikliği yorgunluk, uyuşma ve megaloblastik anemiye yol açar. Metformin kullanan diyabet hastalarında eksiklik riski yüksektir.',
-    recommendation: 'Normal aralık: 200–900 pg/mL. Metformin kullanımı B12 emilimini bozar → yılda bir kontrol önerilir. Vejeteryanlar ve 50 yaş üstü bireylerde tarama endikasyonu artar.',
-    frequencyMonths: 12, ageMin: 20, ageMax: 120, sex: 'both', weight: 1,
+    explanation: 'Sinir sistemi ve kan hücreleri için gerekli. Eksikliği yorgunluk, uyuşma ve megaloblastik anemiye yol açar. Metformin kullanan diyabet hastalarında malabsorpsiyon riski yüksektir.',
+    recommendation: 'ADA 2025 kılavuzu, metformin kullanan diyabetik hastalarda periyodik B12 izlemini önermektedir. Asemptomatik genel popülasyonda rutin B12 taraması için uluslararası kılavuz desteği yoktur; bu nedenle yalnızca metformin kullanan hastalarda gösterilmektedir.',
+    frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 1,
     doctor: 'İç Hastalıkları', icon: '💊',
     sources: [
-      { name: 'ADA — Metformin and B12 Deficiency (Standards of Care 2025)', url: 'https://professional.diabetes.org/standards-of-care' },
-      { name: 'BMJ — Vitamin B12 deficiency (Clinical Review)', url: 'https://www.bmj.com/content/349/bmj.g5226' },
+      { name: 'ADA — Metformin and B12 Deficiency (Standards of Care 2025, Bölüm 9)', url: 'https://professional.diabetes.org/standards-of-care' },
     ],
   },
 
@@ -283,7 +282,6 @@ export const DISEASE_SCREENINGS = {
       { id: 'biyokimya', months: 12 },
       { id: 'lipid', months: 12 },
       { id: 'vitamin_d', months: 12 },
-      { id: 'b12', months: 12 },
       { id: 'idrar', months: 12 },
       { id: 'dis_kontrol', months: 6 },
       { id: 'hepatit', months: 60 },
@@ -380,7 +378,6 @@ export const DISEASE_SCREENINGS = {
       { id: 'dexa', months: 24 },
       { id: 'vitamin_d', months: 6 },
       { id: 'biyokimya', months: 12 },
-      { id: 'b12', months: 12 },
     ]
   },
 
