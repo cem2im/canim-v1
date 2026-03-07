@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import useAppStore from '../store/useAppStore'
 import { DISEASE_LIST } from '../data/screenings'
+import FeedbackSection from '../components/FeedbackSection'
+import Disclaimer from '../components/Disclaimer'
 
 export default function Profile() {
   const profile  = useAppStore(s => s.profile)
@@ -129,11 +131,13 @@ export default function Profile() {
       </div>
 
       {/* App info */}
-      <div className="text-center py-4 text-xs text-gray-400">
-        <div className="font-bold text-teal text-sm mb-1">Canım v3.0</div>
-        Prof. Dr. Cem Şimşek tarafından tasarlandı<br/>
-        Hacettepe Üniversitesi
+      <div className="text-center py-2 text-xs text-gray-400 mb-2">
+        <div className="font-bold text-teal text-sm mb-0.5">Canım v3.0</div>
+        Prof. Dr. Cem Şimşek tarafından tasarlandı
       </div>
+
+      <FeedbackSection page="profile" />
+      <Disclaimer />
 
       {/* Add Medication Modal */}
       {editingMed && (

@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import useAppStore from '../store/useAppStore'
 import { SCREENINGS } from '../data/screenings'
+import FeedbackSection from '../components/FeedbackSection'
+import Disclaimer from '../components/Disclaimer'
 
 const TR_MONTHS = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık']
 
@@ -138,6 +140,9 @@ export default function History() {
           </div>
         </div>
       )}
+
+      <FeedbackSection page="lab" />
+      <Disclaimer />
     </div>
   )
 }

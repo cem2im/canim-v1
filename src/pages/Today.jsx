@@ -5,6 +5,8 @@ import ScreeningDetail from '../components/ScreeningDetail'
 import DoctorVisitModal from '../components/DoctorVisitModal'
 import DoctorVisitCard from '../components/DoctorVisitCard'
 import DoctorVisitDetail from '../components/DoctorVisitDetail'
+import FeedbackSection from '../components/FeedbackSection'
+import Disclaimer from '../components/Disclaimer'
 
 export default function Today() {
   const profile = useAppStore(s => s.profile)
@@ -164,15 +166,9 @@ export default function Today() {
         ))}
       </div>
 
-      {/* Footer Disclaimer */}
-      <div className="mx-5 mb-6 mt-4 py-3 px-4 rounded-2xl bg-gray-50">
-        <p className="text-xs text-gray-400 text-center leading-relaxed">
-          Bu uygulama güncel kılavuzlara dayalı tarama hatırlatmaları sunar. Tıbbi teşhis veya tedavi yerine geçmez. Tarama sonuçlarınızı mutlaka doktorunuzla değerlendirin.
-        </p>
-        <p className="text-xs text-gray-300 text-center mt-1">
-          Prof. Dr. Cem Şimşek • Hacettepe Üniversitesi
-        </p>
-      </div>
+      {/* Feedback + Disclaimer */}
+      <FeedbackSection page="today" />
+      <Disclaimer />
 
       {/* Doctor Visit Modal */}
       {showDoctorModal && (
