@@ -57,7 +57,7 @@ export default function ScreeningDetail({ screening, onBack }) {
           <span className="text-3xl">{screening.icon}</span>
           <div>
             <h1 className="text-lg font-extrabold text-gray-900">{screening.trName}</h1>
-            <div className="text-xs text-gray-400">{screening.enName}</div>
+            <div className="text-xs text-gray-500">{screening.enName}</div>
           </div>
         </div>
 
@@ -119,7 +119,7 @@ export default function ScreeningDetail({ screening, onBack }) {
         {/* Uzman Branşlar — tam genişlik, tüm ilgili branşlar */}
         {screening.doctor && (
           <div className="mt-3 bg-gray-50 rounded-2xl p-3">
-            <div className="text-xs text-gray-400 font-semibold mb-2">Hangi uzmana başvurun?</div>
+            <div className="text-xs text-gray-500 font-semibold mb-2">Hangi uzmana başvurun?</div>
             <div className="flex flex-wrap gap-2">
               {screening.doctor.split(' · ').map((d, i) => (
                 <span

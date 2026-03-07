@@ -5,6 +5,13 @@ import ScreeningDetail from '../components/ScreeningDetail'
 import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
 
+function formatDate(dateStr) {
+  if (!dateStr) return ''
+  const d = new Date(dateStr)
+  const months = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara']
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`
+}
+
 export default function Screenings() {
   const getScreeningCards = useAppStore(s => s.getScreeningCards)
   const [selected, setSelected] = useState(null)
@@ -23,7 +30,7 @@ export default function Screenings() {
   return (
     <div className="page-enter pb-24 px-5 pt-6">
       <h1 className="text-xl font-extrabold text-gray-900 mb-1">Taramalarım</h1>
-      <p className="text-sm text-gray-400 mb-5">{cards.length} tarama takip ediliyor</p>
+      <p className="text-sm text-gray-500 mb-5">{cards.length} tarama takip ediliyor</p>
 
       {overdue.length > 0 && <Section title="🔴 Gecikmiş" cards={overdue} onSelect={setSelected} />}
       {upcoming.length > 0 && <Section title="🔵 Bu Ay Yapılmalı" cards={upcoming} onSelect={setSelected} />}
@@ -51,8 +58,8 @@ function Section({ title, cards, onSelect }) {
           <span className="text-2xl">{card.icon}</span>
           <div className="flex-1">
             <div className="font-semibold text-gray-900 text-sm">{card.trName}</div>
-            <div className="text-xs text-gray-400">
-              {card.nextDate ? `Sonraki: ${card.nextDate}` : 'Tarih belirsiz'}
+            <div className="text-sm text-gray-500">
+              {card.nextDate ? `Sonraki: ${formatDate(card.nextDate)}` : 'Tarih belirsiz'}
             </div>
           </div>
           <div

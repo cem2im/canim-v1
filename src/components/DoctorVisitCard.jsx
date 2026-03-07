@@ -2,10 +2,10 @@
 // Props: { schedule, lastVisitDate, nextVisitDate, status, daysUntil, onClick }
 
 const STATUS_CONFIG = {
-  overdue: { label: 'Gecikmiş', color: '#EF4444', bg: '#FEF2F2' },
-  soon:    { label: 'Yaklaşıyor', color: '#F59E0B', bg: '#FFFBEB' },
-  ok:      { label: 'Güncel', color: '#10B981', bg: '#ECFDF5' },
-  unknown: { label: 'Bilinmiyor', color: '#9CA3AF', bg: '#F9FAFB' },
+  overdue: { label: 'Gecikmiş',   color: '#DC2626', bg: '#FEF2F2' },
+  soon:    { label: 'Yaklaşıyor', color: '#D97706', bg: '#FFFBEB' },
+  ok:      { label: 'Güncel',     color: '#0D9488', bg: '#F0FDFA' },
+  unknown: { label: 'Bilinmiyor', color: '#6B7280', bg: '#F9FAFB' },
 }
 
 function formatDate(dateStr) {
@@ -35,7 +35,7 @@ export default function DoctorVisitCard({ schedule, lastVisitDate, nextVisitDate
               <span className="text-xl">🏥</span>
               <div>
                 <div className="font-bold text-gray-900 text-sm">{schedule.doctor}</div>
-                <div className="text-xs text-gray-400">Her {schedule.intervalMonths} ayda bir</div>
+                <div className="text-sm text-gray-500">Her {schedule.intervalMonths} ayda bir</div>
               </div>
             </div>
             {/* Status badge */}
@@ -52,16 +52,16 @@ export default function DoctorVisitCard({ schedule, lastVisitDate, nextVisitDate
           </div>
 
           {/* Purpose */}
-          <div className="text-xs text-gray-500 mt-2 leading-relaxed">{schedule.purpose}</div>
+          <div className="text-sm text-gray-500 mt-2 leading-relaxed">{schedule.purpose}</div>
 
           {/* Next visit */}
-          <div className="text-xs mt-2 text-gray-500">
-            📅 Sonraki: <strong className={status === 'overdue' ? 'text-red-500' : 'text-gray-700'}>{nextLabel}</strong>
+          <div className="text-sm mt-2 text-gray-500">
+            📅 Sonraki: <strong className={status === 'overdue' ? 'text-red-600' : 'text-gray-700'}>{nextLabel}</strong>
           </div>
 
           {/* Early trigger warning (collapsed summary) */}
           {schedule.earlyTriggers?.length > 0 && (
-            <div className="mt-2 text-xs text-amber-700 bg-amber-50 rounded-xl px-3 py-2">
+            <div className="mt-2 text-sm text-amber-700 bg-amber-50 rounded-xl px-3 py-2">
               ⚠️ {schedule.earlyTriggers[0]}
               {schedule.earlyTriggers.length > 1 && (
                 <span className="text-amber-500"> +{schedule.earlyTriggers.length - 1} durum daha</span>

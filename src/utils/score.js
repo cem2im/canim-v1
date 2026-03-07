@@ -33,9 +33,9 @@ export function calcScore(screeningCards) {
 }
 
 export function scoreColor(score) {
-  if (score >= 85) return '#10B981'  // green
-  if (score >= 65) return '#F59E0B'  // amber
-  return '#EF4444'                    // red
+  if (score >= 85) return '#0D9488'  // teal-600 — positive, on-brand
+  if (score >= 65) return '#D97706'  // amber-600 — readable, less glaring
+  return '#DC2626'                    // red-600 — clear but not alarm-red
 }
 
 export function scoreLabel(score) {
@@ -47,11 +47,11 @@ export function scoreLabel(score) {
 
 export function statusColor(status) {
   return {
-    overdue:  '#EF4444',
-    upcoming: '#0D7377',
-    soon:     '#F59E0B',
-    ok:       '#10B981',
-    unknown:  '#6B7280',
+    overdue:  '#DC2626',  // red-600 — firm but not alarming
+    upcoming: '#0D7377',  // teal — on-brand
+    soon:     '#D97706',  // amber-600 — readable
+    ok:       '#0D9488',  // teal-600 — positive, matches scoreColor
+    unknown:  '#6B7280',  // gray-500
   }[status] ?? '#6B7280'
 }
 

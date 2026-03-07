@@ -56,7 +56,7 @@ export default function FeedbackSection({ page }) {
     <div className="mx-5 mb-2 bg-white rounded-2xl border border-gray-100 p-5"
       style={{boxShadow:'0 1px 8px rgba(0,0,0,0.04)'}}>
       <div className="text-sm font-bold text-gray-700 mb-0.5">Bu sayfa nasıldı?</div>
-      <div className="text-xs text-gray-400 mb-4">
+      <div className="text-xs text-gray-500 mb-4">
         Görüşleriniz uygulamayı geliştirmemize yardımcı oluyor.
       </div>
 

@@ -61,7 +61,7 @@ export default function Profile() {
         {/* Cancer history indicator — read-only */}
         {diseases.some(d => DISEASE_LIST.find(x => x.id === d)?.group === 'kanser') && (
           <div className="mt-3 pt-3 border-t border-gray-100">
-            <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Ailede Kanser Öyküsü</div>
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Ailede Kanser Öyküsü</div>
             <div className="flex flex-wrap gap-2">
               {diseases
                 .map(id => DISEASE_LIST.find(x => x.id === id))
@@ -74,7 +74,7 @@ export default function Profile() {
                 ))
               }
             </div>
-            <p className="text-xs text-gray-400 mt-2">Değiştirmek için onboarding'i sıfırlayın.</p>
+            <p className="text-xs text-gray-500 mt-2">Değiştirmek için onboarding'i sıfırlayın.</p>
           </div>
         )}
       </Section>
@@ -82,15 +82,15 @@ export default function Profile() {
       {/* Medications */}
       <Section title="İlaçlarım" action={{ label:'+ Ekle', onClick:() => { setEditingMed('new'); setMedForm({name:'',dose:'',timing:'sabah'}) } }}>
         {medications.length === 0 && (
-          <p className="text-sm text-gray-400 py-2">Henüz ilaç eklenmedi.</p>
+          <p className="text-sm text-gray-500 py-2">Henüz ilaç eklenmedi.</p>
         )}
         {medications.map(med => (
           <div key={med.id} className="flex items-center justify-between py-3 border-b border-gray-100">
             <div>
               <div className="font-semibold text-sm text-gray-900">{med.name}</div>
-              <div className="text-xs text-gray-400">{med.dose} · {med.timing}</div>
+              <div className="text-xs text-gray-500">{med.dose} · {med.timing}</div>
             </div>
-            <button onClick={() => removeMedication(med.id)} className="text-red-400 text-xs font-semibold">Sil</button>
+            <button onClick={() => removeMedication(med.id)} className="text-red-500 text-sm font-semibold">Sil</button>
           </div>
         ))}
       </Section>
@@ -98,7 +98,7 @@ export default function Profile() {
       {/* Emergency */}
       <Section title="Acil Bilgilerim">
         <div className="py-2">
-          <label className="text-xs font-bold text-gray-400 uppercase tracking-wide block mb-1">Kan Grubu</label>
+          <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1">Kan Grubu</label>
           <div className="flex flex-wrap gap-2">
             {['A+','A-','B+','B-','AB+','AB-','0+','0-','Bilmiyorum'].map(bt => (
               <button key={bt}
@@ -117,7 +117,7 @@ export default function Profile() {
       {/* WhatsApp Share */}
       <div className="mb-5 bg-white rounded-2xl border border-gray-100 overflow-hidden p-4" style={{boxShadow:'0 1px 8px rgba(0,0,0,0.04)'}}>
         <h2 className="text-sm font-bold text-gray-700 mb-3">Arkadaşlarına Öner</h2>
-        <p className="text-xs text-gray-400 mb-3 leading-relaxed">
+        <p className="text-xs text-gray-500 mb-3 leading-relaxed">
           Canım'ı faydalı buluyorsan arkadaşlarınla paylaş. Tarama hatırlatıcısı herkese lazım!
         </p>
         <button
@@ -151,7 +151,7 @@ export default function Profile() {
           ) : (
             <>
               <div className="text-sm font-bold text-gray-700">Yalnızca Bu Cihazda</div>
-              <div className="text-xs text-gray-400 mt-0.5">
+              <div className="text-xs text-gray-500 mt-0.5">
                 Verileriniz kaydedilmiyor. Cihazı değiştirirseniz kaybolabilir.
               </div>
             </>
@@ -160,14 +160,14 @@ export default function Profile() {
         {authUser?.saved && (
           <button
             onClick={async () => { await supabase.auth.signOut() }}
-            className="text-xs text-gray-400 font-semibold px-2 py-1 rounded-lg"
+            className="text-xs text-gray-500 font-semibold px-2 py-1 rounded-lg"
             style={{background:'rgba(0,0,0,0.05)'}}
           >Çıkış</button>
         )}
       </div>
 
       {/* App info */}
-      <div className="text-center py-2 text-xs text-gray-400 mb-2">
+      <div className="text-center py-2 text-xs text-gray-500 mb-2">
         <div className="font-bold text-teal text-sm mb-0.5">Canım v3.0</div>
         Prof. Dr. Cem Şimşek tarafından tasarlandı
       </div>
@@ -181,17 +181,17 @@ export default function Profile() {
           <div className="w-full max-w-md mx-auto bg-white rounded-t-3xl p-6" onClick={e => e.stopPropagation()}>
             <h3 className="font-extrabold text-gray-900 mb-4">İlaç Ekle</h3>
             <div className="mb-3">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide block mb-1">İlaç Adı</label>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1">İlaç Adı</label>
               <input autoFocus className="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 focus:border-teal outline-none font-semibold"
                 placeholder="Metformin" value={medForm.name} onChange={e => setMedForm(f=>({...f,name:e.target.value}))} />
             </div>
             <div className="mb-3">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide block mb-1">Doz</label>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-1">Doz</label>
               <input className="w-full px-4 py-3 rounded-2xl border-2 border-gray-200 focus:border-teal outline-none font-semibold"
                 placeholder="500mg" value={medForm.dose} onChange={e => setMedForm(f=>({...f,dose:e.target.value}))} />
             </div>
             <div className="mb-4">
-              <label className="text-xs font-bold text-gray-400 uppercase tracking-wide block mb-2">Ne Zaman</label>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide block mb-2">Ne Zaman</label>
               <div className="flex gap-2">
                 {['sabah','akşam','her ikisi'].map(t => (
                   <button key={t} onClick={() => setMedForm(f=>({...f,timing:t}))}
@@ -237,7 +237,7 @@ function EditField({ label, value, onSave, type='text', placeholder='' }) {
 
   if (editing) return (
     <div className="py-2 border-b border-gray-100">
-      <label className="text-xs font-bold text-gray-400 block mb-1">{label}</label>
+      <label className="text-xs font-bold text-gray-500 block mb-1">{label}</label>
       <div className="flex gap-2">
         <input autoFocus type={type}
           className="flex-1 px-3 py-2 rounded-xl border-2 border-teal outline-none font-semibold text-sm"
@@ -254,7 +254,7 @@ function EditField({ label, value, onSave, type='text', placeholder='' }) {
     <div onClick={() => { setVal(value); setEditing(true) }}
       className="flex items-center justify-between py-3 border-b border-gray-100 cursor-pointer">
       <span className="text-sm font-semibold text-gray-700">{label}</span>
-      <span className="text-sm text-gray-400">{value || placeholder || 'Ekle →'}</span>
+      <span className="text-sm text-gray-500">{value || placeholder || 'Ekle →'}</span>
     </div>
   )
 }

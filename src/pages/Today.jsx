@@ -60,7 +60,7 @@ export default function Today() {
     <div className="page-enter pb-28">
       {/* Header */}
       <div className="px-5 pt-6 pb-4">
-        <div className="text-xs text-gray-400 mb-0.5">{dateStr}</div>
+        <div className="text-xs text-gray-500 mb-0.5">{dateStr}</div>
         <h1 className="text-xl font-extrabold text-gray-900">{greeting}, {profile?.name?.split(' ')[0]} 👋</h1>
       </div>
 
@@ -118,7 +118,7 @@ export default function Today() {
         <div className="mb-5">
           <div className="px-5 mb-3">
             <h2 className="text-sm font-bold text-gray-700">🏥 Doktor Kontrolleri</h2>
-            <p className="text-xs text-gray-400">Hastalıklarınıza göre düzenli ziyaret takvimi</p>
+            <p className="text-sm text-gray-500">Hastalıklarınıza göre düzenli ziyaret takvimi</p>
           </div>
           <div className="px-5">
             {doctorCards.map(card => (
@@ -207,7 +207,7 @@ function ScreeningCard({ card, onClick }) {
               <div>
                 <div className="font-bold text-gray-900 text-sm">{card.trName}</div>
                 {card.why && (
-                  <div className="text-xs text-gray-400 mt-0.5 leading-relaxed max-w-xs">{card.why}</div>
+                  <div className="text-sm text-gray-500 mt-0.5 leading-relaxed max-w-xs">{card.why}</div>
                 )}
               </div>
             </div>
@@ -219,9 +219,9 @@ function ScreeningCard({ card, onClick }) {
           </div>
           <div className="mt-2 flex items-center gap-3 flex-wrap">
             {doctorBadge && (
-              <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">🏥 {doctorBadge}</span>
+              <span className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">🏥 {doctorBadge}</span>
             )}
-            <span className="text-xs text-gray-400">📅 {nextDateLabel}</span>
+            <span className="text-xs text-gray-500">📅 {nextDateLabel}</span>
           </div>
         </div>
       </div>

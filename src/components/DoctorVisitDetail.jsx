@@ -56,7 +56,7 @@ export default function DoctorVisitDetail({ schedule, lastVisitDate, onBack }) {
             <span className="text-3xl">🏥</span>
             <div>
               <div className="text-xl font-extrabold text-gray-900">{schedule.doctor}</div>
-              <div className="text-sm text-gray-400">Her <strong>{schedule.intervalMonths}</strong> ayda bir</div>
+              <div className="text-sm text-gray-500">Her <strong>{schedule.intervalMonths}</strong> ayda bir</div>
             </div>
           </div>
           <div className="text-sm text-gray-500 mt-3 leading-relaxed">{schedule.purpose}</div>
@@ -83,7 +83,7 @@ export default function DoctorVisitDetail({ schedule, lastVisitDate, onBack }) {
         {/* Last visit / Next visit */}
         <div className="mb-5 grid grid-cols-2 gap-3">
           <div className="p-3 rounded-2xl bg-gray-50 border border-gray-100">
-            <div className="text-xs text-gray-400 mb-1">Son Ziyaret</div>
+            <div className="text-xs text-gray-500 mb-1">Son Ziyaret</div>
             <div className="text-sm font-bold text-gray-700">{lastVisitDate ? formatDate(lastVisitDate) : 'Bilinmiyor'}</div>
           </div>
           <div
@@ -139,7 +139,7 @@ export default function DoctorVisitDetail({ schedule, lastVisitDate, onBack }) {
         {/* Guideline */}
         {schedule.guideline && (
           <div className="mb-5 px-4 py-3 rounded-2xl bg-gray-50 border border-gray-100">
-            <div className="text-xs text-gray-400 mb-0.5">Kılavuz Kaynağı</div>
+            <div className="text-xs text-gray-500 mb-0.5">Kılavuz Kaynağı</div>
             <div className="text-xs text-gray-600 font-medium">{schedule.guideline}</div>
           </div>
         )}

@@ -80,14 +80,14 @@ export default function History() {
   return (
     <div className="page-enter pb-24 px-5 pt-6">
       <h1 className="text-xl font-extrabold text-gray-900 mb-1">Geçmişim</h1>
-      <p className="text-sm text-gray-400 mb-5">Tamamlanan tarama ve doktor ziyaretleri</p>
+      <p className="text-sm text-gray-500 mb-5">Tamamlanan tarama ve doktor ziyaretleri</p>
 
       {isEmpty ? (
         <div className="mt-8">
           <div className="text-center py-12">
             <div className="text-5xl mb-4">📋</div>
             <div className="font-bold text-gray-700 text-lg mb-2">Henüz tamamlanan tarama yok.</div>
-            <div className="text-sm text-gray-400 mb-6">Kontrole gittiğinizde taramalarınızı buraya ekleyin.</div>
+            <div className="text-sm text-gray-500 mb-6">Kontrole gittiğinizde taramalarınızı buraya ekleyin.</div>
             <button
               onClick={() => setActiveTab('today')}
               className="px-6 py-3 rounded-2xl text-white font-bold text-sm active:scale-98"
@@ -116,12 +116,12 @@ export default function History() {
                     <div className="flex-1">
                       <div className="font-semibold text-sm text-gray-900">{item.name}</div>
                       {item.source && (
-                        <div className="text-xs text-gray-400">{item.source} viziti</div>
+                        <div className="text-xs text-gray-500">{item.source} viziti</div>
                       )}
                     </div>
                     <div className="text-right">
-                      <div className="text-xs text-gray-400">{formatDateLong(item.date)}</div>
-                      <div className="text-xs font-bold mt-0.5" style={{color:'#10B981'}}>✅</div>
+                      <div className="text-xs text-gray-500">{formatDateLong(item.date)}</div>
+                      <div className="text-xs font-bold mt-0.5" style={{color:'#0D9488'}}>✅</div>
                     </div>
                   </div>
                 ))}
