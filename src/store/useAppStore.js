@@ -7,6 +7,11 @@ import { DISEASE_DOCTOR_SCHEDULE } from '../data/screenings'
 const useAppStore = create(
   persist(
     (set, get) => ({
+      // ── APP PHASE ───────────────────────────────────────────────────────────
+      landingSeen: false,   // true after user taps "Başla" on landing page
+      authHandled: false,   // true after user completes or skips auth screen
+      authUser: null,       // { username, userId, saved } | null
+
       // ── ONBOARDING ──────────────────────────────────────────────────────────
       onboardingDone: false,
       profile: null,        // { name, birthYear, sex, height, weight }
@@ -39,6 +44,9 @@ const useAppStore = create(
       activeTab: 'today',
 
       // ─── ACTIONS ────────────────────────────────────────────────────────────
+
+      setLandingSeen:  ()     => set({ landingSeen: true }),
+      setAuthHandled:  (user) => set({ authHandled: true, authUser: user }),
 
       completeOnboarding: (profile, diseases, initialDates, initialDoctorDates) => set({
         profile,

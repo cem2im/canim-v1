@@ -1,4 +1,6 @@
 import useAppStore from './store/useAppStore'
+import LandingPage from './pages/LandingPage'
+import AuthScreen from './pages/AuthScreen'
 import Onboarding from './pages/Onboarding'
 import Today from './pages/Today'
 import Screenings from './pages/Screenings'
@@ -14,10 +16,20 @@ const TABS = [
 
 export default function App() {
   const onboardingDone = useAppStore(s => s.onboardingDone)
+  const landingSeen    = useAppStore(s => s.landingSeen)
+  const authHandled    = useAppStore(s => s.authHandled)
+  const authUser       = useAppStore(s => s.authUser)
+  const setLandingSeen = useAppStore(s => s.setLandingSeen)
+  const setAuthHandled = useAppStore(s => s.setAuthHandled)
   const activeTab      = useAppStore(s => s.activeTab)
   const setActiveTab   = useAppStore(s => s.setActiveTab)
 
-  if (!onboardingDone) return <Onboarding />
+  // Returning users who finished onboarding go straight to main
+  if (!onboardingDone) {
+    if (!landingSeen) return <LandingPage onStart={setLandingSeen} />
+    if (!authHandled) return <AuthScreen onAuth={user => setAuthHandled(user)} />
+    return <Onboarding />
+  }
 
   return (
     <div className="relative" style={{background:'#FAFAF8', minHeight:'100dvh'}}>

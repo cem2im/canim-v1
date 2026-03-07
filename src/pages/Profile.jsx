@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import useAppStore from '../store/useAppStore'
 import { DISEASE_LIST } from '../data/screenings'
+import { supabase } from '../lib/supabase'
 import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
 
 export default function Profile() {
   const profile  = useAppStore(s => s.profile)
+  const authUser = useAppStore(s => s.authUser)
   const diseases = useAppStore(s => s.diseases)
   const medications = useAppStore(s => s.medications)
   const emergency = useAppStore(s => s.emergency)
@@ -128,6 +130,40 @@ export default function Profile() {
         >
           📤 Arkadaşlarına Öner (WhatsApp)
         </button>
+      </div>
+
+      {/* Data save status */}
+      <div className="mb-5 px-4 py-4 rounded-2xl flex items-center gap-3"
+        style={authUser?.saved
+          ? {background:'#e8f4f5', border:'1px solid #b2dfdb'}
+          : {background:'#fafafa', border:'1px solid #e5e7eb'}}>
+        <span className="text-2xl">{authUser?.saved ? '☁️' : '📱'}</span>
+        <div className="flex-1">
+          {authUser?.saved ? (
+            <>
+              <div className="text-sm font-bold" style={{color:'#0D7377'}}>
+                @{authUser.username} · Veriler Kaydedildi
+              </div>
+              <div className="text-xs text-gray-500 mt-0.5">
+                Verileriniz hesabınıza bağlı.
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="text-sm font-bold text-gray-700">Yalnızca Bu Cihazda</div>
+              <div className="text-xs text-gray-400 mt-0.5">
+                Verileriniz kaydedilmiyor. Cihazı değiştirirseniz kaybolabilir.
+              </div>
+            </>
+          )}
+        </div>
+        {authUser?.saved && (
+          <button
+            onClick={async () => { await supabase.auth.signOut() }}
+            className="text-xs text-gray-400 font-semibold px-2 py-1 rounded-lg"
+            style={{background:'rgba(0,0,0,0.05)'}}
+          >Çıkış</button>
+        )}
       </div>
 
       {/* App info */}

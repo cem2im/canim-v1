@@ -82,7 +82,7 @@ function doctorTimeToDate(timeOption) {
 }
 
 export default function Onboarding() {
-  const [step, setStep] = useState(0)          // 0=welcome, 1=basicInfo, 2=diseases, 3=screenings, 4=done
+  const [step, setStep] = useState(1)          // 1=basicInfo, 2=diseases, 3=summary, 4=questions
   const [subPage, setSubPage] = useState(null) // null | 'cancer'
   const [showConfirmation, setShowConfirmation] = useState(false)
 
@@ -107,46 +107,9 @@ export default function Onboarding() {
   const age = new Date().getFullYear() - birthYear
   const profile = { name, birthYear, sex, height: skipMeasurements ? null : (height ? parseInt(height) : null), weight: skipMeasurements ? null : (weight ? parseFloat(weight) : null) }
 
-  // ── STEP 0: Welcome ──────────────────────────────────────────────────────
-  if (step === 0) return (
-    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 page-enter" style={{background:'linear-gradient(160deg, #e8f4f5 0%, #FAFAF8 60%)'}}>
-      {/* Logo */}
-      <div className="flex flex-col items-center mb-10">
-        <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-4 shadow-lg" style={{background:'linear-gradient(135deg, #0D7377, #14919B)'}}>
-          <span className="text-white text-3xl font-black">C</span>
-        </div>
-        <span className="text-3xl font-black text-gray-800 tracking-tight">Canım</span>
-      </div>
-
-      <div className="text-center mb-12">
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-4 leading-tight">
-          Taramalarını<br/>Kaçırma
-        </h1>
-        <p className="text-gray-500 text-base leading-relaxed max-w-xs">
-          Yaşına, cinsiyetine ve hastalıklarına göre hangi taramaları ne zaman yaptırman gerektiğini gösteren ücretsiz uygulama.
-        </p>
-      </div>
-
-      <div className="w-full max-w-xs">
-        <button
-          onClick={() => setStep(1)}
-          className="w-full py-4 rounded-2xl text-white font-bold text-lg shadow-lg active:scale-98 transition-all"
-          style={{background:'linear-gradient(135deg, #0D7377, #14919B)'}}
-        >
-          Başla →
-        </button>
-        <p className="text-xs text-gray-400 text-center mt-4">
-          Ücretsiz · Kayıt gerekmez · Verileriniz yalnızca cihazınızda
-        </p>
-      </div>
-    </div>
-  )
-
   // ── STEP 1: Basic Info ────────────────────────────────────────────────────
   if (step === 1) return (
     <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-      <button onClick={() => setStep(0)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
-
       <div className="flex-1">
         <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 1 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sizi Tanıyalım</h1>
