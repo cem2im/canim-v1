@@ -1,7 +1,30 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import useAppStore from '../store/useAppStore'
 import { DISEASE_LIST, SCREENINGS, DISEASE_DOCTOR_SCHEDULE } from '../data/screenings'
 import { buildScreeningList, buildInitialDates, TIME_OPTIONS } from '../utils/engine'
+
+// ── Category buckets for the summary screen ──────────────────────────────────
+const SCREENING_CATEGORY = {
+  kan_sayimi:'blood', biyokimya:'blood', lipid:'blood', hba1c:'blood',
+  tsh:'blood', vitamin_d:'blood', uacr:'blood', hepatit:'blood',
+  hiv_tarama:'blood', depresyon_tarama:'vitals',
+  tansiyon_olcumu:'vitals', obezite_tarama:'vitals', ekg:'vitals',
+  ekokardiyografi:'vitals', dexa:'vitals', fibroscan:'vitals', karin_usg:'vitals',
+  mamografi:'cancer', pap_smear:'cancer', prostat:'cancer',
+  kolonoskopi:'cancer', kolon_kanseri:'cancer', aort_anevrizması:'cancer',
+  genetik_danisman:'cancer',
+}
+const CATEGORIES = [
+  { key:'blood',  label:'Kan Tahlilleri',     icon:'🩸' },
+  { key:'vitals', label:'Muayene & İzleme',   icon:'🩺' },
+  { key:'cancer', label:'Kanser Taraması',    icon:'🔬' },
+  { key:'other',  label:'Özel Taramalar',     icon:'📋' },
+]
+function freqLabel(months) {
+  const map = {1:'Ayda bir',3:'3 ayda bir',6:'6 ayda bir',12:'Yılda bir',
+    24:'2 yılda bir',36:'3 yılda bir',60:'5 yılda bir',120:'10 yılda bir'}
+  return map[months] || `${months} ayda bir`
+}
 
 const ROUTINE_IDS = new Set(['kan_sayimi','biyokimya','lipid','hba1c','tansiyon_olcumu'])
 
@@ -269,11 +292,18 @@ export default function Onboarding() {
           </button>
         </div>
 
-        <div className="mb-4 p-4 rounded-2xl bg-gray-50 border border-gray-200">
-          <p className="text-xs text-gray-500 text-center">
-            Hiçbir hastalığınız yoksa boş bırakın — yaş ve cinsiyete göre temel taramalarınız oluşturulur.
-          </p>
-        </div>
+        {/* Hiçbirinde Yok */}
+        <button
+          onClick={() => { setDiseases([]); handleDiseaseDone() }}
+          className={`w-full flex items-center justify-center gap-3 py-4 px-4 rounded-2xl border-2 font-bold text-sm transition-all active:scale-98 mb-4 ${
+            diseases.length === 0
+              ? 'border-teal bg-teal-pale text-teal'
+              : 'border-gray-200 bg-white text-gray-500'
+          }`}
+        >
+          <span className="text-xl">✓</span>
+          <span>Hiçbirinde Yok — Sağlıklıyım</span>
+        </button>
 
         {/* Confirmation overlay */}
         {showConfirmation && (
@@ -375,8 +405,82 @@ export default function Onboarding() {
     )
   }
 
-  // ── STEP 3: Doctor visit questions → then special screenings ────────────────
+  // ── STEP 3: Smart Summary Screen ─────────────────────────────────────────
   if (step === 3) {
+    const screeningList = buildScreeningList(diseases, profile)
+    const grouped = {}
+    for (const s of screeningList) {
+      const cat = SCREENING_CATEGORY[s.id] || 'other'
+      if (!grouped[cat]) grouped[cat] = []
+      grouped[cat].push(s)
+    }
+    const total = screeningList.length
+
+    return (
+      <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
+        <button onClick={() => setStep(2)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
+        <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sizin İçin Belirlendi</h1>
+        <p className="text-gray-500 text-sm mb-1">
+          {name && <span className="font-semibold text-gray-700">{name}, </span>}
+          {age} yaş · {sex === 'F' ? 'Kadın' : 'Erkek'}
+          {diseases.length > 0 && <span> · {diseases.length} tanı</span>}
+        </p>
+        <div className="mb-6 px-4 py-3 rounded-2xl flex items-center gap-3" style={{background:'linear-gradient(135deg,#e8f4f5,#f0fafa)', border:'1px solid #b2dfdb'}}>
+          <span className="text-2xl">📋</span>
+          <div>
+            <div className="font-bold text-gray-900 text-sm">{total} tarama ve kontrol belirlendi</div>
+            <div className="text-xs text-gray-500">Yaş, cinsiyet ve sağlık durumunuza göre kişiselleştirildi</div>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto -mx-6 px-6 space-y-5 pb-4">
+          {CATEGORIES.map(({ key, label, icon }) => {
+            const items = grouped[key]
+            if (!items || items.length === 0) return null
+            return (
+              <div key={key}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-base">{icon}</span>
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{label}</span>
+                  <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'#e8f4f5', color:'#0D7377'}}>{items.length}</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {items.map(s => (
+                    <div key={s.id} className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white border border-gray-100">
+                      <span className="text-xl shrink-0">{s.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-semibold text-gray-900 text-sm leading-tight">{s.trName}</div>
+                        {s.why && <div className="text-xs text-gray-400 mt-0.5 line-clamp-1">{s.why}</div>}
+                      </div>
+                      <div className="text-xs font-bold shrink-0 px-2 py-1 rounded-xl" style={{background:'#f3f4f6', color:'#6B7280'}}>
+                        {freqLabel(s.frequencyMonths)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        <div className="mt-4 mb-3 px-3 py-2 rounded-xl text-center" style={{background:'#fffbeb', border:'1px solid #fde68a'}}>
+          <p className="text-xs text-amber-700">Sonraki adımda bu taramaları en son ne zaman yaptırdığınızı soracağız.</p>
+        </div>
+
+        <button
+          onClick={() => setStep(4)}
+          className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98"
+          style={{background:'#0D7377'}}
+        >
+          Devam — Tarihleri Belirle →
+        </button>
+      </div>
+    )
+  }
+
+  // ── STEP 4: Doctor visit questions → then special screenings ────────────────
+  if (step === 4) {
     const screeningList = buildScreeningList(diseases, profile)
     const specialScreenings = screeningList
       .filter(s => s.layer === 2 && s.weight >= 2 && !ROUTINE_IDS.has(s.id))
@@ -443,8 +547,8 @@ export default function Onboarding() {
       ]
       return (
         <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-          <button onClick={() => setStep(2)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
-          <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
+          <button onClick={() => setStep(3)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+          <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 4 / 4</div>
           <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Doktor Ziyaretleriniz</h1>
           <p className="text-gray-500 text-sm mb-6">Hastalıklarınız için en son ne zaman doktora gittiniz?</p>
 
@@ -503,10 +607,10 @@ export default function Onboarding() {
     return (
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
         <button
-          onClick={() => doctorQuestions.length > 0 ? setDoctorSubStep(0) : setStep(2)}
+          onClick={() => doctorQuestions.length > 0 ? setDoctorSubStep(0) : setStep(3)}
           className="text-teal font-semibold text-sm mb-6 self-start"
         >← Geri</button>
-        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
+        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 4 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Son Kontroller</h1>
         <p className="text-gray-500 text-sm mb-2">Bu özel taramaları yaptırdınız mı?</p>
         <div className="mb-6 px-3 py-2 rounded-xl" style={{background:'#eff6ff', border:'1px solid #bfdbfe'}}>
