@@ -1,9 +1,27 @@
 import { useState, useEffect } from 'react'
 import useAppStore from '../store/useAppStore'
-import { DISEASE_LIST, SCREENINGS } from '../data/screenings'
+import { DISEASE_LIST, SCREENINGS, DISEASE_DOCTOR_SCHEDULE } from '../data/screenings'
 import { buildScreeningList, buildInitialDates, TIME_OPTIONS } from '../utils/engine'
 
 const ROUTINE_IDS = new Set(['kan_sayimi','biyokimya','lipid','hba1c','tansiyon_olcumu'])
+
+// Maps onboarding time answers to approximate dates
+function doctorTimeToDate(timeOption) {
+  const today = new Date()
+  const map = {
+    'this_month': 0,
+    '3m': 3,
+    '6m': 6,
+    '1y': 12,
+    '2y': 24,
+    'never': null,
+  }
+  const months = map[timeOption]
+  if (months === null || months === undefined) return null
+  const d = new Date(today)
+  d.setMonth(d.getMonth() - months)
+  return d.toISOString().slice(0, 10)
+}
 
 export default function Onboarding() {
   const [step, setStep] = useState(0)          // 0=welcome, 1=basicInfo, 2=diseases, 3=screenings, 4=done
@@ -23,6 +41,8 @@ export default function Onboarding() {
 
   // Step 3 state
   const [answers, setAnswers] = useState({}) // { screeningId: timeOption }
+  const [doctorAnswers, setDoctorAnswers] = useState({}) // { scheduleId: timeOption }
+  const [doctorSubStep, setDoctorSubStep] = useState(0) // 0=doctor visit questions, 1=screening questions
 
   const completeOnboarding = useAppStore(s => s.completeOnboarding)
 
@@ -355,14 +375,31 @@ export default function Onboarding() {
     )
   }
 
-  // ── STEP 3: Critical screenings only ────────────────────────────────────────
+  // ── STEP 3: Doctor visit questions → then special screenings ────────────────
   if (step === 3) {
     const screeningList = buildScreeningList(diseases, profile)
-    // Only show layer:2 screenings with weight >= 2, not routine doctor items
     const specialScreenings = screeningList
       .filter(s => s.layer === 2 && s.weight >= 2 && !ROUTINE_IDS.has(s.id))
       .slice(0, 5)
 
+    // Primary doctor entries for each selected disease
+    const chronicDiseaseIds = ['hipertansiyon','diyabet','hiperlipidemi','obezite','yagli_karaciger','kalp_damar','kemik_erimesi']
+    const doctorQuestions = []
+    const seenDoctors = new Set()
+    const diseasesToAsk = diseases.filter(d => chronicDiseaseIds.includes(d))
+    for (const diseaseId of diseasesToAsk) {
+      const schedules = DISEASE_DOCTOR_SCHEDULE[diseaseId] || []
+      if (schedules.length > 0) {
+        const primary = schedules[0]
+        if (!seenDoctors.has(primary.doctor)) {
+          seenDoctors.add(primary.doctor)
+          const diseaseLabel = DISEASE_LIST.find(d => d.id === diseaseId)?.label || diseaseId
+          doctorQuestions.push({ ...primary, diseaseId, diseaseLabel })
+        }
+      }
+    }
+
+    const setDoctorAnswer = (scheduleId, val) => setDoctorAnswers(prev => ({...prev, [scheduleId]: val}))
     const setAnswer = (id, val) => setAnswers(prev => ({...prev, [id]: val}))
 
     const handleFinish = () => {
@@ -372,22 +409,103 @@ export default function Onboarding() {
         if (!allAnswers[s.id]) allAnswers[s.id] = 'unknown'
       }
       const initialDates = buildInitialDates(fullList, allAnswers)
+
+      // Build doctor visit dates from onboarding answers
+      const initialDoctorDates = {}
+      for (const [scheduleId, timeOption] of Object.entries(doctorAnswers)) {
+        const date = doctorTimeToDate(timeOption)
+        if (date) initialDoctorDates[scheduleId] = date
+      }
+
       completeOnboarding(
         { name, birthYear, sex, height: skipMeasurements ? null : (height ? parseInt(height) : null), weight: skipMeasurements ? null : (weight ? parseFloat(weight) : null) },
         diseases,
-        initialDates
+        initialDates,
+        initialDoctorDates
       )
     }
 
+    // If nothing to ask at all, finish immediately
+    if (doctorQuestions.length === 0 && specialScreenings.length === 0) {
+      handleFinish()
+      return null
+    }
+
+    // Sub-step 0: Doctor visit date questions
+    if (doctorSubStep === 0 && doctorQuestions.length > 0) {
+      const DOCTOR_TIME_OPTIONS = [
+        { value: 'this_month', label: 'Bu ay' },
+        { value: '3m', label: '3 ay önce' },
+        { value: '6m', label: '6 ay önce' },
+        { value: '1y', label: '1 yıl önce' },
+        { value: '2y', label: '2 yıl önce' },
+        { value: 'never', label: 'Hiç gitmedim' },
+      ]
+      return (
+        <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
+          <button onClick={() => setStep(2)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+          <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
+          <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Doktor Ziyaretleriniz</h1>
+          <p className="text-gray-500 text-sm mb-6">Hastalıklarınız için en son ne zaman doktora gittiniz?</p>
+
+          <div className="flex-1 overflow-y-auto -mx-6 px-6">
+            {doctorQuestions.map(q => (
+              <div key={q.id} className="mb-5 p-4 rounded-2xl bg-white border border-gray-200">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xl">🏥</span>
+                  <div>
+                    <span className="font-bold text-gray-900 text-sm">{q.doctor}</span>
+                    <div className="text-xs text-gray-400">{q.diseaseLabel}</div>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400 mb-3 leading-relaxed">En son ne zaman gittin?</p>
+                <div className="flex flex-wrap gap-2">
+                  {DOCTOR_TIME_OPTIONS.map(opt => (
+                    <button
+                      key={opt.value}
+                      onClick={() => setDoctorAnswer(q.id, opt.value)}
+                      className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
+                      style={doctorAnswers[q.id] === opt.value
+                        ? {background:'#0D7377', color:'white'}
+                        : {background:'#f3f4f6', color:'#374151'}}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={() => {
+              if (specialScreenings.length > 0) {
+                setDoctorSubStep(1)
+              } else {
+                handleFinish()
+              }
+            }}
+            className="w-full py-4 rounded-2xl text-white font-bold text-base mt-4 active:scale-98"
+            style={{background:'#0D7377'}}
+          >
+            {specialScreenings.length > 0 ? 'Devam →' : 'Canım\'ı Hazırla 🚀'}
+          </button>
+        </div>
+      )
+    }
+
+    // Sub-step 1 (or 0 if no doctor questions): Special screenings
     if (specialScreenings.length === 0) {
-      // Nothing to ask — jump straight to onboarding done
       handleFinish()
       return null
     }
 
     return (
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-        <button onClick={() => setStep(2)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+        <button
+          onClick={() => doctorQuestions.length > 0 ? setDoctorSubStep(0) : setStep(2)}
+          className="text-teal font-semibold text-sm mb-6 self-start"
+        >← Geri</button>
         <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Son Kontroller</h1>
         <p className="text-gray-500 text-sm mb-2">Bu özel taramaları yaptırdınız mı?</p>
@@ -405,7 +523,6 @@ export default function Onboarding() {
               {s.why && <p className="text-xs text-gray-400 mb-3 leading-relaxed">{s.why}</p>}
               <div className="text-xs font-semibold text-gray-500 mb-2">Yaptırdınız mı?</div>
               <div className="flex flex-wrap gap-2">
-                {/* Yes → time picker */}
                 {answers[s.id] && answers[s.id] !== 'no' ? (
                   <div className="w-full">
                     <div className="flex flex-wrap gap-2 mb-2">

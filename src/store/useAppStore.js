@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { buildScreeningList } from '../utils/engine'
 import { calcScore } from '../utils/score'
+import { DISEASE_DOCTOR_SCHEDULE } from '../data/screenings'
 
 const useAppStore = create(
   persist(
@@ -27,6 +28,10 @@ const useAppStore = create(
       // [{ id, name, dose, timing }]
       medications: [],
       
+      // ── DOCTOR VISIT DATES ──────────────────────────────────────────────────
+      // { scheduleId: 'YYYY-MM-DD' } — keyed by DISEASE_DOCTOR_SCHEDULE entry id
+      doctorVisitDates: {},
+
       // ── EMERGENCY INFO ──────────────────────────────────────────────────────
       emergency: { bloodType: '', allergies: '', contactName: '', contactPhone: '' },
 
@@ -35,10 +40,11 @@ const useAppStore = create(
 
       // ─── ACTIONS ────────────────────────────────────────────────────────────
 
-      completeOnboarding: (profile, diseases, initialDates) => set({
+      completeOnboarding: (profile, diseases, initialDates, initialDoctorDates) => set({
         profile,
         diseases,
         screeningDates: initialDates,
+        doctorVisitDates: initialDoctorDates || {},
         onboardingDone: true,
       }),
 
@@ -115,6 +121,52 @@ const useAppStore = create(
       removeMedication: (id) => set(state => ({
         medications: state.medications.filter(m => m.id !== id)
       })),
+
+      // Save last doctor visit date for a schedule entry
+      setDoctorVisitDate: (scheduleId, dateString) => set(state => ({
+        doctorVisitDates: { ...state.doctorVisitDates, [scheduleId]: dateString }
+      })),
+
+      // Computed: get doctor visit schedule cards with status
+      getDoctorVisitCards: () => {
+        const { diseases, doctorVisitDates } = get()
+        const today = new Date()
+        const seen = new Set()
+        const cards = []
+
+        const diseasesToCheck = diseases.length > 0 ? diseases : ['healthy']
+        for (const diseaseId of diseasesToCheck) {
+          const schedules = DISEASE_DOCTOR_SCHEDULE[diseaseId] || []
+          for (const schedule of schedules) {
+            // Deduplicate by doctor name
+            if (seen.has(schedule.doctor)) continue
+            seen.add(schedule.doctor)
+
+            const lastVisitDate = doctorVisitDates[schedule.id] || null
+            let nextVisitDate = null
+            let status = 'unknown'
+            let daysUntil = null
+
+            if (lastVisitDate) {
+              const last = new Date(lastVisitDate)
+              const next = new Date(last)
+              next.setMonth(next.getMonth() + schedule.intervalMonths)
+              nextVisitDate = next.toISOString().slice(0, 10)
+              daysUntil = Math.round((next - today) / 86400000)
+              if (daysUntil < 0)       status = 'overdue'
+              else if (daysUntil <= 30) status = 'soon'
+              else                      status = 'ok'
+            }
+
+            cards.push({ ...schedule, lastVisitDate, nextVisitDate, status, daysUntil, diseaseId })
+          }
+        }
+
+        return cards.sort((a, b) => {
+          const order = { overdue: 0, soon: 1, unknown: 2, ok: 3 }
+          return order[a.status] - order[b.status]
+        })
+      },
 
       updateEmergency: (data) => set(state => ({ emergency: { ...state.emergency, ...data } })),
 

@@ -716,3 +716,188 @@ export const DOCTOR_SCREENING_MAP = {
   'Göğüs Hastalıkları': ['akci_bt'],
   'Vasküler Cerrahi': ['karotis_usg', 'aort_anevrizması'],
 }
+
+// ── HASTALIK BAZLI DOKTOR KONTROL TAKVİMİ ────────────────────────────────────
+// Her hastalık için: hangi doktor, kaç ayda bir, ziyarette ne yapılır, erken gitme durumları
+export const DISEASE_DOCTOR_SCHEDULE = {
+
+  hipertansiyon: [
+    {
+      id: 'htn_aile',
+      doctor: 'Aile Hekimi / Dahiliye',
+      intervalMonths: 3,
+      purpose: 'Tansiyon ölçümü, ilaç değerlendirmesi, böbrek fonksiyon testi',
+      screenings: ['tansiyon_olcumu', 'biyokimya', 'idrar'],
+      earlyTriggers: [
+        'Tansiyon sürekli >140/90 mmHg (ilaçta rağmen)',
+        'Yeni baş ağrısı, görme bozukluğu, çarpıntı',
+        'Bacak şişmesi veya ani kilo artışı',
+      ],
+      guideline: 'ESC/ESH Hipertansiyon Kılavuzu 2023',
+    },
+    {
+      id: 'htn_kardiyoloji',
+      doctor: 'Kardiyoloji',
+      intervalMonths: 12,
+      purpose: 'EKG, ekokardiyografi, kardiyovasküler risk değerlendirmesi',
+      screenings: ['ekg', 'ekokardiyografi', 'lipid'],
+      earlyTriggers: [
+        'Göğüs ağrısı veya nefes darlığı',
+        'Çarpıntı veya bayılma hissi',
+      ],
+      guideline: 'ESC/ESH Hipertansiyon Kılavuzu 2023',
+    },
+  ],
+
+  diyabet: [
+    {
+      id: 'dm_dahiliye',
+      doctor: 'Dahiliye / Endokrinoloji',
+      intervalMonths: 3,
+      purpose: 'HbA1c, ilaç dozajı gözden geçirme, ayak muayenesi, beslenme değerlendirmesi',
+      screenings: ['hba1c', 'biyokimya', 'tansiyon_olcumu', 'idrar'],
+      earlyTriggers: [
+        'HbA1c >8% (kan şekeri kontrolden çıkmış)',
+        'Sık hipoglisemi (kan şekeri düşme) atakları',
+        'Ayakta yara veya uyuşma',
+        'Bulantı, kusma, iştahsızlık (ketoz riski)',
+      ],
+      guideline: 'ADA Standart Bakım Kılavuzu 2025',
+    },
+    {
+      id: 'dm_goz',
+      doctor: 'Göz Hastalıkları (Oftalmoloji)',
+      intervalMonths: 12,
+      purpose: 'Göz dibi muayenesi (fundoskopi) — diyabetik retinopati taraması',
+      screenings: ['goz_dibi'],
+      earlyTriggers: [
+        'Görme bulanıklığı veya ani görme kaybı',
+        'Işık çakması, göz önünde uçuşan noktalar',
+      ],
+      guideline: 'ADA Standart Bakım Kılavuzu 2025, Bölüm 12',
+    },
+    {
+      id: 'dm_nefroloji',
+      doctor: 'Nefroloji',
+      intervalMonths: 12,
+      purpose: 'İdrar albumin/kreatinin oranı (UACR), eGFR böbrek filtrasyonu',
+      screenings: ['idrar', 'biyokimya'],
+      earlyTriggers: [
+        'UACR değerinde artış (önceki sonuçtan belirgin yüksek)',
+        'Bacak ve yüzde şişme (ödem)',
+        'eGFR düşüşü',
+      ],
+      guideline: 'ADA Standart Bakım Kılavuzu 2025, Bölüm 11',
+    },
+    {
+      id: 'dm_dis',
+      doctor: 'Diş Hekimi',
+      intervalMonths: 6,
+      purpose: 'Periodontal (diş eti) muayene — diyabet diş eti hastalığı riskini artırır',
+      screenings: ['dis_kontrol'],
+      earlyTriggers: [
+        'Diş eti kanaması veya şişmesi',
+        'Diş ağrısı veya sallanma',
+      ],
+      guideline: 'ADA Periodontal Hastalık ve Diyabet 2022',
+    },
+  ],
+
+  hiperlipidemi: [
+    {
+      id: 'lip_dahiliye',
+      doctor: 'Dahiliye / Kardiyoloji',
+      intervalMonths: 6,
+      purpose: 'Lipid paneli, statin yan etki değerlendirmesi (karaciğer, kas enzimleri)',
+      screenings: ['lipid', 'biyokimya'],
+      earlyTriggers: [
+        'Kas ağrısı veya güçsüzlük (statin yan etkisi olabilir)',
+        'Sarılık veya koyu idrar (karaciğer)',
+        'LDL hedefe ulaşılamıyorsa',
+      ],
+      guideline: 'ESC/EAS Dislipidemi Kılavuzu 2019 + 2025 Güncelleme',
+    },
+  ],
+
+  obezite: [
+    {
+      id: 'obz_dahiliye',
+      doctor: 'Dahiliye / Obezite Kliniği',
+      intervalMonths: 3,
+      purpose: 'BMI ve bel çevresi, metabolik panel, tedavi planı değerlendirmesi',
+      screenings: ['obezite_tarama', 'biyokimya', 'lipid', 'hba1c', 'tansiyon_olcumu'],
+      earlyTriggers: [
+        'Kilo artışı devam ediyor veya hızlandı',
+        'Yeni uyku apnesi belirtileri (horlama, gündüz uyuma)',
+        'Eklem ağrısı yürümeyi zorlaştırıyor',
+      ],
+      guideline: 'AACE/OMA Obezite Kılavuzu 2025',
+    },
+  ],
+
+  yagli_karaciger: [
+    {
+      id: 'ykc_gastro',
+      doctor: 'Gastroenteroloji / Hepatoloji',
+      intervalMonths: 6,
+      purpose: 'Karaciğer enzimleri, FIB-4 skoru, fibrozis takibi, karın ultrasonografisi',
+      screenings: ['biyokimya', 'karin_usg', 'fibroscan'],
+      earlyTriggers: [
+        'Sağ üst karın ağrısı veya hassasiyeti',
+        'Sarılık, koyu idrar, açık renkli dışkı',
+        'FIB-4 >2.67 (fibrozis riski yüksek)',
+        'ALT/AST değerlerinde belirgin artış',
+      ],
+      guideline: 'EASL-EASD-EASO MASLD Kılavuzu 2024',
+    },
+  ],
+
+  kalp_damar: [
+    {
+      id: 'kvh_kardiyoloji',
+      doctor: 'Kardiyoloji',
+      intervalMonths: 6,
+      purpose: 'EKG, ekokardiyografi, lipid paneli, ilaç değerlendirmesi',
+      screenings: ['ekg', 'ekokardiyografi', 'lipid', 'tansiyon_olcumu'],
+      earlyTriggers: [
+        'Göğüs ağrısı veya baskı hissi',
+        'Nefes darlığı (özellikle yatarken)',
+        'Çarpıntı, baygınlık veya bayılma',
+        'Bacaklarda ani şişme',
+      ],
+      guideline: 'ESC Kardiyovasküler Hastalık Önleme Kılavuzu 2021',
+    },
+  ],
+
+  kemik_erimesi: [
+    {
+      id: 'kem_endokrin',
+      doctor: 'Endokrinoloji / Romatoloji',
+      intervalMonths: 12,
+      purpose: 'DEXA kemik yoğunluğu, D vitamini, kalsiyum değerlendirmesi',
+      screenings: ['dexa', 'vitamin_d', 'biyokimya'],
+      earlyTriggers: [
+        'Düşme veya düşük enerjili kırık (kolayca kırık)',
+        'Bel veya sırt ağrısında ani artış',
+        'Boy kısalması',
+      ],
+      guideline: 'IOF + USPSTF Osteoporoz Kılavuzu 2025',
+    },
+  ],
+
+  // Sağlıklı bireyler için genel kontrol
+  healthy: [
+    {
+      id: 'healthy_aile',
+      doctor: 'Aile Hekimi',
+      intervalMonths: 12,
+      purpose: 'Yıllık genel kontrol: tansiyon, BMI, kan testleri, aşı durumu',
+      screenings: ['tansiyon_olcumu', 'lipid', 'biyokimya', 'hepatit'],
+      earlyTriggers: [
+        'Yeni başlayan semptomlar',
+        'Aile öyküsünde önemli değişiklik',
+      ],
+      guideline: 'USPSTF Preventive Services Recommendations 2025',
+    },
+  ],
+}

@@ -3,16 +3,21 @@ import useAppStore from '../store/useAppStore'
 import { scoreColor, scoreLabel, statusColor, statusLabel } from '../utils/score'
 import ScreeningDetail from '../components/ScreeningDetail'
 import DoctorVisitModal from '../components/DoctorVisitModal'
+import DoctorVisitCard from '../components/DoctorVisitCard'
+import DoctorVisitDetail from '../components/DoctorVisitDetail'
 
 export default function Today() {
   const profile = useAppStore(s => s.profile)
   const getScore = useAppStore(s => s.getScore)
   const getScreeningCards = useAppStore(s => s.getScreeningCards)
+  const getDoctorVisitCards = useAppStore(s => s.getDoctorVisitCards)
   const [selected, setSelected] = useState(null)
+  const [selectedDoctor, setSelectedDoctor] = useState(null)
   const [showDoctorModal, setShowDoctorModal] = useState(false)
 
   const score = getScore()
   const cards = getScreeningCards()
+  const doctorCards = getDoctorVisitCards()
   const color = scoreColor(score)
   const label = scoreLabel(score)
 
@@ -39,6 +44,14 @@ export default function Today() {
 
   if (selected) return (
     <ScreeningDetail screening={selected} onBack={() => setSelected(null)} />
+  )
+
+  if (selectedDoctor) return (
+    <DoctorVisitDetail
+      schedule={selectedDoctor}
+      lastVisitDate={selectedDoctor.lastVisitDate}
+      onBack={() => setSelectedDoctor(null)}
+    />
   )
 
   return (
@@ -97,6 +110,29 @@ export default function Today() {
           🏥 Kontrole Gittim — Taramaları Kaydet
         </button>
       </div>
+
+      {/* Doktor Kontrolleri section */}
+      {doctorCards.length > 0 && (
+        <div className="mb-5">
+          <div className="px-5 mb-3">
+            <h2 className="text-sm font-bold text-gray-700">🏥 Doktor Kontrolleri</h2>
+            <p className="text-xs text-gray-400">Hastalıklarınıza göre düzenli ziyaret takvimi</p>
+          </div>
+          <div className="px-5">
+            {doctorCards.map(card => (
+              <DoctorVisitCard
+                key={card.id}
+                schedule={card}
+                lastVisitDate={card.lastVisitDate}
+                nextVisitDate={card.nextVisitDate}
+                status={card.status}
+                daysUntil={card.daysUntil}
+                onClick={() => setSelectedDoctor(card)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Action list */}
       <div className="px-5">
