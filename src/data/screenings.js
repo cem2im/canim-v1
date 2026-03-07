@@ -465,7 +465,7 @@ export const DISEASE_SCREENINGS = {
   // tiroid kaldırıldı — USPSTF Grade I, uygulama kapsamı dışı (Cem 07.03.2026)
 
   kolon_kanseri_riski: {
-    label: 'Kolon Kanseri Riski',
+    label: 'Ailede Kanser Öyküsü',
     screenings: [
       { id: 'kolonoskopi', months: 60 },
       { id: 'kan_sayimi', months: 12 },
@@ -482,5 +482,5 @@ export const DISEASE_LIST = [
   { id: 'yagli_karaciger',     label: 'Yağlı Karaciğer',     icon: '🫘' },
   { id: 'kalp_damar',          label: 'Kalp Damar Hastalığı', icon: '❤️' },
   { id: 'kemik_erimesi',       label: 'Kemik Erimesi',        icon: '🦴' },
-  { id: 'kolon_kanseri_riski', label: 'Kolon Kanseri Riski',  icon: '🔭' },
+  { id: 'kolon_kanseri_riski', label: 'Ailede Kanser Öyküsü', icon: '🧬' },
 ]
