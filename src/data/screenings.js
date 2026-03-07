@@ -201,8 +201,8 @@ export const SCREENINGS = {
   // ── KANSER TARAMALARI ─────────────────────────────────────────────────────────
   kolonoskopi: {
     id: 'kolonoskopi', trName: 'Kolonoskopi', enName: 'Colonoscopy',
-    explanation: 'Kolon kanseri ve poliplerini erken tespit eder. 10 yılda bir kolonoskopi; alternatif olarak yılda bir gaita testi (FIT) yapılabilir.',
-    recommendation: 'USPSTF 2021: 50–75 yaş Grade A, 45–49 yaş Grade B. Kabul edilen tarama yöntemleri: kolonoskopi (10 yılda bir, altın standart); FIT gaita testi (yılda bir); BT kolonografi/sanal kolonoskopi (5 yılda bir). Polip saptanırsa sıklık azalır (3–5 yıl). İlk derece akraba kolon kanseri varsa 40 yaşında veya tanı yaşından 10 yıl önce başla.',
+    explanation: 'Kolon kanseri ve poliplerini erken tespit eder. Polip görüldüğünde aynı seansta çıkarılabilir. Aile öyküsü başlangıç yaşını ve sıklığı önemli ölçüde değiştirir.',
+    recommendation: 'USPSTF 2021: 45–49 yaş Grade B, 50–75 yaş Grade A. Ortalama risk seçenekleri: kolonoskopi 10 yılda bir (altın standart), FIT gaita testi yılda bir, BT kolonografi 5 yılda bir. ⚠️ AİLE ÖYKÜSÜ KURALLARI (NCCN/ACS): (1) 60 yaş altında KRK olan 1. derece akraba VEYA herhangi yaşta ≥2 akraba → 40 yaşında ya da en genç tanıdan 10 yıl önce başla, her 5 yılda bir kolonoskopi; dışkı testi kabul edilmez. (2) 60 yaş ve üstünde KRK olan 1 akraba → 40 yaşında başla, her 10 yılda bir kolonoskopi. (3) Lynch sendromu → her 1–2 yılda bir, 20–25 yaşından itibaren. (4) FAP → her yıl, 12–15 yaşından itibaren.',
     frequencyMonths: 120, ageMin: 45, ageMax: 75, sex: 'both', weight: 3,
     doctor: 'Gastroenteroloji · Genel Cerrahi · Aile Hekimi', icon: '🔭',
     sources: [
@@ -214,13 +214,15 @@ export const SCREENINGS = {
 
   mamografi: {
     id: 'mamografi', trName: 'Mamografi', enName: 'Mammography',
-    explanation: 'Meme kanserini erken evrede tespit etmenin en etkili yöntemi. 2024 USPSTF güncellemesiyle başlangıç yaşı 50\'den 40\'a indirildi.',
-    recommendation: '40–74 yaş arası tüm kadınlara 2 yılda bir mamografi önerilir (USPSTF B, 2024). Yüksek risk (BRCA mutasyonu, aile öyküsü) varlığında yılda bir ve MRI eklenir.',
-    frequencyMonths: 24, ageMin: 40, ageMax: 74, sex: 'F', weight: 3,
+    explanation: 'Meme kanserini erken evrede tespit etmenin en etkili yöntemi. Aile öyküsü başlangıç yaşını ve sıklığı önemli ölçüde değiştirir.',
+    recommendation: 'ORTALAMA RİSK — USPSTF 2024 Grade B: 40–74 yaş tüm kadınlara 2 yılda bir mamografi. ⚠️ AİLE ÖYKÜSÜ KURALLARI (ACS/NCCN): Yaşam boyu risk ≥%20 VEYA BRCA1/2 mutasyonu VEYA 1. derece akrabada BRCA mutasyonu → 30 yaşında yılda bir mamografi + yılda bir meme MRI (tamamlayıcı, tek başına MRI yetersiz). "10 yıl önce kuralı": tarama, ailedeki en erken tanıdan 10 yıl önce başlar (en erken 30 yaş). BRCA1 taşıyıcılarında 6 ayda bir klinik muayene düşünülebilir (ESMO). Türkiye Sağlık Bakanlığı: 40–69 yaş 2 yılda bir mamografi (KETEM).',
+    frequencyMonths: 24, ageMin: 30, ageMax: 74, sex: 'F', weight: 3,
     doctor: 'Radyoloji · Kadın Hastalıkları · Genel Cerrahi · Tıbbi Onkoloji', icon: '🎗️',
     sources: [
-      { name: 'USPSTF — Breast Cancer Screening (Nisan 2024)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/breast-cancer-screening' },
-      { name: 'ESMO — Breast Cancer Early Detection Guidelines', url: 'https://www.esmo.org/guidelines/early-breast-cancer' },
+      { name: 'USPSTF — Breast Cancer Screening (Nisan 2024, Grade B)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/breast-cancer-screening' },
+      { name: 'ACS — Breast Cancer Screening Guidelines (High Risk)', url: 'https://www.cancer.org/cancer/types/breast-cancer/screening-tests-and-early-detection/american-cancer-society-recommendations-for-the-early-detection-of-breast-cancer.html' },
+      { name: 'NCCN — Breast Cancer Screening (2024)', url: 'https://www.ncbi.nlm.nih.gov/books/NBK556050/table/article-18569.table0/' },
+      { name: 'ESMO — Hereditary Breast-Ovarian Cancer Screening', url: 'https://www.researchgate.net/publication/364712474_Risk_reduction_and_screening_of_cancer_in_hereditary_breast-ovarian_cancer_syndromes_ESMO_Clinical_Practice_Guideline' },
     ],
   },
 
@@ -275,12 +277,25 @@ export const SCREENINGS = {
   prostat: {
     id: 'prostat', trName: 'Prostat Taraması (PSA)', enName: 'Prostate-Specific Antigen Screening',
     explanation: 'PSA kan testi prostat kanseri riskini değerlendirmek için kullanılır. Yaşa göre normallik aralıkları değişir.',
-    recommendation: '55–69 yaş arası erkeklerde PSA taraması kişiselleştirilmiş karar gerektirir (USPSTF C). Siyahi erkekler ve birinci derece akraba öyküsü olanlar 40–45 yaşında başlayabilir. Yüksek PSA → üroloji konsültasyonu.',
-    frequencyMonths: 12, ageMin: 50, ageMax: 75, sex: 'M', weight: 3,
+    recommendation: 'USPSTF: 55–69 yaş paylaşımlı karar (Grade C); ≥70 yaş önerilmez. Uygulama "PSA yaptır" değil, "doktorunuzla tartışın" mesajı verir. ⚠️ AİLE ÖYKÜSÜ KURALLARI (ACS): Ortalama risk → 50 yaşında tartışma. Yüksek risk (siyahi erkek VEYA 65 yaş altında prostat kanseri olan 1 1. derece akraba) → 45 yaşında tartışma. En yüksek risk (65 yaş altında 1\'den fazla 1. derece akraba) → 40 yaşında tartışma. BRCA2 mutasyonu → 40 yaşında yıllık PSA (ESMO 2025 / NCCN).',
+    frequencyMonths: 12, ageMin: 40, ageMax: 75, sex: 'M', weight: 3,
     doctor: 'Üroloji · Aile Hekimi · Tıbbi Onkoloji', icon: '🔵',
     sources: [
       { name: 'USPSTF — Prostate Cancer Screening (2018)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/prostate-cancer-screening' },
       { name: 'EAU — Prostate Cancer Guidelines (2024)', url: 'https://uroweb.org/guidelines/prostate-cancer' },
+    ],
+  },
+
+  genetik_danisman: {
+    id: 'genetik_danisman', trName: 'Genetik Danışmanlık (BRCA / Lynch)', enName: 'Genetic Counseling and Risk Assessment',
+    explanation: 'Ailede meme, yumurtalık, kolorektal veya pankreas kanseri öyküsü olanlarda BRCA1/2 veya Lynch sendromu mutasyonu riski artmıştır. Genetik test sonucu profilaktik cerrahi kararını ve tarama yoğunluğunu doğrudan belirler.',
+    recommendation: 'USPSTF Grade B: Ailede meme, yumurtalık, tüp veya periton kanseri öyküsü olan ya da yüksek riskli etnisiteden gelen kişilere (örn. Aşkenaz Yahudi kökeni) doğrulanmış aile riski değerlendirme aracıyla tarama yapılması ve pozitif sonuçta genetik danışmana yönlendirilmesi önerilir. NCCN: 50 yaş altı kolorektal kanser tanısı alan tüm bireylere aile öyküsünden bağımsız germline test önerilir. BRCA1/2 mutasyon taşıyıcılarında yumurtalık kanseri için prophylactic salpingo-ooferektomi (RRSO) en etkin korunma yöntemidir (BRCA1: 35-40 yaş, BRCA2: 40-45 yaş).',
+    frequencyMonths: 999, ageMin: 18, ageMax: 120, sex: 'both', weight: 3,
+    doctor: 'Tıbbi Genetik · Tıbbi Onkoloji · Kadın Hastalıkları · Gastroenteroloji', icon: '🧬',
+    sources: [
+      { name: 'USPSTF — BRCA Risk Assessment, Genetic Counseling, and Testing (Grade B)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/brca-related-cancer-risk-assessment-genetic-counseling-and-genetic-testing' },
+      { name: 'NCCN — Hereditary Breast, Ovarian, Pancreatic and Prostate Cancers (HBOPP)', url: 'https://www.nccn.org/patients/guidelines/content/PDF/genetics-patient.pdf' },
+      { name: 'ESMO — Risk Reduction and Screening in Hereditary Breast-Ovarian Cancer', url: 'https://www.researchgate.net/publication/364712474_Risk_reduction_and_screening_of_cancer_in_hereditary_breast-ovarian_cancer_syndromes_ESMO_Clinical_Practice_Guideline' },
     ],
   },
 
@@ -465,9 +480,18 @@ export const DISEASE_SCREENINGS = {
   // tiroid kaldırıldı — USPSTF Grade I, uygulama kapsamı dışı (Cem 07.03.2026)
 
   kolon_kanseri_riski: {
+    // Ailede herhangi bir kanser öyküsü — aile öyküsüne göre değişen yoğunlaştırılmış tarama
     label: 'Ailede Kanser Öyküsü',
     screenings: [
+      // ZORUNLU: Genetik danışmanlık / BRCA-Lynch değerlendirmesi (USPSTF Grade B)
+      { id: 'genetik_danisman', months: 999 },
+      // Kolorektal kanser: aile öyküsünde her 5 yılda bir (ACS/NCCN), 40 yaşında başla
       { id: 'kolonoskopi', months: 60 },
+      // Meme kanseri: aile öyküsünde yıllık mamografi (ACS/NCCN) + gerekirse MRI
+      { id: 'mamografi', months: 12 },
+      // Prostat kanseri: 1. derece akraba öyküsünde 45 yaşında tartışma (ACS)
+      { id: 'prostat', months: 24 },
+      // Genel: kan sayımı kanser izlemi için
       { id: 'kan_sayimi', months: 12 },
     ]
   },
