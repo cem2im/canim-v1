@@ -5,6 +5,7 @@ import { buildScreeningList, buildInitialDates, TIME_OPTIONS } from '../utils/en
 
 export default function Onboarding() {
   const [step, setStep] = useState(0)
+  const [subPage, setSubPage] = useState(null) // null | 'cancer'
   const [name, setName] = useState('')
   const [birthYear, setBirthYear] = useState(1970)
   const [sex, setSex] = useState(null)
@@ -97,9 +98,10 @@ export default function Onboarding() {
   )
 
   // ── STEP 1: Disease selection ───────────────────────────────────────────────
-  if (step === 1) {
+  if (step === 1 && subPage === null) {
     const chronicDiseases = DISEASE_LIST.filter(d => !d.group)
     const kanserDiseases  = DISEASE_LIST.filter(d => d.group === 'kanser')
+    const selectedCancerCount = kanserDiseases.filter(d => diseases.includes(d.id)).length
 
     const toggleDisease = id => setDiseases(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
@@ -132,42 +134,37 @@ export default function Onboarding() {
               >
                 <span className="text-2xl">{d.icon}</span>
                 <span className="text-xs text-center leading-tight">{d.label}</span>
-                {diseases.includes(d.id) && (
-                  <span className="text-xs font-black">✓</span>
-                )}
+                {diseases.includes(d.id) && <span className="text-xs font-black">✓</span>}
               </button>
             ))}
           </div>
 
-          {/* ── Ailede Kanser Öyküsü ── */}
+          {/* ── Ailede Kanser Öyküsü — ayrı sayfa butonu ── */}
           <div className="mb-2 flex items-center gap-2">
             <span className="text-base">🧬</span>
             <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Ailede Kanser Öyküsü</span>
           </div>
-          <div className="mb-3 px-3 py-2 rounded-xl bg-amber-50 border border-amber-200">
-            <p className="text-xs text-amber-700 leading-snug">
-              Ailenizde kanser öyküsü varsa lütfen aşağıdan ilgili seçenekleri belirtin. Hangi kanser türü ve akrabanızın tanı yaşı önemlidir.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 gap-2 mb-6 pl-2">
-            {kanserDiseases.map(d => (
-              <button
-                key={d.id}
-                onClick={() => toggleDisease(d.id)}
-                className={`flex items-center gap-3 py-3 px-3 rounded-xl border-2 font-semibold transition-all active:scale-98 ${
-                  diseases.includes(d.id)
-                    ? 'border-teal bg-teal-pale text-teal'
-                    : 'border-gray-200 bg-white text-gray-600'
-                }`}
-              >
-                <span className="text-xl shrink-0">{d.icon}</span>
-                <span className="text-xs text-left leading-tight flex-1">{d.label}</span>
-                {diseases.includes(d.id) && (
-                  <span className="text-xs font-black shrink-0">✓</span>
-                )}
-              </button>
-            ))}
-          </div>
+          <button
+            onClick={() => setSubPage('cancer')}
+            className="w-full flex items-center justify-between px-4 py-4 rounded-2xl border-2 transition-all active:scale-98 mb-6"
+            style={selectedCancerCount > 0
+              ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377'}
+              : {borderColor:'#E5E7EB', background:'white', color:'#374151'}
+            }
+          >
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🧬</span>
+              <div className="text-left">
+                <div className="font-bold text-sm">Ailede Kanser Öyküsü</div>
+                <div className="text-xs mt-0.5" style={{color: selectedCancerCount > 0 ? '#0D7377' : '#9CA3AF'}}>
+                  {selectedCancerCount > 0
+                    ? `${selectedCancerCount} seçenek işaretlendi ✓`
+                    : 'Varsa belirtmek için dokunun'}
+                </div>
+              </div>
+            </div>
+            <span className="text-gray-400 font-bold text-lg">→</span>
+          </button>
 
         </div>
 
@@ -183,6 +180,93 @@ export default function Onboarding() {
           style={{background:'#0D7377'}}
         >
           Devam →
+        </button>
+      </div>
+    )
+  }
+
+  // ── STEP 1 — CANCER SUB-PAGE ─────────────────────────────────────────────
+  if (step === 1 && subPage === 'cancer') {
+    // Cinsiyet filtrelemesi
+    const hiddenForSex = sex === 'F'
+      ? ['aile_prostat']                                           // Kadınlarda prostat yok
+      : ['aile_meme_yuksek','aile_meme_orta','aile_yumurtalik']   // Erkeklerde meme/yumurtalık yok
+
+    const kanserDiseases = DISEASE_LIST
+      .filter(d => d.group === 'kanser')
+      .filter(d => !hiddenForSex.includes(d.id))
+
+    const toggleDisease = id => setDiseases(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    )
+
+    // Kanser türlerine göre grupla
+    const groups = [
+      { title: '🎗️ Meme Kanseri',        ids: ['aile_meme_yuksek','aile_meme_orta'] },
+      { title: '🟠 Kolorektal Kanser',    ids: ['aile_krc_yuksek','aile_krc_orta','aile_krc_dusuk'] },
+      { title: '🔵 Prostat Kanseri',      ids: ['aile_prostat'] },
+      { title: '🟣 Yumurtalık Kanseri',   ids: ['aile_yumurtalik'] },
+      { title: '🧬 Genetik Mutasyon',     ids: ['brca_lynch'] },
+    ].map(g => ({
+      ...g,
+      items: kanserDiseases.filter(d => g.ids.includes(d.id))
+    })).filter(g => g.items.length > 0)
+
+    return (
+      <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
+        <button onClick={() => setSubPage(null)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+
+        <div className="mb-1 text-xs font-bold text-teal uppercase tracking-widest">Adım 2 / 3</div>
+        <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Ailede Kanser Öyküsü</h1>
+
+        {/* Açıklama notu */}
+        <div className="mb-6 px-4 py-3 rounded-2xl bg-amber-50 border border-amber-200">
+          <p className="text-sm text-amber-800 leading-relaxed">
+            Ailenizde kanser öyküsü varsa lütfen aşağıdan ilgili seçenekleri belirtin. Hangi kanser türü ve akrabanızın tanı yaşı önemlidir.
+          </p>
+        </div>
+
+        <div className="flex-1 overflow-y-auto -mx-6 px-6">
+          {groups.map(g => (
+            <div key={g.title} className="mb-5">
+              {/* Kanser türü başlığı */}
+              <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{g.title}</div>
+              <div className="flex flex-col gap-2">
+                {g.items.map(d => (
+                  <button
+                    key={d.id}
+                    onClick={() => toggleDisease(d.id)}
+                    className="flex items-center gap-3 py-3 px-4 rounded-2xl border-2 font-semibold transition-all active:scale-98 text-left"
+                    style={diseases.includes(d.id)
+                      ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377'}
+                      : {borderColor:'#E5E7EB', background:'white', color:'#374151'}
+                    }
+                  >
+                    <span className="text-xl shrink-0">{d.icon}</span>
+                    <span className="text-sm leading-snug flex-1">{d.label}</span>
+                    {diseases.includes(d.id) && (
+                      <span className="font-black shrink-0" style={{color:'#0D7377'}}>✓</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          <div className="mb-6 px-4 py-3 rounded-2xl bg-gray-50 border border-gray-200">
+            <p className="text-xs text-gray-500 leading-relaxed">
+              1. derece akraba: anne, baba, kardeş, çocuk<br/>
+              2. derece akraba: büyükanne/baba, hala, teyze, dayı, amca
+            </p>
+          </div>
+        </div>
+
+        <button
+          onClick={() => setSubPage(null)}
+          className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98"
+          style={{background:'#0D7377'}}
+        >
+          Kaydet ve Geri Dön
         </button>
       </div>
     )
