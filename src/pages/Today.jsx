@@ -71,27 +71,27 @@ export default function Today() {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-sm font-medium opacity-80 mb-1">Tarama Uyum Puanı</div>
-            <div className="text-5xl font-black mb-1">{score}</div>
-            <div className="inline-block px-3 py-1 rounded-full text-xs font-bold" style={{background:'rgba(255,255,255,0.2)'}}>
+            <div className="text-6xl font-black tracking-tight mb-2" style={{lineHeight:1}}>{score}</div>
+            <div className="inline-block px-3 py-1 rounded-full text-sm font-bold" style={{background:'rgba(255,255,255,0.2)'}}>
               {label}
             </div>
           </div>
-          {/* Score ring */}
-          <ScoreRing score={score} color="rgba(255,255,255,0.9)" />
+          {/* Score ring — visual only, no duplicate number */}
+          <ScoreRing score={score} />
         </div>
-        <div className="mt-4 pt-4 border-t border-white/20 flex gap-4 text-sm">
-          <div>
-            <span className="font-black">{cards.filter(c=>c.status==='overdue').length}</span>
-            <span className="opacity-70 ml-1">Gecikmiş</span>
-          </div>
-          <div>
-            <span className="font-black">{cards.filter(c=>c.status==='upcoming').length}</span>
-            <span className="opacity-70 ml-1">Bu ay</span>
-          </div>
-          <div>
-            <span className="font-black">{okCards.length}</span>
-            <span className="opacity-70 ml-1">Tamam</span>
-          </div>
+        {/* Stat boxes — 4-column grid */}
+        <div className="mt-5 pt-4 border-t border-white/20 grid grid-cols-4 gap-1">
+          {[
+            { count: cards.filter(c=>c.status==='overdue').length,  label:'Gecikmiş', dot:'#FCA5A5' },
+            { count: cards.filter(c=>c.status==='upcoming').length, label:'Bu ay',    dot:'#99F6E4' },
+            { count: cards.filter(c=>c.status==='soon').length,     label:'Yakında',  dot:'#FDE68A' },
+            { count: okCards.length,                                label:'Tamam',    dot:'#99F6E4' },
+          ].map(s => (
+            <div key={s.label} className="flex flex-col items-center py-2 rounded-2xl" style={{background:'rgba(255,255,255,0.1)'}}>
+              <span className="text-2xl font-black leading-none mb-1">{s.count}</span>
+              <span className="text-xs opacity-75 font-medium">{s.label}</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -180,9 +180,7 @@ export default function Today() {
 
 function ScreeningCard({ card, onClick }) {
   const color = statusColor(card.status)
-  // Doctor specialty badge — first item from doctor field
   const doctorBadge = card.doctor ? card.doctor.split(' · ')[0] : null
-  // Format next date nicely
   const nextDateLabel = card.nextDate
     ? (() => {
         const d = new Date(card.nextDate)
@@ -191,37 +189,45 @@ function ScreeningCard({ card, onClick }) {
       })()
     : 'En kısa zamanda'
 
+  // Subtle status bg tint (6% opacity) — helps visual scanning
+  const bgTint = {
+    overdue:  '#FEF2F2',
+    upcoming: '#F0FDFA',
+    soon:     '#FFFBEB',
+    ok:       '#F0FDFA',
+    unknown:  '#FAFAFA',
+  }[card.status] ?? '#FAFAFA'
+
   return (
     <div
       onClick={onClick}
-      className="mb-3 bg-white rounded-2xl border border-gray-100 overflow-hidden cursor-pointer active:scale-98 transition-transform"
-      style={{boxShadow:'0 2px 12px rgba(0,0,0,0.05)'}}
+      className="mb-3 rounded-2xl border overflow-hidden cursor-pointer active:scale-98 transition-transform"
+      style={{
+        background: bgTint,
+        borderColor: `${color}30`,
+        boxShadow: '0 2px 12px rgba(0,0,0,0.04)',
+      }}
     >
       <div className="flex items-stretch">
         {/* Left color bar */}
-        <div className="w-1.5 flex-shrink-0" style={{background:color}}/>
-        <div className="flex-1 px-4 py-4">
-          <div className="flex items-start justify-between">
-            <div className="flex items-center gap-2 flex-1">
-              <span className="text-xl">{card.icon}</span>
-              <div>
-                <div className="font-bold text-gray-900 text-sm">{card.trName}</div>
-                {card.why && (
-                  <div className="text-sm text-gray-500 mt-0.5 leading-relaxed max-w-xs">{card.why}</div>
-                )}
-              </div>
+        <div className="w-1 flex-shrink-0" style={{background:color}}/>
+        <div className="flex-1 px-5 py-5">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-3 flex-1">
+              <span className="text-2xl">{card.icon}</span>
+              <div className="font-bold text-gray-900 text-base leading-snug">{card.trName}</div>
             </div>
-            <div className="ml-2 flex-shrink-0">
-              <span className="text-xs font-bold px-2.5 py-1 rounded-full" style={{background:`${color}18`, color}}>
-                {statusLabel(card.status, card.daysUntil)}
-              </span>
-            </div>
+            <span className="text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 mt-0.5" style={{background:`${color}20`, color}}>
+              {statusLabel(card.status, card.daysUntil)}
+            </span>
           </div>
-          <div className="mt-2 flex items-center gap-3 flex-wrap">
+          <div className="mt-3 flex items-center gap-3 flex-wrap">
             {doctorBadge && (
-              <span className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">🏥 {doctorBadge}</span>
+              <span className="text-xs font-medium text-gray-500 bg-white/70 border border-gray-200 px-2.5 py-1 rounded-full">
+                🏥 {doctorBadge}
+              </span>
             )}
-            <span className="text-xs text-gray-500">📅 {nextDateLabel}</span>
+            <span className="text-xs font-medium text-gray-500">📅 {nextDateLabel}</span>
           </div>
         </div>
       </div>
@@ -229,25 +235,27 @@ function ScreeningCard({ card, onClick }) {
   )
 }
 
-function ScoreRing({ score, color = '#fff' }) {
-  const r = 36
+function ScoreRing({ score }) {
+  const r = 38
   const circ = 2 * Math.PI * r
-  const pct = (score - 40) / 60 // map 40-100 → 0-1
-  const dash = pct * circ
+  const pct = (score - 40) / 60  // map 40–100 → 0–1
+  const dash = Math.max(0, pct) * circ
   return (
-    <svg width="90" height="90" viewBox="0 0 90 90">
-      <circle cx="45" cy="45" r={r} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="7"/>
+    <svg width="88" height="88" viewBox="0 0 88 88">
+      {/* Track */}
+      <circle cx="44" cy="44" r={r} fill="none" stroke="rgba(255,255,255,0.15)" strokeWidth="8"/>
+      {/* Progress */}
       <circle
-        cx="45" cy="45" r={r} fill="none" stroke={color} strokeWidth="7"
+        cx="44" cy="44" r={r} fill="none"
+        stroke="rgba(255,255,255,0.85)" strokeWidth="8"
         strokeDasharray={`${dash} ${circ}`}
         strokeLinecap="round"
-        transform="rotate(-90 45 45)"
-        className="score-ring"
+        transform="rotate(-90 44 44)"
       />
-      <text x="45" y="45" textAnchor="middle" dominantBaseline="middle"
-        fill={color} fontSize="16" fontWeight="800" fontFamily="Inter"
-      >{score}</text>
-      <text x="45" y="60" textAnchor="middle" fill={color} fontSize="8" opacity="0.7" fontFamily="Inter">/ 100</text>
+      {/* Label only — no duplicate score number */}
+      <text x="44" y="44" textAnchor="middle" dominantBaseline="middle"
+        fill="rgba(255,255,255,0.9)" fontSize="11" fontWeight="700" fontFamily="Inter"
+      >/100</text>
     </svg>
   )
 }
