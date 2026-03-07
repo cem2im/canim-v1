@@ -13,11 +13,12 @@ export const SCREENINGS = {
   kan_sayimi: {
     id: 'kan_sayimi', trName: 'Tam Kan Sayımı', enName: 'Complete Blood Count',
     explanation: 'Kırmızı ve beyaz kan hücrelerini, trombositleri ölçer. Anemi, enfeksiyon veya kan hastalıklarını tespit eder.',
-    recommendation: 'USPSTF veya ESC, asemptomatik sağlıklı yetişkinde rutin tam kan sayımı taraması önermemektedir. Hipertansiyon, diyabet, kronik böbrek hastalığı veya hematolojik şüphe varlığında endikedir. Burada yalnızca kronik hastalık grubundaki hastalara gösterilmektedir.',
+    recommendation: 'Asemptomatik sağlıklı yetişkinde rutin tam kan sayımı taraması için hiçbir kılavuz desteği yoktur (USPSTF hiçbir grade vermemiştir). Kronik hastalık grubunda ise zorunludur: AHA/ACC 2025 Hipertansiyon Kılavuzu, tüm hipertansiyon hastalarında başlangıç teşhis panelinde CBC\'yi zorunlu kılmaktadır — gizli anemi, zaten yüksek ardyük altındaki kalpte ek iş yükü yaratır ve kalp yetmezliğini hızlandırabilir. ADA 2024/2025: Kapsamlı başlangıç değerlendirmesinde ve yıllık izlemde CBC zorunlu — HbA1c güvenilirliği için anemi/hemoglobinopati dışlanması gerekir.',
     frequencyMonths: 12, ageMin: 20, ageMax: 120, sex: 'both', weight: 1,
     doctor: 'İç Hastalıkları', icon: '🩸',
     sources: [
-      { name: 'ESC — CVD Prevention Guidelines (2021)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/CVD-Prevention-in-clinical-practice' },
+      { name: 'AHA/ACC 2025 — Hypertension Guideline (CBC başlangıç paneli)', url: 'https://www.ahajournals.org/doi/10.1161/CIR.0000000000001356' },
+      { name: 'ADA — Comprehensive Medical Evaluation (Standards of Care 2025, Bölüm 4)', url: 'https://diabetesjournals.org/care/article/48/Supplement_1/S59/157568' },
       { name: 'NCBI StatPearls — Health Screening (2023)', url: 'https://www.ncbi.nlm.nih.gov/books/NBK436014/' },
     ],
   },
@@ -100,10 +101,11 @@ export const SCREENINGS = {
   idrar: {
     id: 'idrar', trName: 'İdrar Albumin/Kreatinin Oranı (UACR)', enName: 'Urine Albumin-to-Creatinine Ratio',
     explanation: 'Böbrek ve diyabet komplikasyonlarını erken tespit eder. İdrar albumin/kreatinin oranı (UACR), diyabetik nefropatinin en erken göstergesidir. Rutin dipstik idrar tahlili bu amaçla yeterli değildir.',
-    recommendation: 'USPSTF, asemptomatik sağlıklı yetişkinde rutin idrar tahlilini önermemektedir (Grade D). Klinik açıdan anlamlı test genel idrar değil, idrar albumin/kreatinin oranıdır (UACR). ADA 2025 ve KDIGO 2024 (Kidney Int 2024;105:S117–S314): Tüm Tip 2 diyabet hastalarına ve tanıdan ≥5 yıl geçmiş Tip 1 diyabet hastalarına yılda bir rastgele UACR + eGFR. Hipertansiyon hastalarında da yılda bir UACR önerilir. Bu uygulama bu testi yalnızca diyabet ve hipertansiyon grubundaki hastalara göstermektedir.',
+    recommendation: 'USPSTF, asemptomatik sağlıklı yetişkinde rutin idrar tahlilini önermemektedir (Grade D). Klinik açıdan anlamlı test genel dipstik idrar değil, idrar albumin/kreatinin oranıdır (UACR). ADA 2025 (Bölüm 11): Tüm Tip 2 diyabet ve tanıdan ≥5 yıl geçmiş Tip 1 diyabetiklere yılda bir UACR + eGFR. KDIGO 2024: Diyabet, hipertansiyon, KBH riski taşıyan herkese UACR + eGFR. AHA/ACC 2025 Hipertansiyon Kılavuzu (kritik güncelleme): UACR, 2017 kılavuzunda "isteğe bağlı" iken 2025 güncellemesinde tüm hipertansiyon hastalarında başlangıç değerlendirmesinde zorunlu hale getirildi — hipertansif nefrosklerozu ve KBH\'ı erken tespit etmek ve böbrek-koruyucu tedaviyi (ACE inhibitörü/ARB) yönlendirmek için.',
     frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 1,
     doctor: 'İç Hastalıkları', icon: '🫧',
     sources: [
+      { name: 'AHA/ACC 2025 — Hypertension Guideline (UACR zorunlu, Bölüm 7)', url: 'https://www.ahajournals.org/doi/10.1161/CIR.0000000000001356' },
       { name: 'ADA — CKD and Diabetes (Standards of Care 2025, Bölüm 11)', url: 'https://professional.diabetes.org/standards-of-care' },
       { name: 'KDIGO — CKD Evaluation and Management (2024, Kidney Int 2024;105:S117–S314)', url: 'https://kdigo.org/guidelines/ckd-evaluation-and-management/' },
     ],
@@ -364,18 +366,20 @@ export const DISEASE_SCREENINGS = {
   },
 
   hipertansiyon: {
+    // AHA/ACC 2025 Hypertension Guideline — zorunlu başlangıç paneli
     label: 'Yüksek Tansiyon',
     screenings: [
-      { id: 'tansiyon_olcumu', months: 6 },
-      { id: 'depresyon_tarama', months: 12 },
-      { id: 'kan_sayimi', months: 6 },
-      { id: 'biyokimya', months: 6 },
-      { id: 'lipid', months: 6 },
-      { id: 'ekg', months: 12 },
-      { id: 'ekokardiyografi', months: 24 },
-      { id: 'karotis_usg', months: 24 },
-      { id: 'goz_dibi', months: 12 },
-      { id: 'idrar', months: 6 },
+      { id: 'tansiyon_olcumu', months: 6 },    // AHA/ACC 2025: zorunlu izlem
+      { id: 'depresyon_tarama', months: 12 },   // USPSTF Grade B
+      { id: 'kan_sayimi', months: 6 },          // AHA/ACC 2025: başlangıç paneli — zorunlu
+      { id: 'biyokimya', months: 6 },           // AHA/ACC 2025: elektrolit, kreatinin, eGFR
+      { id: 'lipid', months: 6 },               // AHA/ACC 2025: PREVENT™ risk hesabı için
+      { id: 'tsh', months: 12 },                // AHA/ACC 2025: sekonder HTN tarama paneli — yeni eklendi
+      { id: 'idrar', months: 6 },               // AHA/ACC 2025: UACR artık zorunlu (2017'de opsiyoneldi)
+      { id: 'ekg', months: 12 },                // ESC 2021: LVH tespiti
+      { id: 'ekokardiyografi', months: 24 },    // ESC/ESH 2023: hedef organ hasarı
+      { id: 'karotis_usg', months: 24 },        // ESC 2021: plak değerlendirmesi (IIb)
+      { id: 'goz_dibi', months: 12 },           // Hipertansif retinopati
     ]
   },
 
