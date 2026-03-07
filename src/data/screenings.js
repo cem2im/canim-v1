@@ -180,10 +180,10 @@ export const SCREENINGS = {
   ekokardiyografi: {
     id: 'ekokardiyografi', trName: 'Ekokardiyografi', enName: 'Echocardiography',
     nameMedical: 'Transtorasik Ekokardiyografi (TTE)',
-    why: 'Kalp kaslarının ve kapakçıklarının çalışıp çalışmadığını ultrasonla gösterir. Kalp yetmezliğini ve hipertansiyon kaynaklı organ hasarını erken tespit eder.',
+    why: 'Kalp kaslarının ve kapakçıklarının çalışıp çalışmadığını ultrasonografiyle gösterir. Kalp yetmezliğini ve hipertansiyon kaynaklı organ hasarını erken tespit eder.',
     layer: 2,
     guideline: 'ESC/ESH 2023 Hipertansiyon Kılavuzu',
-    explanation: 'Kalp kasları ve kapakçıklarının ultrason görüntüsü. Kalp yetmezliği, kapak hastalığı ve sol ventrikül hipertrofisini tespit eder.',
+    explanation: 'Kalp kasları ve kapakçıklarının ultrasonografi görüntüsü. Kalp yetmezliği, kapak hastalığı ve sol ventrikül hipertrofisini tespit eder.',
     recommendation: 'ÖNEMLİ GÜNCELLEME: Ekokardiyografi genel nüfus tarama testi değil, tanısal bir araçtır. ESC 2021 KVH Önleme Kılavuzu: Asemptomatik yetişkinlerde KV risk tahminini iyileştirmek amacıyla rutin ekokardiyografi yapılması Sınıf III (önerilmez), Düzey B\'dir. ASE 2019 Uygun Kullanım Kriterleri: Asemptomatik, endikasyonsuz hastalarda rutin tarama ekosu "Nadiren Uygun" olarak sınıflandırılmıştır. Ekokardiyografi endikasyonları: Kalp yetmezliği şüphesi (Sınıf I), hipertansiyonun organ hasarı değerlendirmesi (ESC/ESH 2023), kapak hastalığı. Bu uygulama ekoyu yalnızca kardiyak semptomu veya hipertansiyon organ hasarı olan hastalara göstermektedir.',
     frequencyMonths: 24, ageMin: 40, ageMax: 120, sex: 'both', weight: 2,
     doctor: 'Kardiyoloji · İç Hastalıkları · Nefroloji', icon: '💓',
@@ -194,7 +194,7 @@ export const SCREENINGS = {
   },
 
   karotis_usg: {
-    id: 'karotis_usg', trName: 'Boyun Damar Ultrasonü', enName: 'Carotid Ultrasound',
+    id: 'karotis_usg', trName: 'Boyun Damar Ultrasonografisi', enName: 'Carotid Ultrasound',
     nameMedical: 'Karotis Duplex Ultrasonografisi (KİMT + Plak Değerlendirmesi)',
     why: 'Boyun damarlarında plak birikimi inme riskinin habercisidir. Erken tespitle tedavi yoğunlaştırılarak inme önlenir.',
     layer: 2,
@@ -211,7 +211,7 @@ export const SCREENINGS = {
 
   // ── METABOLİK / ORGAN ────────────────────────────────────────────────────────
   karin_usg: {
-    id: 'karin_usg', trName: 'Karın Ultrasonü', enName: 'Abdominal Ultrasound',
+    id: 'karin_usg', trName: 'Karın Ultrasonografisi', enName: 'Abdominal Ultrasound',
     nameMedical: 'Batın Ultrasonografisi',
     why: 'Karaciğer yağlanması, kist ve tümörleri erken tespit eder. Tedavi edilmemiş yağlı karaciğer siroza ve karaciğer kanserine ilerleyebilir.',
     layer: 2,
@@ -446,7 +446,7 @@ export const SCREENINGS = {
     layer: 2,
     guideline: 'USPSTF 2019 Grade B',
     explanation: 'Karın aortunun genişlemesi (≥3 cm) genellikle belirtisizdir. Rüptür mortalitesi %85\'i aşar; tarama ile cerrahi fırsat yakalanabilir.',
-    recommendation: 'USPSTF 2019 Grade B: 65–75 yaş arası, hayatında ≥100 sigara içmiş (yaklaşık 5 paket-yıl) erkeklere tek seferlik karın ultrasonu ile AAA taraması. 65–75 yaş hiç sigara içmemiş erkekler: Grade C (seçici, bireysel karar). Kadınlar için yeterli kanıt yok (Grade I sigaralı; Grade D sigara içmemiş). Ultrasonda aort çapı: normal <3 cm; AAA ≥3 cm.',
+    recommendation: 'USPSTF 2019 Grade B: 65–75 yaş arası, hayatında ≥100 sigara içmiş (yaklaşık 5 paket-yıl) erkeklere tek seferlik karın ultrasonografisi ile AAA taraması. 65–75 yaş hiç sigara içmemiş erkekler: Grade C (seçici, bireysel karar). Kadınlar için yeterli kanıt yok (Grade I sigaralı; Grade D sigara içmemiş). Ultrasonda aort çapı: normal <3 cm; AAA ≥3 cm.',
     frequencyMonths: 999, ageMin: 65, ageMax: 75, sex: 'M', weight: 3,
     doctor: 'Vasküler Cerrahi · Radyoloji · Kardiyoloji', icon: '🫀',
     sources: [

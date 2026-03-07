@@ -133,7 +133,7 @@ export default function History() {
               onClick={() => setActiveTab('today')}
               className="text-sm font-semibold text-teal underline"
             >
-              + Yeni doktor ziyitini ekle
+              + Yeni Doktor Ziyareti Ekle
             </button>
           </div>
         </div>
