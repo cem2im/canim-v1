@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import useAppStore from '../store/useAppStore'
-import { DISEASE_LIST, SCREENINGS, DISEASE_DOCTOR_SCHEDULE } from '../data/screenings'
+import { DISEASE_LIST, SCREENINGS, DISEASE_DOCTOR_SCHEDULE, DISEASE_SCREENINGS } from '../data/screenings'
 import { buildScreeningList, buildInitialDates, TIME_OPTIONS } from '../utils/engine'
 
 // ── Category buckets for the summary screen ──────────────────────────────────
@@ -21,9 +21,44 @@ const CATEGORIES = [
   { key:'other',  label:'Özel Taramalar',     icon:'📋' },
 ]
 function freqLabel(months) {
+  if (months >= 999) return 'Defaya mahsus'
   const map = {1:'Ayda bir',3:'3 ayda bir',6:'6 ayda bir',12:'Yılda bir',
     24:'2 yılda bir',36:'3 yılda bir',60:'5 yılda bir',120:'10 yılda bir'}
   return map[months] || `${months} ayda bir`
+}
+// Screenings to hide from summary
+const HIDDEN_FROM_SUMMARY = new Set(['hiv_tarama'])
+// Display name overrides
+function screeningDisplayName(s) {
+  if (s.id === 'hepatit') return 'Viral Hepatit Taraması'
+  return s.trName
+}
+// Build grouped list: disease groups first, then age/gender base
+function buildGroupedScreenings(diseases, allList) {
+  const assigned = new Set()
+  const groups = []
+  for (const diseaseId of diseases) {
+    const set = DISEASE_SCREENINGS[diseaseId]
+    if (!set) continue
+    const meta = DISEASE_LIST.find(d => d.id === diseaseId)
+    const items = []
+    for (const { id } of set.screenings) {
+      if (assigned.has(id)) continue
+      const s = allList.find(x => x.id === id)
+      if (!s) continue
+      assigned.add(id)
+      items.push(s)
+    }
+    if (items.length > 0) {
+      groups.push({ key: diseaseId, label: `${meta?.label || diseaseId} Nedeniyle`, icon: meta?.icon || '💊', items })
+    }
+  }
+  // Age/gender base group
+  const baseItems = allList.filter(s => !assigned.has(s.id))
+  if (baseItems.length > 0) {
+    groups.push({ key: 'base', label: 'Yaş ve Cinsiyetinize Göre', icon: '🩺', items: baseItems })
+  }
+  return groups
 }
 
 const ROUTINE_IDS = new Set(['kan_sayimi','biyokimya','lipid','hba1c','tansiyon_olcumu'])
@@ -244,6 +279,18 @@ export default function Onboarding() {
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sağlık Durumunuz</h1>
         <p className="text-gray-500 text-sm mb-6">Hangi sağlık sorunlarınız var?<br/>Birden fazla seçebilirsiniz.</p>
 
+        {/* Hiçbirinde Yok — TOP */}
+        <button
+          onClick={() => { setDiseases([]); handleDiseaseDone() }}
+          className="w-full flex items-center justify-center gap-3 py-4 px-4 rounded-2xl border-2 font-bold text-sm transition-all active:scale-98 mb-5"
+          style={diseases.length === 0
+            ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377'}
+            : {borderColor:'#D1D5DB', background:'white', color:'#6B7280'}}
+        >
+          <span className="text-xl">✓</span>
+          <span>Yukarıdakilerin Hiçbirinde Yok — Sağlıklıyım</span>
+        </button>
+
         <div className="flex-1 overflow-y-auto -mx-6 px-6">
           {/* Kronik Hastalıklar */}
           <div className="mb-2 flex items-center gap-2">
@@ -291,19 +338,6 @@ export default function Onboarding() {
             <span className="text-gray-400 font-bold text-lg">→</span>
           </button>
         </div>
-
-        {/* Hiçbirinde Yok */}
-        <button
-          onClick={() => { setDiseases([]); handleDiseaseDone() }}
-          className={`w-full flex items-center justify-center gap-3 py-4 px-4 rounded-2xl border-2 font-bold text-sm transition-all active:scale-98 mb-4 ${
-            diseases.length === 0
-              ? 'border-teal bg-teal-pale text-teal'
-              : 'border-gray-200 bg-white text-gray-500'
-          }`}
-        >
-          <span className="text-xl">✓</span>
-          <span>Hiçbirinde Yok — Sağlıklıyım</span>
-        </button>
 
         {/* Confirmation overlay */}
         {showConfirmation && (
@@ -407,70 +441,59 @@ export default function Onboarding() {
 
   // ── STEP 3: Smart Summary Screen ─────────────────────────────────────────
   if (step === 3) {
-    const screeningList = buildScreeningList(diseases, profile)
-    const grouped = {}
-    for (const s of screeningList) {
-      const cat = SCREENING_CATEGORY[s.id] || 'other'
-      if (!grouped[cat]) grouped[cat] = []
-      grouped[cat].push(s)
-    }
-    const total = screeningList.length
+    const allList = buildScreeningList(diseases, profile)
+      .filter(s => !HIDDEN_FROM_SUMMARY.has(s.id))
+    const groupedList = buildGroupedScreenings(diseases, allList)
+    const total = allList.length
 
     return (
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-        <button onClick={() => setStep(2)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+        <button onClick={() => setStep(2)} className="text-teal font-semibold text-sm mb-4 self-start">← Geri</button>
+
+        {/* BIG notice — top */}
+        <div className="mb-5 px-5 py-4 rounded-2xl" style={{background:'linear-gradient(135deg,#0D7377,#14919B)'}}>
+          <div className="text-white text-base font-extrabold mb-1">Sonraki adımda bu taramaları en son ne zaman yaptırdığınızı soracağız.</div>
+          <div className="text-white/80 text-xs">Tarihleri bilmiyorsanız "Hatırlamıyorum" diyebilirsiniz — sorun değil.</div>
+        </div>
+
         <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sizin İçin Belirlendi</h1>
-        <p className="text-gray-500 text-sm mb-1">
+        <p className="text-gray-500 text-sm mb-4">
           {name && <span className="font-semibold text-gray-700">{name}, </span>}
           {age} yaş · {sex === 'F' ? 'Kadın' : 'Erkek'}
           {diseases.length > 0 && <span> · {diseases.length} tanı</span>}
+          {' '}· <span className="font-semibold text-teal">{total} tarama</span>
         </p>
-        <div className="mb-6 px-4 py-3 rounded-2xl flex items-center gap-3" style={{background:'linear-gradient(135deg,#e8f4f5,#f0fafa)', border:'1px solid #b2dfdb'}}>
-          <span className="text-2xl">📋</span>
-          <div>
-            <div className="font-bold text-gray-900 text-sm">{total} tarama ve kontrol belirlendi</div>
-            <div className="text-xs text-gray-500">Yaş, cinsiyet ve sağlık durumunuza göre kişiselleştirildi</div>
-          </div>
-        </div>
 
         <div className="flex-1 overflow-y-auto -mx-6 px-6 space-y-5 pb-4">
-          {CATEGORIES.map(({ key, label, icon }) => {
-            const items = grouped[key]
-            if (!items || items.length === 0) return null
-            return (
-              <div key={key}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-base">{icon}</span>
-                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{label}</span>
-                  <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'#e8f4f5', color:'#0D7377'}}>{items.length}</span>
-                </div>
-                <div className="flex flex-col gap-2">
-                  {items.map(s => (
-                    <div key={s.id} className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white border border-gray-100">
-                      <span className="text-xl shrink-0">{s.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-semibold text-gray-900 text-sm leading-tight">{s.trName}</div>
-                        {s.why && <div className="text-xs text-gray-400 mt-0.5 line-clamp-1">{s.why}</div>}
-                      </div>
-                      <div className="text-xs font-bold shrink-0 px-2 py-1 rounded-xl" style={{background:'#f3f4f6', color:'#6B7280'}}>
-                        {freqLabel(s.frequencyMonths)}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          {groupedList.map(({ key, label, icon, items }) => (
+            <div key={key}>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-base">{icon}</span>
+                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">{label}</span>
+                <span className="ml-auto text-xs font-bold px-2 py-0.5 rounded-full" style={{background:'#e8f4f5', color:'#0D7377'}}>{items.length}</span>
               </div>
-            )
-          })}
-        </div>
-
-        <div className="mt-4 mb-3 px-3 py-2 rounded-xl text-center" style={{background:'#fffbeb', border:'1px solid #fde68a'}}>
-          <p className="text-xs text-amber-700">Sonraki adımda bu taramaları en son ne zaman yaptırdığınızı soracağız.</p>
+              <div className="flex flex-col gap-2">
+                {items.map(s => (
+                  <div key={s.id} className="flex items-center gap-3 px-4 py-3 rounded-2xl bg-white border border-gray-100">
+                    <span className="text-xl shrink-0">{s.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-gray-900 text-sm leading-tight">{screeningDisplayName(s)}</div>
+                      {s.why && <div className="text-xs text-gray-400 mt-0.5 line-clamp-1">{s.why}</div>}
+                    </div>
+                    <div className="text-xs font-bold shrink-0 px-2 py-1 rounded-xl" style={{background:'#f3f4f6', color:'#6B7280'}}>
+                      {freqLabel(s.frequencyMonths)}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
 
         <button
           onClick={() => setStep(4)}
-          className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98"
+          className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98 mt-4"
           style={{background:'#0D7377'}}
         >
           Devam — Tarihleri Belirle →
@@ -627,7 +650,33 @@ export default function Onboarding() {
               {s.why && <p className="text-xs text-gray-400 mb-3 leading-relaxed">{s.why}</p>}
               <div className="text-xs font-semibold text-gray-500 mb-2">Yaptırdınız mı?</div>
               <div className="flex flex-wrap gap-2">
-                {answers[s.id] && answers[s.id] !== 'no' ? (
+                {!answers[s.id] ? (
+                  /* Initial state: Evet / Hayır */
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setAnswer(s.id, 'this_month')}
+                      className="px-4 py-2 rounded-xl text-sm font-semibold active:scale-95"
+                      style={{background:'#0D7377', color:'white'}}
+                    >Evet →</button>
+                    <button
+                      onClick={() => setAnswer(s.id, 'no')}
+                      className="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 active:scale-95"
+                    >Hayır / Hatırlamıyorum</button>
+                  </div>
+                ) : answers[s.id] === 'no' ? (
+                  /* 'no' selected — show as selected */
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setAnswer(s.id, 'this_month')}
+                      className="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 active:scale-95"
+                    >Evet →</button>
+                    <button
+                      className="px-4 py-2 rounded-xl text-sm font-semibold active:scale-95"
+                      style={{background:'#374151', color:'white'}}
+                    >✓ Hayır / Hatırlamıyorum</button>
+                  </div>
+                ) : (
+                  /* Time option selected */
                   <div className="w-full">
                     <div className="flex flex-wrap gap-2 mb-2">
                       {[
@@ -642,31 +691,13 @@ export default function Onboarding() {
                           onClick={() => setAnswer(s.id, opt.value)}
                           className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
                           style={answers[s.id] === opt.value ? {background:'#0D7377', color:'white'} : {background:'#f3f4f6', color:'#374151'}}
-                        >
-                          {opt.label}
-                        </button>
+                        >{opt.label}</button>
                       ))}
                     </div>
                     <button
                       onClick={() => setAnswer(s.id, 'no')}
                       className="text-xs text-gray-400 underline"
                     >Hayır / Hatırlamıyorum</button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setAnswer(s.id, 'this_month')}
-                      className="px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-95"
-                      style={{background:'#0D7377', color:'white'}}
-                    >
-                      Evet →
-                    </button>
-                    <button
-                      onClick={() => setAnswer(s.id, 'no')}
-                      className="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 active:scale-95"
-                    >
-                      Hayır / Hatırlamıyorum
-                    </button>
                   </div>
                 )}
               </div>
