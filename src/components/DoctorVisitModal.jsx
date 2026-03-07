@@ -37,7 +37,10 @@ export default function DoctorVisitModal({ onClose }) {
   const logDoctorVisit = useAppStore(s => s.logDoctorVisit)
 
   const patientScreeningIds = new Set(getScreeningCards().map(c => c.id))
-  const doctorTypes = Object.keys(DOCTOR_SCREENING_MAP)
+  // Only show doctors that have ≥1 screening the patient is actually tracking
+  const doctorTypes = Object.keys(DOCTOR_SCREENING_MAP).filter(doctor =>
+    (DOCTOR_SCREENING_MAP[doctor] || []).some(id => patientScreeningIds.has(id))
+  )
 
   const handleDoctorSelect = (doctor) => {
     setSelectedDoctor(doctor)
