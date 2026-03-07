@@ -91,10 +91,29 @@ export default function Profile() {
         <EditField label="Telefon" value={emergency.contactPhone} onSave={v => saveEmergency('contactPhone', v)} placeholder="05XX XXX XX XX" type="tel" />
       </Section>
 
+      {/* WhatsApp Share */}
+      <div className="mb-5 bg-white rounded-2xl border border-gray-100 overflow-hidden p-4" style={{boxShadow:'0 1px 8px rgba(0,0,0,0.04)'}}>
+        <h2 className="text-sm font-bold text-gray-700 mb-3">Arkadaşlarına Öner</h2>
+        <p className="text-xs text-gray-400 mb-3 leading-relaxed">
+          Canım'ı faydalı buluyorsan arkadaşlarınla paylaş. Tarama hatırlatıcısı herkese lazım!
+        </p>
+        <button
+          onClick={() => {
+            const text = `Canım uygulamasını dene — yaşına ve hastalıklarına göre hangi taramaları ne zaman yaptırman gerektiğini gösteriyor! https://cem2im.github.io/canim-v1/`
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`)
+          }}
+          className="w-full py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-all"
+          style={{background:'#25D366'}}
+        >
+          📤 Arkadaşlarına Öner (WhatsApp)
+        </button>
+      </div>
+
       {/* App info */}
       <div className="text-center py-4 text-xs text-gray-400">
-        <div className="font-bold text-teal text-sm mb-1">Canım v1.0</div>
-        Doç. Dr. Cem Şimşek tarafından tasarlandı
+        <div className="font-bold text-teal text-sm mb-1">Canım v3.0</div>
+        Prof. Dr. Cem Şimşek tarafından tasarlandı<br/>
+        Hacettepe Üniversitesi
       </div>
 
       {/* Add Medication Modal */}

@@ -12,6 +12,10 @@ export const SCREENINGS = {
   // ── RUTIN LAB ────────────────────────────────────────────────────────────────
   kan_sayimi: {
     id: 'kan_sayimi', trName: 'Tam Kan Sayımı', enName: 'Complete Blood Count',
+    nameMedical: 'Tam Kan Sayımı (CBC)',
+    why: 'Anemi, enfeksiyon ve gizli kan hastalıklarını erken tespit eder. Diyabet ve hipertansiyon hastalarında kalpte ek yük yaratan anemiyi dışlamak için zorunludur.',
+    layer: 1,
+    guideline: 'AHA/ACC 2025 Hipertansiyon Kılavuzu',
     explanation: 'Kırmızı ve beyaz kan hücrelerini, trombositleri ölçer. Anemi, enfeksiyon veya kan hastalıklarını tespit eder.',
     recommendation: 'Asemptomatik sağlıklı yetişkinde rutin tam kan sayımı taraması için hiçbir kılavuz desteği yoktur (USPSTF hiçbir grade vermemiştir). Kronik hastalık grubunda ise zorunludur: AHA/ACC 2025 Hipertansiyon Kılavuzu, tüm hipertansiyon hastalarında başlangıç teşhis panelinde CBC\'yi zorunlu kılmaktadır — gizli anemi, zaten yüksek ardyük altındaki kalpte ek iş yükü yaratır ve kalp yetmezliğini hızlandırabilir. ADA 2024/2025: Kapsamlı başlangıç değerlendirmesinde ve yıllık izlemde CBC zorunlu — HbA1c güvenilirliği için anemi/hemoglobinopati dışlanması gerekir.',
     frequencyMonths: 12, ageMin: 20, ageMax: 120, sex: 'both', weight: 1,
@@ -25,6 +29,10 @@ export const SCREENINGS = {
 
   biyokimya: {
     id: 'biyokimya', trName: 'Biyokimya Paneli', enName: 'Comprehensive Metabolic Panel',
+    nameMedical: 'Kapsamlı Metabolik Panel (CMP)',
+    why: 'Böbrek ve karaciğer fonksiyonlarını, kan şekerini ve elektrolitleri gösterir. Erken organ hasarını tespit ederek tedaviyi yönlendirir.',
+    layer: 1,
+    guideline: 'ESC 2021 KVH Önleme Kılavuzu',
     explanation: 'Açlık glikozu, renal fonksiyon (kreatinin, eGFR), karaciğer enzimleri ve elektrolitler dahil metabolizma durumunuzu gösterir.',
     recommendation: 'ESC 2021 CVD Önleme Kılavuzu, kardiyovasküler risk değerlendirmesi için tüm yetişkinlerde 5 yılda bir açlık glikozu ve renal fonksiyon ölçümü önermektedir. Risk gruplarında (diyabet, hipertansiyon, KVH, obezite, ailede böbrek hastalığı, 60 yaş üstü) KDIGO 2024 kapsamlı değerlendirme önerir. ADA 2025: tüm diyabet hastalarında yılda bir eGFR + idrar albumin/kreatinin oranı (UACR). Hipertansiyon veya diyabet hastalarında 6 ayda bir takip gerekir.',
     frequencyMonths: 60, ageMin: 20, ageMax: 120, sex: 'both', weight: 1,
@@ -38,6 +46,10 @@ export const SCREENINGS = {
 
   lipid: {
     id: 'lipid', trName: 'Lipid Paneli', enName: 'Lipid Panel',
+    nameMedical: 'Lipid Profili (Total Kolesterol, LDL, HDL, Trigliserid)',
+    why: 'Yüksek kolesterol kalp krizi ve inme riskini artırır ancak hiçbir belirti vermez. Erken tespitle ilaç ve yaşam tarzı değişiklikleriyle kolayca kontrol altına alınabilir.',
+    layer: 1,
+    guideline: 'ESC/EAS 2019 Dislipidemi Kılavuzu',
     explanation: 'Toplam kolesterol, LDL, HDL ve trigliseridleri ölçer. Kalp hastalığı riskini gösterir.',
     recommendation: 'ACC/AHA 2018: 20 yaşından itibaren her 4–6 yılda bir lipid profili. LDL hedefleri (ESC/EAS 2019): Düşük risk <116 mg/dL, orta risk <100 mg/dL, yüksek risk <70 mg/dL, çok yüksek risk <55 mg/dL. ESC/EAS 2025 Odaklanmış Güncelleme: Yeni "Aşırı yüksek risk" kategorisi (maksimal tedaviye rağmen tekrarlayan olaylar veya çok damar hastalığı) için LDL-C <40 mg/dL (1.0 mmol/L) hedefi (Sınıf IIb). Lp(a) ölçümü hayatında en az bir kez önerilir. Statin kullananlarda 6–12 haftada bir kontrol, hedef sağlananlar için yılda bir yeterlidir.',
     frequencyMonths: 12, ageMin: 20, ageMax: 120, sex: 'both', weight: 2,
@@ -51,6 +63,10 @@ export const SCREENINGS = {
 
   hba1c: {
     id: 'hba1c', trName: 'HbA1c (Şeker Takibi)', enName: 'Glycated Hemoglobin',
+    nameMedical: 'Glikozile Hemoglobin (HbA1c)',
+    why: 'Son 3 ayın ortalama kan şekerini gösterir. Yüksek HbA1c göz, böbrek ve sinir hasarına yol açar; erken kontrol bu komplikasyonları önler.',
+    layer: 1,
+    guideline: 'ADA Standart Bakım Kılavuzu 2025',
     explanation: 'Son 3 ayın ortalama kan şekerini gösterir. Diyabet kontrolünün altın standardıdır.',
     recommendation: 'Tarama: ADA 2025, risk faktöründen bağımsız olarak 35 yaş üstü tüm yetişkinlerde diyabet taramasını önermektedir. USPSTF 2021 Grade B: 35–70 yaş, fazla kilolu/obez yetişkinlerde. Normal ise 3 yılda bir tekrar; prediyabette yılda bir. Tedavi hedefleri: Çoğu yetişkinde <7,0%; kısa hastalık süresi olan genç hastalarda <6,5%; kompleks/yaşlı hastalarda <8,0%. Kontrolsüz veya ilaç değişikliği yapılan hastalarda 3 ayda bir; hedefte olan hastalarda 6 ayda bir yeterlidir.',
     frequencyMonths: 3, ageMin: 18, ageMax: 120, sex: 'both', weight: 2,
@@ -64,6 +80,10 @@ export const SCREENINGS = {
 
   tsh: {
     id: 'tsh', trName: 'Tiroid Testleri (TSH)', enName: 'Thyroid Function',
+    nameMedical: 'Tiroid Stimülan Hormon (TSH)',
+    why: 'Tiroid bezi yavaşlayınca yorgunluk, kilo artışı ve depresyon; aşırı çalışınca çarpıntı ve kilo kaybı görülür. TSH testi tek ölçümle ikisini de tespit eder.',
+    layer: 1,
+    guideline: 'ATA/AACE 2012 Tiroid Kılavuzu',
     explanation: 'Tiroid bezinin çalışıp çalışmadığını kontrol eder. Hem hiperaktif (hipertiroidi) hem de düşük aktif (hipotiroidi) tiroid erken tedaviyle düzelir.',
     recommendation: 'ÖNEMLİ UYARI — Kılavuzlar arasında görüş ayrılığı mevcuttur: USPSTF 2015, asemptomatik gebe olmayan yetişkinlerde rutin TSH taraması için yetersiz kanıt bildirmiş (Grade I) ve bu öneri güncellenmemiştir (Ann Intern Med 2015;162:641–650). Buna karşın ATA/AACE 2012 kılavuzu, 35 yaşından itibaren 5 yılda bir tarama önermektedir. Normal TSH aralığı: 0,4–4,0 mIU/L. Tedavi genel olarak TSH >10 mIU/L olduğunda değerlendirilir. Tedavi altındaki hastalarda 6 ayda bir; stabil hastalarda yılda bir kontrol önerilir. Bu uygulama TSH taramasını yalnızca tiroid hastalığı ve yüksek riskli gruplara göstermektedir.',
     frequencyMonths: 12, ageMin: 30, ageMax: 120, sex: 'both', weight: 1,
@@ -77,6 +97,10 @@ export const SCREENINGS = {
 
   vitamin_d: {
     id: 'vitamin_d', trName: 'D Vitamini', enName: 'Vitamin D (25-OH)',
+    nameMedical: '25-Hidroksi Vitamin D (25-OH-D)',
+    why: 'Kemik sağlığı, bağışıklık ve kas gücü için kritik. Obezite ve kemik erimesi hastalarında eksiklik riski yüksek olup kırık riskini artırır.',
+    layer: 1,
+    guideline: 'Endocrine Society 2024 Vitamin D Kılavuzu',
     explanation: 'Kemik sağlığı, bağışıklık ve kas gücü için kritik. Obezite ve kemik erimesi hastalarında eksiklik riski yüksektir.',
     recommendation: 'ÖNEMLİ GÜNCELLEME (2024): Hem USPSTF 2021 (Grade I — yetersiz kanıt) hem de Endocrine Society 2024 kılavuzu (JCEM 2024;109:1907–1947), genel sağlıklı yetişkinde rutin 25(OH)D testi yapılmasını önermemektedir. Endocrine Society 2024, obezite, prediyabet veya koyu tenli olmak dahil hiçbir risk grubu için rutin test önermemekte; sayısal eşik değerleri (eski 2011 kılavuzundaki <20 veya <30 ng/mL) tamamen terk edilmiştir. Endocrine Society 2024, test yapmaksızın ampirik takviye önermektedir: 1–18 yaş çocuklar (raşitizm önlemi), gebe kadınlar, 75 yaş üstü yetişkinler (mortalite azaltımı), yüksek riskli prediyabetikler. Bu uygulamada D vitamini testi yalnızca risk faktörü olan hastalara (obezite, kemik erimesi) gösterilmektedir.',
     frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 1,
@@ -89,6 +113,10 @@ export const SCREENINGS = {
 
   b12: {
     id: 'b12', trName: 'B12 Vitamini', enName: 'Vitamin B12',
+    nameMedical: 'Vitamin B12 (Kobalamin)',
+    why: 'Metformin uzun süreli kullanımı B12 emilimini bozar. Eksiklik sinir hasarına ve kansızlığa yol açar; erken tespit ile takviye ile önlenebilir.',
+    layer: 1,
+    guideline: 'ADA Standart Bakım Kılavuzu 2025',
     explanation: 'Sinir sistemi ve kan hücreleri için gerekli. Eksikliği yorgunluk, uyuşma ve megaloblastik anemiye yol açar. Metformin kullanan diyabet hastalarında malabsorpsiyon riski yüksektir.',
     recommendation: 'ADA 2025 kılavuzu, metformin kullanan diyabetik hastalarda periyodik B12 izlemini önermektedir. Asemptomatik genel popülasyonda rutin B12 taraması için uluslararası kılavuz desteği yoktur; bu nedenle yalnızca metformin kullanan hastalarda gösterilmektedir.',
     frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 1,
@@ -100,6 +128,10 @@ export const SCREENINGS = {
 
   idrar: {
     id: 'idrar', trName: 'İdrar Albumin/Kreatinin Oranı (UACR)', enName: 'Urine Albumin-to-Creatinine Ratio',
+    nameMedical: 'İdrar Albumin/Kreatinin Oranı (UACR)',
+    why: 'Böbrek hasarının en erken göstergesidir. Diyabet ve hipertansiyonu olan hastalarda böbrekleri korumak için kritik; erken tespit ile böbrek yetmezliği önlenebilir.',
+    layer: 1,
+    guideline: 'ADA Standart Bakım Kılavuzu 2025 / AHA/ACC 2025 Hipertansiyon Kılavuzu',
     explanation: 'Böbrek ve diyabet komplikasyonlarını erken tespit eder. İdrar albumin/kreatinin oranı (UACR), diyabetik nefropatinin en erken göstergesidir. Rutin dipstik idrar tahlili bu amaçla yeterli değildir.',
     recommendation: 'USPSTF, asemptomatik sağlıklı yetişkinde rutin idrar tahlilini önermemektedir (Grade D). Klinik açıdan anlamlı test genel dipstik idrar değil, idrar albumin/kreatinin oranıdır (UACR). ADA 2025 (Bölüm 11): Tüm Tip 2 diyabet ve tanıdan ≥5 yıl geçmiş Tip 1 diyabetiklere yılda bir UACR + eGFR. KDIGO 2024: Diyabet, hipertansiyon, KBH riski taşıyan herkese UACR + eGFR. AHA/ACC 2025 Hipertansiyon Kılavuzu (kritik güncelleme): UACR, 2017 kılavuzunda "isteğe bağlı" iken 2025 güncellemesinde tüm hipertansiyon hastalarında başlangıç değerlendirmesinde zorunlu hale getirildi — hipertansif nefrosklerozu ve KBH\'ı erken tespit etmek ve böbrek-koruyucu tedaviyi (ACE inhibitörü/ARB) yönlendirmek için.',
     frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 1,
@@ -113,6 +145,10 @@ export const SCREENINGS = {
 
   hepatit: {
     id: 'hepatit', trName: 'Hepatit B ve C Taraması', enName: 'Hepatitis B & C Screening',
+    nameMedical: 'Hepatit B Yüzey Antijeni (HBsAg) + Anti-HCV Antikor Testi',
+    why: 'Hepatit B ve C virüsleri yıllarca belirti vermeden karaciğere zarar verir. Erken tespit ile tam iyileşme veya karaciğer kanserinin önlenmesi mümkündür.',
+    layer: 1,
+    guideline: 'USPSTF 2020 Grade B / CDC 2023',
     explanation: 'Karaciğer sirozuna ve kansere yol açabilen Hepatit B ve C virüslerini tarar. Çoğu hasta yıllarca belirti vermez.',
     recommendation: 'HCV: USPSTF 2020 Grade B — 18–79 yaş tüm yetişkinlere evrensel, hayatında bir kez HCV taraması; süregelen risk varlığında periyodik tekrar. HBV (USPSTF): USPSTF 2020 Grade B — risk tabanlıdır, evrensel değildir; yalnızca risk faktörü olan yetişkinlere önerilir. HBV (CDC): CDC 2023 (MMWR 2023;72:RR-1) önemli güncelleme — 18 yaş üstü tüm yetişkinlere üçlü panel (HBsAg + anti-HBs + anti-HBc) ile evrensel, hayatında bir kez HBV taraması önermektedir. Bu, USPSTF\'nin risk tabanlı yaklaşımından daha geniş kapsamlıdır. HBsAg negatif ve aşısız bireylere Hepatit B aşılaması yapılmalıdır.',
     frequencyMonths: 999, ageMin: 18, ageMax: 79, sex: 'both', weight: 2,
@@ -127,6 +163,10 @@ export const SCREENINGS = {
   // ── KARDİYOVASKÜLER ──────────────────────────────────────────────────────────
   ekg: {
     id: 'ekg', trName: 'EKG (Kalp Ritmi)', enName: 'Electrocardiogram',
+    nameMedical: 'Elektrokardiyografi (EKG/ECG)',
+    why: 'Kalpte gizli ritim bozukluğu veya iskemi olup olmadığını gösterir. Hipertansiyon ve diyabet hastalarında sol ventrikül hipertrofisini tespit eder.',
+    layer: 1,
+    guideline: 'ESC 2021 KVH Önleme Kılavuzu',
     explanation: 'Kalpte ritim bozukluğu, iletim bloğu veya sessiz iskemi olup olmadığını gösterir.',
     recommendation: 'ÖNEMLİ GÜNCELLEME: USPSTF 2018 (JAMA 2018;319:2308), düşük riskli asemptomatik yetişkinlerde (%10 altında 10 yıllık KVH riski) rutin EKG taramasını aktif olarak önermemektedir (Grade D). Orta/yüksek risk için kanıt yetersizdir (Grade I). ESC 2021 de asemptomatik KVH risk tahmininde rutin EKG önermemektedir. EKG şu durumlarda endikedir: hipertansiyon (sol ventrikül hipertrofisi tespiti), aritmi şüphesi, kalp yetmezliği değerlendirmesi. Asemptomatik risk değerlendirmesinde tercih edilen alternatif: koroner arter kalsiyum (CAC) skoru (ACC/AHA Sınıf IIa). Bu uygulama EKG\'yi yalnızca hipertansiyon, diyabet veya kardiyak semptomu olan hastalara göstermektedir.',
     frequencyMonths: 12, ageMin: 40, ageMax: 120, sex: 'both', weight: 2,
@@ -139,6 +179,10 @@ export const SCREENINGS = {
 
   ekokardiyografi: {
     id: 'ekokardiyografi', trName: 'Ekokardiyografi', enName: 'Echocardiography',
+    nameMedical: 'Transtorasik Ekokardiyografi (TTE)',
+    why: 'Kalp kaslarının ve kapakçıklarının çalışıp çalışmadığını ultrasonla gösterir. Kalp yetmezliğini ve hipertansiyon kaynaklı organ hasarını erken tespit eder.',
+    layer: 2,
+    guideline: 'ESC/ESH 2023 Hipertansiyon Kılavuzu',
     explanation: 'Kalp kasları ve kapakçıklarının ultrason görüntüsü. Kalp yetmezliği, kapak hastalığı ve sol ventrikül hipertrofisini tespit eder.',
     recommendation: 'ÖNEMLİ GÜNCELLEME: Ekokardiyografi genel nüfus tarama testi değil, tanısal bir araçtır. ESC 2021 KVH Önleme Kılavuzu: Asemptomatik yetişkinlerde KV risk tahminini iyileştirmek amacıyla rutin ekokardiyografi yapılması Sınıf III (önerilmez), Düzey B\'dir. ASE 2019 Uygun Kullanım Kriterleri: Asemptomatik, endikasyonsuz hastalarda rutin tarama ekosu "Nadiren Uygun" olarak sınıflandırılmıştır. Ekokardiyografi endikasyonları: Kalp yetmezliği şüphesi (Sınıf I), hipertansiyonun organ hasarı değerlendirmesi (ESC/ESH 2023), kapak hastalığı. Bu uygulama ekoyu yalnızca kardiyak semptomu veya hipertansiyon organ hasarı olan hastalara göstermektedir.',
     frequencyMonths: 24, ageMin: 40, ageMax: 120, sex: 'both', weight: 2,
@@ -151,6 +195,10 @@ export const SCREENINGS = {
 
   karotis_usg: {
     id: 'karotis_usg', trName: 'Boyun Damar Ultrasonü', enName: 'Carotid Ultrasound',
+    nameMedical: 'Karotis Duplex Ultrasonografisi (KİMT + Plak Değerlendirmesi)',
+    why: 'Boyun damarlarında plak birikimi inme riskinin habercisidir. Erken tespitle tedavi yoğunlaştırılarak inme önlenir.',
+    layer: 2,
+    guideline: 'ESC 2021 KVH Önleme Kılavuzu',
     explanation: 'Boyun damarlarında (karotis) plak birikimini ve damar duvarı kalınlığını (IMT) gösterir.',
     recommendation: 'ÖNEMLİ GÜNCELLEME — Kılavuzlar arasında ayrım yapılması gerekir: Karotis İMT (intima-media kalınlığı): USPSTF 2021 (JAMA 2021;325:476), genel yetişkin popülasyonunda asemptomatik karotis darlığı taramasına aktif olarak karşı çıkmaktadır (Grade D). ACC/AHA 2013: İlk kardiyovasküler olay riski değerlendirmesinde rutin KİMT ölçümü önerilmez (Sınıf III — Yarar yok; 2010 önerisinden geri adım). Karotis Plak Değerlendirmesi (İMT\'den farklıdır): ESC 2021, KAK yoksa veya uygulanamıyorsa, tedavi eşiği yakınındaki hastalarda risk değiştirici olarak dikkate alınabilir (Sınıf IIb, Düzey B). Plak tanımı: çevre duvarın >%50 kalınlaşması veya fokal İMT ≥1,5 mm. Bu uygulama boyun damar USG\'yi yalnızca hipertansiyon veya yüksek KVH riski olan hastalara göstermektedir.',
     frequencyMonths: 24, ageMin: 45, ageMax: 120, sex: 'both', weight: 2,
@@ -164,6 +212,10 @@ export const SCREENINGS = {
   // ── METABOLİK / ORGAN ────────────────────────────────────────────────────────
   karin_usg: {
     id: 'karin_usg', trName: 'Karın Ultrasonü', enName: 'Abdominal Ultrasound',
+    nameMedical: 'Batın Ultrasonografisi',
+    why: 'Karaciğer yağlanması, kist ve tümörleri erken tespit eder. Tedavi edilmemiş yağlı karaciğer siroza ve karaciğer kanserine ilerleyebilir.',
+    layer: 2,
+    guideline: 'EASL-EASD-EASO 2024 MASLD Kılavuzu',
     explanation: 'Karaciğer, safra kesesi, dalak, böbrekleri ve büyük damarları görüntüler. Yağlı karaciğer, taş, kist ve tümör tespitinde kullanılır.',
     recommendation: 'MASLD/Yağlı karaciğer taraması: EASL-EASD-EASO 2024 ve AASLD 2023, popülasyon genelinde steatotik karaciğer hastalığı için ultrason taraması önermemektedir. Konvansiyonel B-mod ultrason erken steatoz tespitinde yetersizdir (özellikle obezitede). Risk altındaki bireylerde ileri fibrozis için tercih edilen yol: önce FIB-4 skoru, ardından transient elastografi (FibroScan). HCC Gözetimi: Tüm siroz hastaları ve seçili sirotik olmayan kronik HBV taşıyıcılarında (endemik ülke kökenli, aile HCC öyküsü olan erkek >40, kadın >50 yaş) her 6 ayda bir ultrason + AFP ile karaciğer kanseri gözetimi önerilir. AFP bu gözetimde zorunlu eşlikçidir (opsiyonel değil).',
     frequencyMonths: 12, ageMin: 30, ageMax: 120, sex: 'both', weight: 2,
@@ -176,6 +228,10 @@ export const SCREENINGS = {
 
   fibroscan: {
     id: 'fibroscan', trName: 'FibroScan (Karaciğer Elastografisi)', enName: 'Liver Fibroscan',
+    nameMedical: 'Transient Elastografi (FibroScan / VCTE)',
+    why: 'Karaciğerdeki sertleşme derecesini biyopsi gerekmeden ölçer. Siroza giden yolu erken tespit ederek tedaviyi zamanında başlatır.',
+    layer: 2,
+    guideline: 'EASL 2024 MASLD Kılavuzu',
     explanation: 'Karaciğerdeki yağlanma derecesini (CAP skoru) ve fibrozis/sertleşme evresini (F0–F4) ölçer. Biyopsi gerektirmeyen non-invaziv altın standarttır.',
     recommendation: 'EASL/AASLD kılavuzlarına göre FibroScan öncesinde FIB-4 skoru hesaplanmalıdır (ilk adım): FIB-4 <1,3 = düşük risk → birinci basamakta izlem; FIB-4 1,3–2,67 = belirsiz → FibroScan endikasyonu; FIB-4 >2,67 = yüksek risk → gastroenteroloji yönlendirmesi. 65 yaş üstü için yaşa göre düzeltilmiş eşik: FIB-4 <2,0. Karaciğer Sertlik Ölçümü (LSM) yorumu: <8 kPa = ileri fibrozis dışlanır; 8–12 kPa = belirsiz (ek test gerekebilir); >12 kPa = ileri fibrozis/cACLD düşündürür; ≥20–25 kPa = klinik açıdan anlamlı portal hipertansiyon. F2+ fibroziste gastroenteroloji takibi zorunludur.',
     frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 2,
@@ -188,6 +244,10 @@ export const SCREENINGS = {
 
   dexa: {
     id: 'dexa', trName: 'Kemik Yoğunluğu (DEXA)', enName: 'Bone Density Scan',
+    nameMedical: 'Dual-Enerji X-Işını Absorbsiyometrisi (DEXA/DXA)',
+    why: 'Kemik yoğunluğu düşük olduğunda kırık riski artar ancak belirti vermez. DEXA ile osteoporoz erken tespit edilir ve kırıklar önlenir.',
+    layer: 2,
+    guideline: 'USPSTF 2025 Osteoporoz Tarama Kılavuzu (JAMA 2025;333:498–508)',
     explanation: 'Kemik mineral yoğunluğunu ölçer. T-skoru -1.0 ile -2.5 arası osteopeni; -2.5 altı osteoporoz anlamına gelir.',
     recommendation: 'USPSTF 2025 (14 Ocak 2025 tarihli yeni final öneri; JAMA 2025;333:498–508): 65 yaş üstü tüm kadınlara DXA ile kemik mineral yoğunluğu (BMD) ölçümü (Grade B). 65 yaş altı postmenopozal kadınlara yüksek kırık riski varsa DXA BMD (Grade B). Erkekler için yetersiz kanıt (Grade I — tüm versiyonlarda değişmedi). Not: BHOF, erkeklerde ≥70 yaş veya ≥50 yaşta risk faktörü varlığında tarama önermektedir (ISCD 2023). Yüksek risk grubunda (uzun süreli kortikosteroid, erken menopoz) 50 yaşından itibaren başlanabilir.',
     frequencyMonths: 24, ageMin: 50, ageMax: 120, sex: 'both', weight: 2,
@@ -201,6 +261,10 @@ export const SCREENINGS = {
   // ── KANSER TARAMALARI ─────────────────────────────────────────────────────────
   kolonoskopi: {
     id: 'kolonoskopi', trName: 'Kolonoskopi', enName: 'Colonoscopy',
+    nameMedical: 'Kolonoskopi (Kolonoskopik İnceleme)',
+    why: 'Kolon kanseri gelişmeden önce polipleri tespit eder ve aynı seansta çıkarır. Bu tarama kolon kanserini %90 oranında önleyebilir.',
+    layer: 2,
+    guideline: 'USPSTF 2021 Grade A (50–75 yaş) / Grade B (45–49 yaş)',
     explanation: 'Kolon kanseri ve poliplerini erken tespit eder. Polip görüldüğünde aynı seansta çıkarılabilir. Aile öyküsü başlangıç yaşını ve sıklığı önemli ölçüde değiştirir.',
     recommendation: 'USPSTF 2021: 45–49 yaş Grade B, 50–75 yaş Grade A. Ortalama risk seçenekleri: kolonoskopi 10 yılda bir (altın standart), FIT gaita testi yılda bir, BT kolonografi 5 yılda bir. ⚠️ AİLE ÖYKÜSÜ KURALLARI (NCCN/ACS): (1) 60 yaş altında KRK olan 1. derece akraba VEYA herhangi yaşta ≥2 akraba → 40 yaşında ya da en genç tanıdan 10 yıl önce başla, her 5 yılda bir kolonoskopi; dışkı testi kabul edilmez. (2) 60 yaş ve üstünde KRK olan 1 akraba → 40 yaşında başla, her 10 yılda bir kolonoskopi. (3) Lynch sendromu → her 1–2 yılda bir, 20–25 yaşından itibaren. (4) FAP → her yıl, 12–15 yaşından itibaren.',
     frequencyMonths: 120, ageMin: 45, ageMax: 75, sex: 'both', weight: 3,
@@ -214,6 +278,10 @@ export const SCREENINGS = {
 
   mamografi: {
     id: 'mamografi', trName: 'Mamografi', enName: 'Mammography',
+    nameMedical: 'Dijital Mamografi (veya DBT — Dijital Breast Tomosynthesis)',
+    why: 'Meme kanserini erken evrede tespit etmenin en etkili yöntemidir. Erken tespit ile tedavi başarısı %95\'in üzerindedir.',
+    layer: 2,
+    guideline: 'USPSTF 2024 Grade B',
     explanation: 'Meme kanserini erken evrede tespit etmenin en etkili yöntemi. Aile öyküsü başlangıç yaşını ve sıklığı önemli ölçüde değiştirir.',
     recommendation: 'ORTALAMA RİSK — USPSTF 2024 Grade B: 40–74 yaş tüm kadınlara 2 yılda bir mamografi. ⚠️ AİLE ÖYKÜSÜ KURALLARI (ACS/NCCN): Yaşam boyu risk ≥%20 VEYA BRCA1/2 mutasyonu VEYA 1. derece akrabada BRCA mutasyonu → 30 yaşında yılda bir mamografi + yılda bir meme MRI (tamamlayıcı, tek başına MRI yetersiz). "10 yıl önce kuralı": tarama, ailedeki en erken tanıdan 10 yıl önce başlar (en erken 30 yaş). BRCA1 taşıyıcılarında 6 ayda bir klinik muayene düşünülebilir (ESMO). Türkiye Sağlık Bakanlığı: 40–69 yaş 2 yılda bir mamografi (KETEM).',
     frequencyMonths: 24, ageMin: 30, ageMax: 74, sex: 'F', weight: 3,
@@ -228,6 +296,10 @@ export const SCREENINGS = {
 
   pap_smear: {
     id: 'pap_smear', trName: 'Pap Smear + HPV Testi', enName: 'Cervical Screening',
+    nameMedical: 'Servikal Sitoloji (Pap Smear) + HPV Ko-Testi',
+    why: 'Serviks (rahim ağzı) kanserini oluşmadan önce tespit eder. Düzenli tarama ile serviks kanseri büyük ölçüde önlenebilir.',
+    layer: 2,
+    guideline: 'USPSTF 2018 Grade A',
     explanation: 'Serviks (rahim ağzı) kanserini önler. Pap smear sitoloji + HPV ko-testi en etkili tarama yöntemidir.',
     recommendation: 'USPSTF 2018 (hâlâ geçerli): 21–29 yaş: 3 yılda bir Pap smear. 30–65 yaş: 5 yılda bir HPV testi + Pap smear (ko-test) veya 3 yılda bir yalnızca Pap smear. 65 yaş üstü, yeterli önceki tarama öyküsü olan kadınlarda USPSTF taramaya karşı çıkıyor (Grade D). Not: ACS 2020 kılavuzu taramayı 25 yaşında başlatmayı önermektedir (USPSTF\'nin 21 yaş önerisinden farklı). 2024 USPSTF taslak güncellemesi (henüz kesinleşmedi): 30–65 yaş için HPV primer taramasını tercih edilen yöntem yapmayı ve kendi kendine örnek almayı (self-collection) eklemeyi önermektedir. HPV aşısı yaptırmak taramayı ortadan kaldırmaz.',
     frequencyMonths: 36, ageMin: 21, ageMax: 65, sex: 'F', weight: 3,
@@ -240,6 +312,10 @@ export const SCREENINGS = {
 
   akci_bt: {
     id: 'akci_bt', trName: 'Akciğer BT (Düşük Doz)', enName: 'Low-Dose CT — Lung Cancer',
+    nameMedical: 'Düşük Doz Toraks Bilgisayarlı Tomografisi (LDCT)',
+    why: 'Ağır sigara içicilerinde akciğer kanserini semptom oluşmadan önce erken tespit eder. Bu tarama akciğer kanseri ölümlerini %20 azaltır.',
+    layer: 2,
+    guideline: 'USPSTF 2021 Grade B',
     explanation: 'Ağır sigara içicilerinde akciğer kanserini erken tespit eder. Yüksek riskli grupta mortaliteyi %20 azaltır.',
     recommendation: '50–80 yaş arası, 20+ paket-yıl sigara içen veya son 15 yıl içinde bırakmış bireylere yılda bir düşük doz BT önerilir (USPSTF B).',
     frequencyMonths: 12, ageMin: 50, ageMax: 80, sex: 'both', weight: 3,
@@ -252,6 +328,10 @@ export const SCREENINGS = {
 
   goz_dibi: {
     id: 'goz_dibi', trName: 'Göz Dibi Muayenesi', enName: 'Dilated Fundus Examination',
+    nameMedical: 'Fundoskopi / Retinal Muayene',
+    why: 'Diyabet göz damarlarına zarar verebilir ve görme kaybına yol açabilir. Erken tespit ile tedavi körlüğü önler.',
+    layer: 2,
+    guideline: 'ADA Standart Bakım Kılavuzu 2025',
     explanation: 'Diyabetik retinopati ve hipertansif retinopatiyi erken tespit eder. Tedavi edilmezse körlüğe yol açabilir.',
     recommendation: 'Tip 2 diyabette tanı anında, Tip 1 diyabette tanıdan 5 yıl sonra göz dibi muayenesi yapılmalıdır. Retinopati yoksa yılda bir, bulgu varsa 3–6 ayda bir tekrar. ADA 2025 Bölüm 12 (Diabetes Care 2025;48:S252–S265) gebelik önerisi güncellendi: Göz muayenesi gebelikten ÖNCE VE birinci trimesterde yapılmalıdır (önceki "veya" ifadesinden "ve"ye geçildi); her trimesterde izlem ve doğum sonrası 1 yıl sürdürülmelidir. Gestasyonel diyabette göz dibi muayenesi gerekli değildir. AI destekli tarama (FDA onaylı algoritmalar, ör. IDx-DR) artık Grade B öneri kapsamındadır.',
     frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 2,
@@ -264,6 +344,10 @@ export const SCREENINGS = {
 
   dis_kontrol: {
     id: 'dis_kontrol', trName: 'Diş Kontrolü', enName: 'Dental Check-up',
+    nameMedical: 'Diş ve Periodontal Muayene',
+    why: 'Diş eti hastalığı diyabeti ve kalp hastalığını kötüleştirir. Düzenli kontrol hem ağız sağlığını hem genel sağlığı korur.',
+    layer: 1,
+    guideline: 'EFP 2022 Periodontal Kılavuzu',
     explanation: 'Diş çürükleri ve periodontal (diş eti) hastalıklarının erken tespiti. Periodontal hastalık kalp hastalığı ve diyabet kontrolünü olumsuz etkiler.',
     recommendation: 'Altı ayda bir diş hekimi kontrolü ve profesyonel temizlik önerilir. Diyabet hastalarında periodontal tedavi HbA1c\'yi düşürür.',
     frequencyMonths: 6, ageMin: 18, ageMax: 120, sex: 'both', weight: 1,
@@ -276,6 +360,10 @@ export const SCREENINGS = {
 
   prostat: {
     id: 'prostat', trName: 'Prostat Taraması (PSA)', enName: 'Prostate-Specific Antigen Screening',
+    nameMedical: 'Prostat Spesifik Antijen (PSA) Testi',
+    why: 'Prostat kanserini erken evrede tespit eder. Aile öyküsü olanlar daha genç yaşta başlayarak riski azaltabilir.',
+    layer: 2,
+    guideline: 'USPSTF 2018 Grade C / EAU 2024',
     explanation: 'PSA kan testi prostat kanseri riskini değerlendirmek için kullanılır. Yaşa göre normallik aralıkları değişir.',
     recommendation: 'USPSTF: 55–69 yaş paylaşımlı karar (Grade C); ≥70 yaş önerilmez. Uygulama "PSA yaptır" değil, "doktorunuzla tartışın" mesajı verir. ⚠️ AİLE ÖYKÜSÜ KURALLARI (ACS): Ortalama risk → 50 yaşında tartışma. Yüksek risk (siyahi erkek VEYA 65 yaş altında prostat kanseri olan 1 1. derece akraba) → 45 yaşında tartışma. En yüksek risk (65 yaş altında 1\'den fazla 1. derece akraba) → 40 yaşında tartışma. BRCA2 mutasyonu → 40 yaşında yıllık PSA (ESMO 2025 / NCCN).',
     frequencyMonths: 12, ageMin: 40, ageMax: 75, sex: 'M', weight: 3,
@@ -288,6 +376,10 @@ export const SCREENINGS = {
 
   genetik_danisman: {
     id: 'genetik_danisman', trName: 'Genetik Danışmanlık (BRCA / Lynch)', enName: 'Genetic Counseling and Risk Assessment',
+    nameMedical: 'Germline Genetik Test (BRCA1/2, Lynch Sendromu / MMR Genleri)',
+    why: 'Ailede kanser öyküsü varsa genetik mutasyon taşıyıcısı olabilirsiniz. Erken tespit profilaktik cerrahi ve yoğun tarama ile kanseri önler.',
+    layer: 2,
+    guideline: 'USPSTF Grade B / NCCN 2024',
     explanation: 'Ailede meme, yumurtalık, kolorektal veya pankreas kanseri öyküsü olanlarda BRCA1/2 veya Lynch sendromu mutasyonu riski artmıştır. Genetik test sonucu profilaktik cerrahi kararını ve tarama yoğunluğunu doğrudan belirler.',
     recommendation: 'USPSTF Grade B: Ailede meme, yumurtalık, tüp veya periton kanseri öyküsü olan ya da yüksek riskli etnisiteden gelen kişilere (örn. Aşkenaz Yahudi kökeni) doğrulanmış aile riski değerlendirme aracıyla tarama yapılması ve pozitif sonuçta genetik danışmana yönlendirilmesi önerilir. NCCN: 50 yaş altı kolorektal kanser tanısı alan tüm bireylere aile öyküsünden bağımsız germline test önerilir. BRCA1/2 mutasyon taşıyıcılarında yumurtalık kanseri için prophylactic salpingo-ooferektomi (RRSO) en etkin korunma yöntemidir (BRCA1: 35-40 yaş, BRCA2: 40-45 yaş).',
     frequencyMonths: 999, ageMin: 18, ageMax: 120, sex: 'both', weight: 3,
@@ -302,6 +394,10 @@ export const SCREENINGS = {
   // ── YENİ TARAMALAR ───────────────────────────────────────────────────────────
   tansiyon_olcumu: {
     id: 'tansiyon_olcumu', trName: 'Kan Basıncı Ölçümü', enName: 'Blood Pressure Screening',
+    nameMedical: 'Arteriyel Kan Basıncı Ölçümü (Sfigmomanometri)',
+    why: 'Hipertansiyon hiçbir belirti vermeden inme ve kalp krizine yol açabilir. Düzenli ölçüm ile erken tespit ve tedavi hayat kurtarır.',
+    layer: 1,
+    guideline: 'USPSTF 2021 Grade A / ESC/ESH 2023 Hipertansiyon Kılavuzu',
     explanation: 'Hipertansiyon erken belirtisiz seyreder; ölçüm tek tanı yoludur. Kontrolsüz hipertansiyon inme, kalp krizi ve böbrek hasarının başlıca nedenidir.',
     recommendation: 'USPSTF 2015 (2021\'de yeniden onaylandı) Grade A: 18 yaş üstü tüm yetişkinlerde ofis tansiyonu ölçümü. Yüksek değer saptandığında ambulatuar (24 saat) veya ev ölçümüyle doğrulama gerekir. 40 yaş üstü veya yüksek riskli (Siyahi yetişkin, yüksek-normal KB): yılda bir. 18–39 yaş normal KB ve risk faktörü yok: 3–5 yılda bir.',
     frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 3,
@@ -314,6 +410,10 @@ export const SCREENINGS = {
 
   depresyon_tarama: {
     id: 'depresyon_tarama', trName: 'Depresyon Taraması', enName: 'Depression Screening',
+    nameMedical: 'PHQ-2/PHQ-9 Depresyon Tarama Ölçeği',
+    why: 'Depresyon genellikle tanınmaz ve tedavi edilmez. Basit bir soru setiyle erken tespit ile tam iyileşme mümkündür.',
+    layer: 1,
+    guideline: 'USPSTF 2023 Grade B',
     explanation: 'Depresyon tüm dünyada önde gelen iş göremezlik nedenidir. PHQ-2 ve PHQ-9 araçları ile basit tarama hayat kurtarabilir.',
     recommendation: 'USPSTF 2023 Grade B: 19 yaş üstü tüm yetişkinlerde depresyon taraması; gebelik/doğum sonrası dönem ve ≥65 yaş dahil. Tarama aracı: PHQ-2 (ön tarama), pozitifse PHQ-9. Optimal aralık belirsiz; yılda bir önerilir. Kanıta dayalı tedavi (psikoterapi ve/veya ilaç) erişilebilir olmalıdır.',
     frequencyMonths: 12, ageMin: 19, ageMax: 120, sex: 'both', weight: 2,
@@ -325,6 +425,10 @@ export const SCREENINGS = {
 
   hiv_tarama: {
     id: 'hiv_tarama', trName: 'HIV Taraması', enName: 'HIV Screening',
+    nameMedical: 'HIV-1/2 Antijen/Antikor Kombine Testi (4. Kuşak)',
+    why: 'HIV yıllarca belirti vermeden ilerleyebilir. Erken tanı ile modern antiretroviral tedavi sayesinde normal yaşam süresi sağlanabilir.',
+    layer: 1,
+    guideline: 'USPSTF 2019 Grade A',
     explanation: 'HIV enfeksiyonu yıllarca belirtisiz seyredebilir. Erken tanı ile modern antiretroviral tedavi ile normal yaşam beklentisi sağlanabilir.',
     recommendation: 'USPSTF 2019 Grade A: 15–65 yaş arası tüm bireylere en az bir kez HIV taraması. Bu yaş dışında da yüksek risk varlığında tarama. Tüm gebelere her gebelikte. Yüksek riskli bireylere (yeni partner, enjeksiyon ilaç kullanımı) yılda bir tekrar. Test: kombine HIV-1/2 antijen/antikor testi (4. kuşak).',
     frequencyMonths: 999, ageMin: 15, ageMax: 65, sex: 'both', weight: 3,
@@ -337,6 +441,10 @@ export const SCREENINGS = {
 
   aort_anevrizması: {
     id: 'aort_anevrizması', trName: 'Aort Anevrizması Taraması (AAA)', enName: 'Abdominal Aortic Aneurysm Screening',
+    nameMedical: 'Karın Aortu Ultrasonografisi (AAA Taraması)',
+    why: 'Aort anevrizması rüptüre kadar hiçbir belirti vermez. Rüptür mortalitesi %85\'i aşar; tarama ile cerrahi fırsat yakalanarak hayat kurtarılır.',
+    layer: 2,
+    guideline: 'USPSTF 2019 Grade B',
     explanation: 'Karın aortunun genişlemesi (≥3 cm) genellikle belirtisizdir. Rüptür mortalitesi %85\'i aşar; tarama ile cerrahi fırsat yakalanabilir.',
     recommendation: 'USPSTF 2019 Grade B: 65–75 yaş arası, hayatında ≥100 sigara içmiş (yaklaşık 5 paket-yıl) erkeklere tek seferlik karın ultrasonu ile AAA taraması. 65–75 yaş hiç sigara içmemiş erkekler: Grade C (seçici, bireysel karar). Kadınlar için yeterli kanıt yok (Grade I sigaralı; Grade D sigara içmemiş). Ultrasonda aort çapı: normal <3 cm; AAA ≥3 cm.',
     frequencyMonths: 999, ageMin: 65, ageMax: 75, sex: 'M', weight: 3,
@@ -348,6 +456,10 @@ export const SCREENINGS = {
 
   obezite_tarama: {
     id: 'obezite_tarama', trName: 'Obezite / BMI Taraması', enName: 'Obesity and BMI Screening',
+    nameMedical: 'Vücut Kitle İndeksi (VKİ/BMI) Değerlendirmesi',
+    why: 'Obezite diyabet, kalp hastalığı ve kanserin en önemli önlenebilir risk faktörüdür. BMI takibi hedefli müdahale ve takip sağlar.',
+    layer: 1,
+    guideline: 'USPSTF 2018 Grade B',
     explanation: 'BMI ölçümü ile obezite (BMI ≥30) ve fazla kilo (BMI 25–29.9) saptanır. Obezite diyabet, kalp hastalığı, kanser ve eklem hastalıklarının en önemli önlenebilir risk faktörüdür.',
     recommendation: 'USPSTF 2018 Grade B: Tüm yetişkinlerde obezite taraması. BMI ≥30 olan yetişkinlere yoğun, çok bileşenli davranışsal müdahale (ilk yılda ≥12 seans) sunulması veya yönlendirilmesi. BMI formülü: kilo (kg) / boy² (m). Sınırlar: <18.5 zayıf; 18.5–24.9 normal; 25–29.9 fazla kilolu; ≥30 obez.',
     frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 2,
@@ -585,3 +697,22 @@ export const DISEASE_LIST = [
   { id: 'aile_yumurtalik',     label: 'Yumurtalık Kanseri — herhangi bir akraba', icon: '🟣', group: 'kanser' },
   { id: 'brca_lynch',          label: 'BRCA1/2 Mutasyonu veya Lynch Sendromu', icon: '🧬', group: 'kanser' },
 ]
+
+// ── DOKTOR VİZİTİ → OTOMATİK TARAMA PAKETLERİ (Kontrole Gittim için) ─────
+export const DOCTOR_SCREENING_MAP = {
+  'Dahiliye / İç Hastalıkları': ['tansiyon_olcumu', 'kan_sayimi', 'biyokimya', 'lipid', 'hba1c', 'idrar', 'obezite_tarama'],
+  'Aile Hekimi': ['tansiyon_olcumu', 'kan_sayimi', 'biyokimya', 'lipid', 'hepatit', 'depresyon_tarama'],
+  'Kardiyoloji': ['ekg', 'ekokardiyografi', 'tansiyon_olcumu', 'lipid', 'karotis_usg'],
+  'Endokrinoloji': ['hba1c', 'tsh', 'vitamin_d', 'biyokimya', 'obezite_tarama'],
+  'Gastroenteroloji': ['kolonoskopi', 'karin_usg', 'fibroscan', 'hepatit'],
+  'Göz Hastalıkları': ['goz_dibi'],
+  'Kadın Hastalıkları': ['mamografi', 'pap_smear'],
+  'Üroloji': ['prostat'],
+  'Ortopedi / Romatoloji': ['dexa'],
+  'Nefroloji': ['idrar', 'biyokimya', 'tansiyon_olcumu'],
+  'Tıbbi Genetik': ['genetik_danisman'],
+  'Psikiyatri': ['depresyon_tarama'],
+  'Diş Hekimi': ['dis_kontrol'],
+  'Göğüs Hastalıkları': ['akci_bt'],
+  'Vasküler Cerrahi': ['karotis_usg', 'aort_anevrizması'],
+}

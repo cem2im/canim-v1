@@ -8,12 +8,16 @@ const useAppStore = create(
     (set, get) => ({
       // ── ONBOARDING ──────────────────────────────────────────────────────────
       onboardingDone: false,
-      profile: null,        // { name, birthYear, sex }
+      profile: null,        // { name, birthYear, sex, height, weight }
       diseases: [],         // ['hipertansiyon', 'diyabet', ...]
       
       // ── SCREENINGS ──────────────────────────────────────────────────────────
       // { screeningId: { lastDoneDate: 'YYYY-MM-DD' | null, nextDate: 'YYYY-MM-DD', customNextDate: null } }
       screeningDates: {},
+
+      // ── VISIT HISTORY ───────────────────────────────────────────────────────
+      // [{ date, doctor, screeningsCompleted: ['id1','id2',...] }]
+      visitHistory: [],
       
       // ── LAB RESULTS ────────────────────────────────────────────────────────
       // { testId: [{ value, unit, date, notes }] }
@@ -57,6 +61,32 @@ const useAppStore = create(
             }
           }
         }))
+      },
+
+      // Log a doctor visit and bulk-mark screenings as done
+      logDoctorVisit: (date, doctorType, screeningIds) => {
+        const { diseases, profile } = get()
+        const list = buildScreeningList(diseases, profile)
+        
+        set(state => {
+          const newDates = { ...state.screeningDates }
+          for (const id of screeningIds) {
+            const item = list.find(s => s.id === id)
+            const freq = item ? item.frequencyMonths : 12
+            newDates[id] = {
+              lastDoneDate: date,
+              nextDate: addMonths(date, freq),
+              customNextDate: null,
+            }
+          }
+          return {
+            screeningDates: newDates,
+            visitHistory: [
+              ...state.visitHistory,
+              { date, doctor: doctorType, screeningsCompleted: screeningIds }
+            ]
+          }
+        })
       },
 
       // Set custom next date (doctor's suggestion)
@@ -121,7 +151,14 @@ const useAppStore = create(
         })
       },
 
+      // complianceScore (renamed from healthScore)
       getScore: () => {
+        const cards = get().getScreeningCards()
+        return calcScore(cards)
+      },
+
+      // Alias for clarity
+      complianceScore: () => {
         const cards = get().getScreeningCards()
         return calcScore(cards)
       },

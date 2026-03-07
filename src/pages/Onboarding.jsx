@@ -1,37 +1,78 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import useAppStore from '../store/useAppStore'
-import { DISEASE_LIST } from '../data/screenings'
+import { DISEASE_LIST, SCREENINGS } from '../data/screenings'
 import { buildScreeningList, buildInitialDates, TIME_OPTIONS } from '../utils/engine'
 
+const ROUTINE_IDS = new Set(['kan_sayimi','biyokimya','lipid','hba1c','tansiyon_olcumu'])
+
 export default function Onboarding() {
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(0)          // 0=welcome, 1=basicInfo, 2=diseases, 3=screenings, 4=done
   const [subPage, setSubPage] = useState(null) // null | 'cancer'
+  const [showConfirmation, setShowConfirmation] = useState(false)
+
+  // Step 1 state
   const [name, setName] = useState('')
   const [birthYear, setBirthYear] = useState(1970)
   const [sex, setSex] = useState(null)
+  const [height, setHeight] = useState('')
+  const [weight, setWeight] = useState('')
+  const [skipMeasurements, setSkipMeasurements] = useState(false)
+
+  // Step 2 state
   const [diseases, setDiseases] = useState([])
+
+  // Step 3 state
   const [answers, setAnswers] = useState({}) // { screeningId: timeOption }
-  const [labAnswers, setLabAnswers] = useState({})
+
   const completeOnboarding = useAppStore(s => s.completeOnboarding)
 
   const age = new Date().getFullYear() - birthYear
-  const profile = { name, birthYear, sex }
+  const profile = { name, birthYear, sex, height: skipMeasurements ? null : (height ? parseInt(height) : null), weight: skipMeasurements ? null : (weight ? parseFloat(weight) : null) }
 
-  // ── STEP 0: Name + Age + Sex ─────────────────────────────────────────────
+  // ── STEP 0: Welcome ──────────────────────────────────────────────────────
   if (step === 0) return (
-    <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
+    <div className="min-h-dvh flex flex-col items-center justify-center px-6 py-10 page-enter" style={{background:'linear-gradient(160deg, #e8f4f5 0%, #FAFAF8 60%)'}}>
       {/* Logo */}
-      <div className="flex items-center gap-3 mb-10">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{background:'#0D7377'}}>
-          <span className="text-white text-lg font-black">C</span>
+      <div className="flex flex-col items-center mb-10">
+        <div className="w-20 h-20 rounded-3xl flex items-center justify-center mb-4 shadow-lg" style={{background:'linear-gradient(135deg, #0D7377, #14919B)'}}>
+          <span className="text-white text-3xl font-black">C</span>
         </div>
-        <span className="text-xl font-black text-gray-800">Canım</span>
+        <span className="text-3xl font-black text-gray-800 tracking-tight">Canım</span>
       </div>
 
+      <div className="text-center mb-12">
+        <h1 className="text-3xl font-extrabold text-gray-900 mb-4 leading-tight">
+          Taramalarını<br/>Kaçırma
+        </h1>
+        <p className="text-gray-500 text-base leading-relaxed max-w-xs">
+          Yaşına, cinsiyetine ve hastalıklarına göre hangi taramaları ne zaman yaptırman gerektiğini gösteren ücretsiz uygulama.
+        </p>
+      </div>
+
+      <div className="w-full max-w-xs">
+        <button
+          onClick={() => setStep(1)}
+          className="w-full py-4 rounded-2xl text-white font-bold text-lg shadow-lg active:scale-98 transition-all"
+          style={{background:'linear-gradient(135deg, #0D7377, #14919B)'}}
+        >
+          Başla →
+        </button>
+        <p className="text-xs text-gray-400 text-center mt-4">
+          Ücretsiz · Kayıt gerekmez · Verileriniz yalnızca cihazınızda
+        </p>
+      </div>
+    </div>
+  )
+
+  // ── STEP 1: Basic Info ────────────────────────────────────────────────────
+  if (step === 1) return (
+    <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
+      <button onClick={() => setStep(0)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+
       <div className="flex-1">
-        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 1 / 3</div>
-        <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Merhaba! 👋</h1>
-        <p className="text-gray-500 text-sm mb-8">Sizi tanıyalım.</p>
+        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 1 / 4</div>
+        <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sizi Tanıyalım</h1>
+        <p className="text-gray-500 text-sm mb-8">Kişiselleştirilmiş tarama takviminiz için gerekli.</p>
 
         {/* Name */}
         <div className="mb-6">
@@ -65,7 +106,7 @@ export default function Onboarding() {
         </div>
 
         {/* Sex */}
-        <div className="mb-8">
+        <div className="mb-6">
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Cinsiyet</label>
           <div className="grid grid-cols-2 gap-3">
             {[{v:'F', label:'Kadın', icon:'👩'}, {v:'M', label:'Erkek', icon:'👨'}].map(opt => (
@@ -73,9 +114,7 @@ export default function Onboarding() {
                 key={opt.v}
                 onClick={() => setSex(opt.v)}
                 className={`py-5 rounded-2xl border-2 text-center font-bold text-base transition-all active:scale-95 ${
-                  sex === opt.v
-                    ? 'border-teal bg-teal-pale text-teal'
-                    : 'border-gray-200 bg-white text-gray-700'
+                  sex === opt.v ? 'border-teal bg-teal-pale text-teal' : 'border-gray-200 bg-white text-gray-700'
                 }`}
               >
                 <div className="text-3xl mb-1">{opt.icon}</div>
@@ -84,11 +123,51 @@ export default function Onboarding() {
             ))}
           </div>
         </div>
+
+        {/* Height & Weight — optional */}
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">Boy & Kilo (İsteğe Bağlı)</label>
+            <button
+              onClick={() => setSkipMeasurements(v => !v)}
+              className="text-xs font-semibold px-3 py-1 rounded-full transition-all"
+              style={skipMeasurements ? {background:'#0D7377', color:'white'} : {background:'#f3f4f6', color:'#6B7280'}}
+            >
+              {skipMeasurements ? '✓ Şu an bilmiyorum' : 'Şu an bilmiyorum'}
+            </button>
+          </div>
+          {!skipMeasurements && (
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <div className="text-xs text-gray-400 mb-1 font-medium">Boy (cm)</div>
+                <input
+                  type="number"
+                  className="w-full px-4 py-3.5 rounded-2xl border-2 border-gray-200 bg-white text-gray-900 font-semibold outline-none focus:border-teal transition-colors"
+                  placeholder="170"
+                  value={height}
+                  onChange={e => setHeight(e.target.value)}
+                  min="100" max="250"
+                />
+              </div>
+              <div>
+                <div className="text-xs text-gray-400 mb-1 font-medium">Kilo (kg)</div>
+                <input
+                  type="number"
+                  className="w-full px-4 py-3.5 rounded-2xl border-2 border-gray-200 bg-white text-gray-900 font-semibold outline-none focus:border-teal transition-colors"
+                  placeholder="70"
+                  value={weight}
+                  onChange={e => setWeight(e.target.value)}
+                  min="30" max="300"
+                />
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       <button
         disabled={!name.trim() || !sex}
-        onClick={() => setStep(1)}
+        onClick={() => setStep(2)}
         className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all disabled:opacity-40 active:scale-98"
         style={{background: (!name.trim() || !sex) ? '#9CA3AF' : '#0D7377'}}
       >
@@ -97,8 +176,8 @@ export default function Onboarding() {
     </div>
   )
 
-  // ── STEP 1: Disease selection ───────────────────────────────────────────────
-  if (step === 1 && subPage === null) {
+  // ── STEP 2: Disease selection ──────────────────────────────────────────────
+  if (step === 2 && subPage === null) {
     const chronicDiseases = DISEASE_LIST.filter(d => !d.group)
     const kanserDiseases  = DISEASE_LIST.filter(d => d.group === 'kanser')
     const selectedCancerCount = kanserDiseases.filter(d => diseases.includes(d.id)).length
@@ -107,16 +186,23 @@ export default function Onboarding() {
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     )
 
+    const handleDiseaseDone = () => {
+      setShowConfirmation(true)
+      setTimeout(() => {
+        setShowConfirmation(false)
+        setStep(3)
+      }, 1500)
+    }
+
     return (
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-        <button onClick={() => setStep(0)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
-        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 2 / 3</div>
+        <button onClick={() => setStep(1)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 2 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sağlık Durumunuz</h1>
         <p className="text-gray-500 text-sm mb-6">Hangi sağlık sorunlarınız var?<br/>Birden fazla seçebilirsiniz.</p>
 
         <div className="flex-1 overflow-y-auto -mx-6 px-6">
-
-          {/* ── Kronik Hastalıklar ── */}
+          {/* Kronik Hastalıklar */}
           <div className="mb-2 flex items-center gap-2">
             <span className="text-base">💊</span>
             <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Kronik Hastalıklar</span>
@@ -127,9 +213,7 @@ export default function Onboarding() {
                 key={d.id}
                 onClick={() => toggleDisease(d.id)}
                 className={`flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-2xl border-2 font-semibold transition-all active:scale-95 ${
-                  diseases.includes(d.id)
-                    ? 'border-teal bg-teal-pale text-teal'
-                    : 'border-gray-200 bg-white text-gray-700'
+                  diseases.includes(d.id) ? 'border-teal bg-teal-pale text-teal' : 'border-gray-200 bg-white text-gray-700'
                 }`}
               >
                 <span className="text-2xl">{d.icon}</span>
@@ -139,7 +223,7 @@ export default function Onboarding() {
             ))}
           </div>
 
-          {/* ── Ailede Kanser Öyküsü — ayrı sayfa butonu ── */}
+          {/* Ailede Kanser Öyküsü */}
           <div className="mb-2 flex items-center gap-2">
             <span className="text-base">🧬</span>
             <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Ailede Kanser Öyküsü</span>
@@ -157,15 +241,12 @@ export default function Onboarding() {
               <div className="text-left">
                 <div className="font-bold text-sm">Ailede Kanser Öyküsü</div>
                 <div className="text-xs mt-0.5" style={{color: selectedCancerCount > 0 ? '#0D7377' : '#9CA3AF'}}>
-                  {selectedCancerCount > 0
-                    ? `${selectedCancerCount} seçenek işaretlendi ✓`
-                    : 'Varsa belirtmek için dokunun'}
+                  {selectedCancerCount > 0 ? `${selectedCancerCount} seçenek işaretlendi ✓` : 'Varsa belirtmek için dokunun'}
                 </div>
               </div>
             </div>
             <span className="text-gray-400 font-bold text-lg">→</span>
           </button>
-
         </div>
 
         <div className="mb-4 p-4 rounded-2xl bg-gray-50 border border-gray-200">
@@ -174,8 +255,19 @@ export default function Onboarding() {
           </p>
         </div>
 
+        {/* Confirmation overlay */}
+        {showConfirmation && (
+          <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+            <div className="bg-white rounded-3xl p-8 mx-6 text-center shadow-2xl">
+              <div className="text-5xl mb-3">✨</div>
+              <div className="text-xl font-extrabold text-gray-900 mb-2">Harika!</div>
+              <div className="text-gray-500 text-sm">Senin için özel taramalar belirlendi.</div>
+            </div>
+          </div>
+        )}
+
         <button
-          onClick={() => setStep(2)}
+          onClick={handleDiseaseDone}
           className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98"
           style={{background:'#0D7377'}}
         >
@@ -185,12 +277,11 @@ export default function Onboarding() {
     )
   }
 
-  // ── STEP 1 — CANCER SUB-PAGE ─────────────────────────────────────────────
-  if (step === 1 && subPage === 'cancer') {
-    // Cinsiyet filtrelemesi
+  // ── STEP 2 — CANCER SUB-PAGE ───────────────────────────────────────────────
+  if (step === 2 && subPage === 'cancer') {
     const hiddenForSex = sex === 'F'
-      ? ['aile_prostat']                                           // Kadınlarda prostat yok
-      : ['aile_meme_yuksek','aile_meme_orta','aile_yumurtalik']   // Erkeklerde meme/yumurtalık yok
+      ? ['aile_prostat']
+      : ['aile_meme_yuksek','aile_meme_orta','aile_yumurtalik']
 
     const kanserDiseases = DISEASE_LIST
       .filter(d => d.group === 'kanser')
@@ -200,7 +291,6 @@ export default function Onboarding() {
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     )
 
-    // Kanser türlerine göre grupla
     const groups = [
       { title: '🎗️ Meme Kanseri',        ids: ['aile_meme_yuksek','aile_meme_orta'] },
       { title: '🟠 Kolorektal Kanser',    ids: ['aile_krc_yuksek','aile_krc_orta','aile_krc_dusuk'] },
@@ -215,21 +305,16 @@ export default function Onboarding() {
     return (
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
         <button onClick={() => setSubPage(null)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
-
-        <div className="mb-1 text-xs font-bold text-teal uppercase tracking-widest">Adım 2 / 3</div>
+        <div className="mb-1 text-xs font-bold text-teal uppercase tracking-widest">Adım 2 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Ailede Kanser Öyküsü</h1>
-
-        {/* Açıklama notu */}
         <div className="mb-6 px-4 py-3 rounded-2xl bg-amber-50 border border-amber-200">
           <p className="text-sm text-amber-800 leading-relaxed">
             Ailenizde kanser öyküsü varsa lütfen aşağıdan ilgili seçenekleri belirtin. Hangi kanser türü ve akrabanızın tanı yaşı önemlidir.
           </p>
         </div>
-
         <div className="flex-1 overflow-y-auto -mx-6 px-6">
           {groups.map(g => (
             <div key={g.title} className="mb-5">
-              {/* Kanser türü başlığı */}
               <div className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">{g.title}</div>
               <div className="flex flex-col gap-2">
                 {g.items.map(d => (
@@ -252,7 +337,6 @@ export default function Onboarding() {
               </div>
             </div>
           ))}
-
           <div className="mb-6 px-4 py-3 rounded-2xl bg-gray-50 border border-gray-200">
             <p className="text-xs text-gray-500 leading-relaxed">
               1. derece akraba: anne, baba, kardeş, çocuk<br/>
@@ -260,7 +344,6 @@ export default function Onboarding() {
             </p>
           </div>
         </div>
-
         <button
           onClick={() => setSubPage(null)}
           className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98"
@@ -272,52 +355,102 @@ export default function Onboarding() {
     )
   }
 
-  // ── STEP 2: Last checkup dates ─────────────────────────────────────────────
-  if (step === 2) {
+  // ── STEP 3: Critical screenings only ────────────────────────────────────────
+  if (step === 3) {
     const screeningList = buildScreeningList(diseases, profile)
-    // Group: lab packages + procedural
-    const labItems = screeningList.filter(s => ['kan_sayimi','biyokimya','lipid','hba1c','tsh','vitamin_d','b12','idrar','hepatit'].includes(s.id))
-    const procItems = screeningList.filter(s => !['kan_sayimi','biyokimya','lipid','hba1c','tsh','vitamin_d','b12','idrar','hepatit'].includes(s.id))
+    // Only show layer:2 screenings with weight >= 2, not routine doctor items
+    const specialScreenings = screeningList
+      .filter(s => s.layer === 2 && s.weight >= 2 && !ROUTINE_IDS.has(s.id))
+      .slice(0, 5)
 
     const setAnswer = (id, val) => setAnswers(prev => ({...prev, [id]: val}))
 
     const handleFinish = () => {
+      const fullList = buildScreeningList(diseases, profile)
       const allAnswers = {...answers}
-      for (const s of screeningList) {
+      for (const s of fullList) {
         if (!allAnswers[s.id]) allAnswers[s.id] = 'unknown'
       }
-      const initialDates = buildInitialDates(screeningList, allAnswers)
-      completeOnboarding(profile, diseases, initialDates)
+      const initialDates = buildInitialDates(fullList, allAnswers)
+      completeOnboarding(
+        { name, birthYear, sex, height: skipMeasurements ? null : (height ? parseInt(height) : null), weight: skipMeasurements ? null : (weight ? parseFloat(weight) : null) },
+        diseases,
+        initialDates
+      )
+    }
+
+    if (specialScreenings.length === 0) {
+      // Nothing to ask — jump straight to onboarding done
+      handleFinish()
+      return null
     }
 
     return (
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-        <button onClick={() => setStep(1)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
-        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 3</div>
+        <button onClick={() => setStep(2)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Son Kontroller</h1>
-        <p className="text-gray-500 text-sm mb-6">Yaklaşık olarak ne zaman yaptırdınız?</p>
+        <p className="text-gray-500 text-sm mb-2">Bu özel taramaları yaptırdınız mı?</p>
+        <div className="mb-6 px-3 py-2 rounded-xl" style={{background:'#eff6ff', border:'1px solid #bfdbfe'}}>
+          <p className="text-xs" style={{color:'#1d4ed8'}}>💡 Kan testleri ve kan basıncı gibi rutin taramalar doktorunuz takip ettiğinden burada sorulmaz.</p>
+        </div>
 
         <div className="flex-1 overflow-y-auto -mx-6 px-6">
-
-          {/* Lab packages */}
-          {labItems.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-sm font-bold text-gray-700 mb-3">Kan Testleri</h2>
-              {labItems.map(s => (
-                <ScreeningQuestion key={s.id} screening={s} answer={answers[s.id]} onChange={val => setAnswer(s.id, val)} />
-              ))}
+          {specialScreenings.map(s => (
+            <div key={s.id} className="mb-4 p-4 rounded-2xl bg-white border border-gray-200">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-xl">{s.icon}</span>
+                <span className="font-bold text-gray-900 text-sm">{s.trName}</span>
+              </div>
+              {s.why && <p className="text-xs text-gray-400 mb-3 leading-relaxed">{s.why}</p>}
+              <div className="text-xs font-semibold text-gray-500 mb-2">Yaptırdınız mı?</div>
+              <div className="flex flex-wrap gap-2">
+                {/* Yes → time picker */}
+                {answers[s.id] && answers[s.id] !== 'no' ? (
+                  <div className="w-full">
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {[
+                        { value: 'this_month', label: 'Bu ay' },
+                        { value: '6m', label: '6 ay önce' },
+                        { value: '1y', label: '1 yıl önce' },
+                        { value: '2y', label: '2 yıl önce' },
+                        { value: 'older', label: '5+ yıl önce' },
+                      ].map(opt => (
+                        <button
+                          key={opt.value}
+                          onClick={() => setAnswer(s.id, opt.value)}
+                          className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
+                          style={answers[s.id] === opt.value ? {background:'#0D7377', color:'white'} : {background:'#f3f4f6', color:'#374151'}}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => setAnswer(s.id, 'no')}
+                      className="text-xs text-gray-400 underline"
+                    >Hayır / Hatırlamıyorum</button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setAnswer(s.id, 'this_month')}
+                      className="px-4 py-2 rounded-xl text-sm font-semibold transition-all active:scale-95"
+                      style={{background:'#0D7377', color:'white'}}
+                    >
+                      Evet →
+                    </button>
+                    <button
+                      onClick={() => setAnswer(s.id, 'no')}
+                      className="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 active:scale-95"
+                    >
+                      Hayır / Hatırlamıyorum
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
-          )}
-
-          {/* Procedural tests */}
-          {procItems.length > 0 && (
-            <div className="mb-6">
-              <h2 className="text-sm font-bold text-gray-700 mb-3">Testler & Muayeneler</h2>
-              {procItems.map(s => (
-                <ScreeningQuestion key={s.id} screening={s} answer={answers[s.id]} onChange={val => setAnswer(s.id, val)} />
-              ))}
-            </div>
-          )}
+          ))}
         </div>
 
         <button
@@ -332,31 +465,4 @@ export default function Onboarding() {
   }
 
   return null
-}
-
-function ScreeningQuestion({ screening, answer, onChange }) {
-  return (
-    <div className="mb-4 p-4 rounded-2xl bg-white border border-gray-200">
-      <div className="flex items-center gap-2 mb-3">
-        <span className="text-xl">{screening.icon}</span>
-        <span className="font-semibold text-gray-900 text-sm">{screening.trName}</span>
-      </div>
-      <div className="flex flex-wrap gap-2">
-        {TIME_OPTIONS.map(opt => (
-          <button
-            key={opt.value}
-            onClick={() => onChange(opt.value)}
-            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95 ${
-              answer === opt.value
-                ? 'text-white'
-                : 'bg-gray-100 text-gray-600'
-            }`}
-            style={answer === opt.value ? {background:'#0D7377'} : {}}
-          >
-            {opt.label}
-          </button>
-        ))}
-      </div>
-    </div>
-  )
 }

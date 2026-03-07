@@ -2,12 +2,14 @@ import { useState } from 'react'
 import useAppStore from '../store/useAppStore'
 import { scoreColor, scoreLabel, statusColor, statusLabel } from '../utils/score'
 import ScreeningDetail from '../components/ScreeningDetail'
+import DoctorVisitModal from '../components/DoctorVisitModal'
 
 export default function Today() {
   const profile = useAppStore(s => s.profile)
   const getScore = useAppStore(s => s.getScore)
   const getScreeningCards = useAppStore(s => s.getScreeningCards)
   const [selected, setSelected] = useState(null)
+  const [showDoctorModal, setShowDoctorModal] = useState(false)
 
   const score = getScore()
   const cards = getScreeningCards()
@@ -29,12 +31,18 @@ export default function Today() {
   const okCards = cards.filter(c => c.status === 'ok')
   const [showAll, setShowAll] = useState(false)
 
+  // Motivation message based on score
+  const motivationMsg = score >= 90 ? 'Harika gidiyorsun! Taramalarını düzenli yaptırıyorsun. 🎉'
+    : score >= 70 ? 'İyi gidiyorsun, birkaç tarama yaklaşıyor.'
+    : score >= 50 ? 'Bazı taramaların gecikmiş, takvimini kontrol et.'
+    : 'Dikkat! Gecikmiş taramaların var, en kısa sürede randevu al. ⚠️'
+
   if (selected) return (
     <ScreeningDetail screening={selected} onBack={() => setSelected(null)} />
   )
 
   return (
-    <div className="page-enter pb-24">
+    <div className="page-enter pb-28">
       {/* Header */}
       <div className="px-5 pt-6 pb-4">
         <div className="text-xs text-gray-400 mb-0.5">{dateStr}</div>
@@ -42,12 +50,12 @@ export default function Today() {
       </div>
 
       {/* Score card */}
-      <div className="mx-5 mb-5 rounded-3xl p-5 text-white overflow-hidden relative" style={{background:`linear-gradient(135deg, #0D7377, #14919B)`}}>
+      <div className="mx-5 mb-4 rounded-3xl p-5 text-white overflow-hidden relative" style={{background:`linear-gradient(135deg, #0D7377, #14919B)`}}>
         <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full opacity-10 bg-white"/>
         <div className="absolute -right-2 -bottom-8 w-24 h-24 rounded-full opacity-10 bg-white"/>
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-sm font-medium opacity-80 mb-1">Sağlık Puanınız</div>
+            <div className="text-sm font-medium opacity-80 mb-1">Tarama Uyum Puanı</div>
             <div className="text-5xl font-black mb-1">{score}</div>
             <div className="inline-block px-3 py-1 rounded-full text-xs font-bold" style={{background:'rgba(255,255,255,0.2)'}}>
               {label}
@@ -70,6 +78,24 @@ export default function Today() {
             <span className="opacity-70 ml-1">Tamam</span>
           </div>
         </div>
+      </div>
+
+      {/* Motivation Banner */}
+      <div className="mx-5 mb-4 px-4 py-3 rounded-2xl" style={{background: score >= 70 ? '#e8f4f5' : score >= 50 ? '#fffbeb' : '#fef2f2'}}>
+        <p className="text-sm font-semibold text-center" style={{color: score >= 70 ? '#0D7377' : score >= 50 ? '#92400e' : '#991b1b'}}>
+          {motivationMsg}
+        </p>
+      </div>
+
+      {/* Kontrole Gittim button */}
+      <div className="mx-5 mb-5">
+        <button
+          onClick={() => setShowDoctorModal(true)}
+          className="w-full py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-transform"
+          style={{background:'linear-gradient(135deg, #14919B, #0D7377)'}}
+        >
+          🏥 Kontrole Gittim — Taramaları Kaydet
+        </button>
       </div>
 
       {/* Action list */}
@@ -101,12 +127,38 @@ export default function Today() {
           <ScreeningCard key={card.id} card={card} onClick={() => setSelected(card)} />
         ))}
       </div>
+
+      {/* Footer Disclaimer */}
+      <div className="mx-5 mb-6 mt-4 py-3 px-4 rounded-2xl bg-gray-50">
+        <p className="text-xs text-gray-400 text-center leading-relaxed">
+          Bu uygulama güncel kılavuzlara dayalı tarama hatırlatmaları sunar. Tıbbi teşhis veya tedavi yerine geçmez. Tarama sonuçlarınızı mutlaka doktorunuzla değerlendirin.
+        </p>
+        <p className="text-xs text-gray-300 text-center mt-1">
+          Prof. Dr. Cem Şimşek • Hacettepe Üniversitesi
+        </p>
+      </div>
+
+      {/* Doctor Visit Modal */}
+      {showDoctorModal && (
+        <DoctorVisitModal onClose={() => setShowDoctorModal(false)} />
+      )}
     </div>
   )
 }
 
 function ScreeningCard({ card, onClick }) {
   const color = statusColor(card.status)
+  // Doctor specialty badge — first item from doctor field
+  const doctorBadge = card.doctor ? card.doctor.split(' · ')[0] : null
+  // Format next date nicely
+  const nextDateLabel = card.nextDate
+    ? (() => {
+        const d = new Date(card.nextDate)
+        const months = ['Oca','Şub','Mar','Nis','May','Haz','Tem','Ağu','Eyl','Eki','Kas','Ara']
+        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`
+      })()
+    : 'En kısa zamanda'
+
   return (
     <div
       onClick={onClick}
@@ -122,7 +174,9 @@ function ScreeningCard({ card, onClick }) {
               <span className="text-xl">{card.icon}</span>
               <div>
                 <div className="font-bold text-gray-900 text-sm">{card.trName}</div>
-                <div className="text-xs text-gray-400">{card.enName}</div>
+                {card.why && (
+                  <div className="text-xs text-gray-400 mt-0.5 leading-relaxed max-w-xs">{card.why}</div>
+                )}
               </div>
             </div>
             <div className="ml-2 flex-shrink-0">
@@ -131,9 +185,12 @@ function ScreeningCard({ card, onClick }) {
               </span>
             </div>
           </div>
-          {card.doctor && (
-            <div className="mt-2 text-xs text-gray-400">🏥 {card.doctor}</div>
-          )}
+          <div className="mt-2 flex items-center gap-3 flex-wrap">
+            {doctorBadge && (
+              <span className="text-xs text-gray-400 bg-gray-50 px-2 py-0.5 rounded-full">🏥 {doctorBadge}</span>
+            )}
+            <span className="text-xs text-gray-400">📅 {nextDateLabel}</span>
+          </div>
         </div>
       </div>
     </div>

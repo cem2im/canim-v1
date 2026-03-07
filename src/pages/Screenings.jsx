@@ -28,6 +28,16 @@ export default function Screenings() {
       {soon.length > 0 && <Section title="🟡 Yaklaşıyor" cards={soon} onSelect={setSelected} />}
       {unknown.length > 0 && <Section title="⚪ Bilinmiyor" cards={unknown} onSelect={setSelected} />}
       {ok.length > 0 && <Section title="✅ Tamamlandı" cards={ok} onSelect={setSelected} />}
+
+      {/* Footer Disclaimer */}
+      <div className="mx-0 mb-6 mt-4 py-3 px-4 rounded-2xl bg-gray-50">
+        <p className="text-xs text-gray-400 text-center leading-relaxed">
+          Bu uygulama güncel kılavuzlara dayalı tarama hatırlatmaları sunar. Tıbbi teşhis veya tedavi yerine geçmez. Tarama sonuçlarınızı mutlaka doktorunuzla değerlendirin.
+        </p>
+        <p className="text-xs text-gray-300 text-center mt-1">
+          Prof. Dr. Cem Şimşek • Hacettepe Üniversitesi
+        </p>
+      </div>
     </div>
   )
 }
