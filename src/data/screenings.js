@@ -157,7 +157,7 @@ export const SCREENINGS = {
     frequencyMonths: 12, ageMin: 30, ageMax: 120, sex: 'both', weight: 2,
     doctor: 'Gastroenteroloji / Radyoloji', icon: '📡',
     sources: [
-      { name: 'EASL-EASD-EASO — MASLD Clinical Practice Guidelines (2024)', url: 'https://www.sciencedirect.com/science/article/pii/S0168827824003295' },
+      { name: 'EASL-EASD-EASO — MASLD Clinical Practice Guidelines (2024)', url: 'https://www.journal-of-hepatology.eu/article/S0168-8278(24)00329-5/fulltext' },
       { name: 'AASLD — NAFLD Practice Guidance (2023)', url: 'https://www.aasld.org/sites/default/files/2023-06/AASLD-PracticeGuidance-NAFLD-June2023.pdf' },
     ],
   },
@@ -169,8 +169,8 @@ export const SCREENINGS = {
     frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 2,
     doctor: 'Gastroenteroloji', icon: '📊',
     sources: [
-      { name: 'EASL-EASD-EASO — MASLD Clinical Practice Guidelines (2024)', url: 'https://www.sciencedirect.com/science/article/pii/S0168827824003295' },
-      { name: 'EASL — Non-Invasive Tests for Liver Fibrosis (2021)', url: 'https://www.journal-of-hepatology.eu/article/S0168-8278(21)00224-2/fulltext' },
+      { name: 'EASL-EASD-EASO — MASLD Clinical Practice Guidelines (2024)', url: 'https://www.journal-of-hepatology.eu/article/S0168-8278(24)00329-5/fulltext' },
+      { name: 'EASL — Non-Invasive Tests for Liver Fibrosis (2021)', url: 'https://www.journal-of-hepatology.eu/article/S0168-8278(21)00398-6/fulltext' },
     ],
   },
 
