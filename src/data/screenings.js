@@ -1,30 +1,36 @@
 // ─── SCREENING DEFINITIONS ───────────────────────────────────────────────────
-// sources: tüm linkler canlı olarak doğrulanmıştır (Mart 2026)
+// Kılavuz uyumu:
+//   USPSTF Grade A/B = en güçlü öneri (zorunlu)
+//   USPSTF Grade C   = bireysel karar (dahil edilebilir)
+//   USPSTF Grade D   = aktif olarak ÖNERMEZ (genel nüfustan çıkarıldı)
+//   USPSTF Grade I   = yetersiz kanıt (genel nüfustan çıkarıldı)
+//   ESC/ADA/EASL     = hastalık grupları için spesifik öneriler
+// Tüm URL'ler canlı olarak doğrulanmıştır (Mart 2026)
 
 export const SCREENINGS = {
 
   // ── RUTIN LAB ────────────────────────────────────────────────────────────────
   kan_sayimi: {
     id: 'kan_sayimi', trName: 'Tam Kan Sayımı', enName: 'Complete Blood Count',
-    explanation: 'Kırmızı ve beyaz kan hücrelerini, trombositleri ölçer. Anemi, enfeksiyon veya kan hastalıklarını erken tespit eder.',
-    recommendation: 'Asemptomatik yetişkinlerde yılda bir tam kan sayımı önerilir. Kronik hastalığı olanlarda 6 ayda bir takip gerekebilir.',
+    explanation: 'Kırmızı ve beyaz kan hücrelerini, trombositleri ölçer. Anemi, enfeksiyon veya kan hastalıklarını tespit eder.',
+    recommendation: 'USPSTF veya ESC, asemptomatik sağlıklı yetişkinde rutin tam kan sayımı taraması önermemektedir. Hipertansiyon, diyabet, kronik böbrek hastalığı veya hematolojik şüphe varlığında endikedir. Burada yalnızca kronik hastalık grubundaki hastalara gösterilmektedir.',
     frequencyMonths: 12, ageMin: 20, ageMax: 120, sex: 'both', weight: 1,
     doctor: 'İç Hastalıkları', icon: '🩸',
     sources: [
-      { name: 'WHO — Integrated Chronic Disease Prevention', url: 'https://www.who.int/publications/i/item/9789240001220' },
-      { name: 'USPSTF — Preventive Care Guidelines', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/topic_search_results?topic_status=P' },
+      { name: 'ESC — CVD Prevention Guidelines (2021)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/CVD-Prevention-in-clinical-practice' },
+      { name: 'NCBI StatPearls — Health Screening (2023)', url: 'https://www.ncbi.nlm.nih.gov/books/NBK436014/' },
     ],
   },
 
   biyokimya: {
     id: 'biyokimya', trName: 'Biyokimya Paneli', enName: 'Comprehensive Metabolic Panel',
-    explanation: 'Karaciğer, böbrek, kan şekeri ve elektrolitler dahil genel metabolizma durumunuzu gösterir.',
-    recommendation: 'Yılda bir rutin biyokimya paneli, erken organ hasarını tespit etmenin temel yoludur. Hipertansiyon veya diyabet hastalarında 6 ayda bir yapılmalıdır.',
-    frequencyMonths: 12, ageMin: 20, ageMax: 120, sex: 'both', weight: 1,
+    explanation: 'Açlık glikozu, renal fonksiyon (kreatinin, eGFR), karaciğer enzimleri ve elektrolitler dahil metabolizma durumunuzu gösterir.',
+    recommendation: 'ESC 2021 CVD Önleme Kılavuzu, kardiyovasküler risk değerlendirmesi için tüm yetişkinlerde 5 yılda bir açlık glikozu ve renal fonksiyon ölçümü önermektedir. Hipertansiyon veya diyabet hastalarında 6 ayda bir takip gerekir. Sağlıklı düşük riskli bireylerde 5 yılda bir yeterlidir.',
+    frequencyMonths: 60, ageMin: 20, ageMax: 120, sex: 'both', weight: 1,
     doctor: 'İç Hastalıkları', icon: '🔬',
     sources: [
-      { name: 'ESC — Cardiovascular Prevention Guidelines (2021)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/CVD-Prevention-in-clinical-practice' },
-      { name: 'ADA — Standards of Care in Diabetes 2025 (Bölüm 10)', url: 'https://professional.diabetes.org/standards-of-care' },
+      { name: 'ESC — CVD Prevention Guidelines 2021 (Bölüm 4.3: CV Risk Değerlendirmesi)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/CVD-Prevention-in-clinical-practice' },
+      { name: 'ADA — Standards of Care in Diabetes 2025', url: 'https://professional.diabetes.org/standards-of-care' },
     ],
   },
 
@@ -66,13 +72,13 @@ export const SCREENINGS = {
 
   vitamin_d: {
     id: 'vitamin_d', trName: 'D Vitamini', enName: 'Vitamin D (25-OH)',
-    explanation: 'Kemik sağlığı, bağışıklık ve kas gücü için kritik. Türkiye\'de popülasyonun %70-80\'inde eksiklik saptanmaktadır.',
-    recommendation: 'Yeterlilik eşiği: >30 ng/mL. Eksiklik: <20 ng/mL → yükleme tedavisi gerekir. Kemik erimesi, diyabet veya bağışıklık sorunlarında 6 ayda bir takip.',
-    frequencyMonths: 12, ageMin: 20, ageMax: 120, sex: 'both', weight: 1,
+    explanation: 'Kemik sağlığı, bağışıklık ve kas gücü için kritik. Obezite, kemik erimesi ve diyabet hastalarında eksiklik riski yüksektir.',
+    recommendation: 'USPSTF 2021: Asemptomatik sağlıklı yetişkinde rutin D vitamini taraması için kanıt yetersizdir (Grade I). Endocrine Society ise obezite, osteoporoz, malabsorpsiyon veya güneş maruziyeti kısıtlı kişiler gibi risk gruplarında yılda bir tarama önermektedir. Bu uygulama D vitaminini yalnızca risk grubu hastalara (obezite, kemik erimesi, diyabet) göstermektedir.',
+    frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 1,
     doctor: 'İç Hastalıkları', icon: '☀️',
     sources: [
+      { name: 'USPSTF — Vitamin D Deficiency Screening (2021, Grade I)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/vitamin-d-deficiency-screening' },
       { name: 'Endocrine Society — Vitamin D Deficiency Guidelines (2011, 2024 güncelleme)', url: 'https://www.endocrine.org/clinical-practice-guidelines/vitamin-d-deficiency' },
-      { name: 'USPSTF — Vitamin D Deficiency Screening (2021)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/vitamin-d-deficiency-screening' },
     ],
   },
 
@@ -89,12 +95,12 @@ export const SCREENINGS = {
 
   idrar: {
     id: 'idrar', trName: 'Tam İdrar Tahlili', enName: 'Urinalysis',
-    explanation: 'Böbrek, mesane ve diyabet komplikasyonlarını erken tespit eder. Mikroalbüminüri, diyabetik nefropatinin en erken işaretidir.',
-    recommendation: 'Diyabet ve hipertansiyon hastalarında yılda bir idrar tahlili ve mikroalbümin/kreatinin oranı önerilir. Pozitif mikroalbüminüri → nefroloji konsültasyonu.',
-    frequencyMonths: 12, ageMin: 20, ageMax: 120, sex: 'both', weight: 1,
+    explanation: 'Böbrek ve diyabet komplikasyonlarını erken tespit eder. Mikroalbüminüri/kreatinin oranı, diyabetik nefropatinin en erken göstergesidir.',
+    recommendation: 'USPSTF, asemptomatik sağlıklı yetişkinde rutin idrar tahlilini önermemektedir (Grade D — aktif olarak karşı çıkılır). ADA 2025 ve KDIGO 2022, diyabet ve hipertansiyon hastalarında yılda bir idrar tahlili + mikroalbümin/kreatinin oranı önermektedir. Bu uygulama idrar tahlilini yalnızca diyabet ve hipertansiyon grubundaki hastalara göstermektedir.',
+    frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 1,
     doctor: 'İç Hastalıkları', icon: '🫧',
     sources: [
-      { name: 'ADA — Chronic Kidney Disease and Diabetes (2025)', url: 'https://professional.diabetes.org/standards-of-care' },
+      { name: 'ADA — CKD and Diabetes (Standards of Care 2025, Bölüm 11)', url: 'https://professional.diabetes.org/standards-of-care' },
       { name: 'KDIGO — CKD Evaluation and Management (2022)', url: 'https://kdigo.org/guidelines/ckd-evaluation-and-management/' },
     ],
   },
@@ -277,14 +283,16 @@ export const SCREENINGS = {
 export const DISEASE_SCREENINGS = {
 
   healthy: {
+    // Yalnızca USPSTF Grade A/B veya eşdeğer ESC/ADA kılavuz desteği olan taramalar
     label: 'Sağlıklı', screenings: [
-      { id: 'kan_sayimi', months: 12 },
-      { id: 'biyokimya', months: 12 },
-      { id: 'lipid', months: 12 },
-      { id: 'vitamin_d', months: 12 },
-      { id: 'idrar', months: 12 },
-      { id: 'dis_kontrol', months: 6 },
-      { id: 'hepatit', months: 60 },
+      { id: 'lipid', months: 60 },          // USPSTF Grade B (40+) + ESC/EAS 2019
+      { id: 'biyokimya', months: 60 },      // ESC 2021: CVD riski için 5 yılda bir glukoz+renal panel
+      { id: 'hepatit', months: 999 },        // USPSTF Grade B: hayatta en az bir kez HCV taraması
+      { id: 'kolonoskopi', months: 120 },   // USPSTF Grade A/B: 45–75 yaş
+      { id: 'mamografi', months: 24 },      // USPSTF Grade B: 40–74 kadın
+      { id: 'pap_smear', months: 36 },      // USPSTF Grade A: 21–65 kadın
+      { id: 'dexa', months: 24 },           // USPSTF Grade B: 65+ kadın, 70+ erkek
+      { id: 'prostat', months: 24 },        // USPSTF Grade C: 55–69 erkek (paylaşımlı karar)
     ]
   },
 
