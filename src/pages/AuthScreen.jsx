@@ -1,174 +1,318 @@
 import { useState } from 'react'
-import { supabase } from '../lib/supabase'
 
-// ── helpers ───────────────────────────────────────────────────────────────────
-async function sha256(text) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text))
-  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
+// Simple local auth — no server, credentials stored in localStorage
+const AUTH_KEY = 'canim_local_accounts'
+
+function getAccounts() {
+  try { return JSON.parse(localStorage.getItem(AUTH_KEY) || '{}') } catch { return {} }
+}
+function saveAccount(username, passwordHash) {
+  const accounts = getAccounts()
+  accounts[username.toLowerCase()] = { username, passwordHash, createdAt: new Date().toISOString() }
+  localStorage.setItem(AUTH_KEY, JSON.stringify(accounts))
+}
+async function hashPassword(password) {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password + 'canim_salt_v1')
+  const hash = await crypto.subtle.digest('SHA-256', data)
+  return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
-function validateUsername(u) {
-  if (!u || u.length < 3)  return 'En az 3 karakter olmalı'
-  if (u.length > 20)        return 'En fazla 20 karakter olabilir'
-  if (!/^[a-z0-9_]+$/.test(u)) return 'Sadece harf (küçük), rakam ve _ kullanın'
-  return null
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
 export default function AuthScreen({ onAuth }) {
-  const [tab,        setTab]        = useState('new')   // 'new' | 'login'
-  const [username,   setUsername]   = useState('')
-  const [password,   setPassword]   = useState('')
-  const [loading,    setLoading]    = useState(false)
-  const [error,      setError]      = useState(null)
-  const [showPass,   setShowPass]   = useState(false)
+  const [mode, setMode] = useState('choice') // 'choice' | 'login' | 'register'
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [password2, setPassword2] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const emailFake = `${username.trim().toLowerCase()}@canim.local`
-
-  const handleSubmit = async () => {
-    setError(null)
-    const unErr = validateUsername(username.trim().toLowerCase())
-    if (unErr) return setError(unErr)
-    if (!password || password.length < 6) return setError('Şifre en az 6 karakter olmalı')
-
+  async function handleRegister() {
+    setError('')
+    const u = username.trim()
+    if (u.length < 3) return setError('Kullanıcı adı en az 3 karakter olmalı.')
+    if (password.length < 6) return setError('Şifre en az 6 karakter olmalı.')
+    if (password !== password2) return setError('Şifreler eşleşmiyor.')
+    const accounts = getAccounts()
+    if (accounts[u.toLowerCase()]) return setError('Bu kullanıcı adı zaten kullanımda.')
     setLoading(true)
     try {
-      if (tab === 'new') {
-        const { data, error: sbErr } = await supabase.auth.signUp({
-          email: emailFake,
-          password,
-          options: { data: { username: username.trim().toLowerCase() } },
-        })
-        if (sbErr) {
-          if (sbErr.message?.includes('already registered')) {
-            setError('Bu kullanıcı adı alınmış. Farklı bir ad deneyin veya "Giriş Yap" sekmesine geçin.')
-          } else {
-            setError(sbErr.message || 'Hesap oluşturulamadı.')
-          }
-          setLoading(false)
-          return
-        }
-        onAuth({ username: username.trim().toLowerCase(), userId: data?.user?.id || null, saved: true })
-
-      } else {
-        const { data, error: sbErr } = await supabase.auth.signInWithPassword({
-          email: emailFake,
-          password,
-        })
-        if (sbErr) {
-          setError('Kullanıcı adı veya şifre hatalı.')
-          setLoading(false)
-          return
-        }
-        onAuth({ username: username.trim().toLowerCase(), userId: data?.user?.id || null, saved: true })
-      }
-    } catch (e) {
-      setError('Bağlantı hatası. İnternet bağlantınızı kontrol edin.')
-    }
+      const hash = await hashPassword(password)
+      saveAccount(u, hash)
+      onAuth({ username: u, type: 'local', saved: true })
+    } catch { setError('Bir hata oluştu.') }
     setLoading(false)
   }
 
-  return (
-    <div className="min-h-dvh flex flex-col px-6 py-10 page-enter" style={{background:'#FAFAF8'}}>
-      {/* Header */}
-      <div className="flex flex-col items-center mb-8">
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-          style={{background:'linear-gradient(135deg,#0D7377,#14919B)'}}>
-          <span className="text-white text-3xl font-black">C</span>
+  async function handleLogin() {
+    setError('')
+    const u = username.trim()
+    if (!u || !password) return setError('Kullanıcı adı ve şifre gerekli.')
+    const accounts = getAccounts()
+    const account = accounts[u.toLowerCase()]
+    if (!account) return setError('Kullanıcı bulunamadı.')
+    setLoading(true)
+    try {
+      const hash = await hashPassword(password)
+      if (hash !== account.passwordHash) {
+        setError('Şifre hatalı.')
+        setLoading(false)
+        return
+      }
+      onAuth({ username: account.username, type: 'local', saved: true })
+    } catch { setError('Bir hata oluştu.') }
+    setLoading(false)
+  }
+
+  // ── Choice Screen ──────────────────────────────────────────────────────────
+  if (mode === 'choice') {
+    return (
+      <div style={{
+        minHeight: '100dvh',
+        background: '#FAFAF8',
+        display: 'flex',
+        flexDirection: 'column',
+        padding: '0 20px',
+      }}>
+        {/* Header */}
+        <div style={{ paddingTop: 64, paddingBottom: 32, textAlign: 'center' }}>
+          <div style={{
+            width: 64, height: 64, borderRadius: 18,
+            background: 'linear-gradient(135deg, #0D7377, #14B8A6)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            margin: '0 auto 20px',
+          }}>
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <path d="M16 4C16 4 8 9 8 16C8 19.7 11 22.7 14.7 23L14.7 28H17.3V23C21 22.7 24 19.7 24 16C24 9 16 4 16 4Z" fill="white" opacity="0.9"/>
+              <path d="M16 13V19M13 16H19" stroke="#0D7377" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <h1 style={{ fontSize: 26, fontWeight: 800, color: '#111827', margin: '0 0 8px' }}>
+            Hoş geldiniz
+          </h1>
+          <p style={{ fontSize: 14, color: '#6B7280', margin: 0, lineHeight: 1.6 }}>
+            Canım'ı nasıl kullanmak istersiniz?
+          </p>
         </div>
-        <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Verilerinizi Koruyun</h1>
-        <p className="text-sm text-gray-500 text-center max-w-xs leading-relaxed">
-          Hesap oluşturarak taramalarınızı kaydedin ve her cihazdan erişin.
+
+        {/* Options */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
+
+          {/* Anonymous — recommended */}
+          <button
+            onClick={() => onAuth(null)}
+            style={{
+              background: 'linear-gradient(135deg, #0D7377, #14B8A6)',
+              border: 'none',
+              borderRadius: 18,
+              padding: '20px 20px',
+              cursor: 'pointer',
+              textAlign: 'left',
+              boxShadow: '0 4px 20px rgba(13,115,119,0.3)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+              <span style={{ fontSize: 26 }}>👤</span>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: 'white' }}>Anonim Devam Et</div>
+                <div style={{
+                  display: 'inline-block',
+                  background: 'rgba(255,255,255,0.2)',
+                  borderRadius: 6,
+                  padding: '2px 8px',
+                  fontSize: 11,
+                  color: 'rgba(255,255,255,0.9)',
+                  fontWeight: 600,
+                  marginTop: 2,
+                }}>Önerilen</div>
+              </div>
+            </div>
+            <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.5 }}>
+              Hesap oluşturmadan hemen başlayın. Verileriniz yalnızca bu cihazda saklanır. Hiçbir kişisel bilginiz bizimle paylaşılmaz.
+            </p>
+          </button>
+
+          {/* Create account */}
+          <button
+            onClick={() => { setMode('register'); setError('') }}
+            style={{
+              background: 'white',
+              border: '1.5px solid #E5E7EB',
+              borderRadius: 18,
+              padding: '18px 20px',
+              cursor: 'pointer',
+              textAlign: 'left',
+              boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+              <span style={{ fontSize: 24 }}>✨</span>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>Hesap Oluştur</div>
+            </div>
+            <p style={{ fontSize: 13, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
+              Birden fazla cihazda erişmek veya verilerinizi yedeklemek için hesap oluşturun. Yalnızca kullanıcı adı ve şifre gerekir — e-posta sorulmaz.
+            </p>
+          </button>
+
+          {/* Login */}
+          <button
+            onClick={() => { setMode('login'); setError('') }}
+            style={{
+              background: 'white',
+              border: '1.5px solid #E5E7EB',
+              borderRadius: 18,
+              padding: '18px 20px',
+              cursor: 'pointer',
+              textAlign: 'left',
+              boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+              <span style={{ fontSize: 24 }}>🔑</span>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>Giriş Yap</div>
+            </div>
+            <p style={{ fontSize: 13, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
+              Daha önce bir hesap oluşturduysanız giriş yapın.
+            </p>
+          </button>
+        </div>
+
+        <p style={{ textAlign: 'center', fontSize: 11, color: '#9CA3AF', padding: '24px 0', lineHeight: 1.5 }}>
+          Hesap oluşturursanız verileriniz bu cihazda şifreli olarak saklanır.
         </p>
       </div>
+    )
+  }
 
-      {/* Tab selector */}
-      <div className="flex bg-gray-100 rounded-2xl p-1 mb-6">
-        {[{key:'new',label:'Yeni Hesap'},{key:'login',label:'Giriş Yap'}].map(t => (
-          <button
-            key={t.key}
-            onClick={() => { setTab(t.key); setError(null) }}
-            className="flex-1 py-2.5 rounded-xl text-sm font-bold transition-all"
-            style={tab === t.key ? {background:'white', color:'#0D7377', boxShadow:'0 1px 4px rgba(0,0,0,0.1)'} : {color:'#6B7280'}}
-          >{t.label}</button>
-        ))}
-      </div>
+  // ── Register / Login Form ──────────────────────────────────────────────────
+  const isRegister = mode === 'register'
 
-      {/* Privacy notice */}
-      <div className="mb-5 px-4 py-3 rounded-2xl flex items-start gap-2.5"
-        style={{background:'#fffbeb', border:'1px solid #fde68a'}}>
-        <span className="text-base mt-0.5">⚠️</span>
-        <p className="text-xs text-amber-800 leading-relaxed">
-          <strong>Gizliliğinizi koruyun:</strong> Gerçek adınızı, TC kimlik numaranızı veya sizi tanımlayan bilgileri kullanmayın. Takma ad veya rastgele bir kullanıcı adı kullanın.
+  return (
+    <div style={{
+      minHeight: '100dvh',
+      background: '#FAFAF8',
+      display: 'flex',
+      flexDirection: 'column',
+      padding: '0 20px',
+    }}>
+      {/* Back button */}
+      <button
+        onClick={() => { setMode('choice'); setError(''); setUsername(''); setPassword(''); setPassword2('') }}
+        style={{ background: 'none', border: 'none', padding: '20px 0 0', cursor: 'pointer', textAlign: 'left', fontSize: 28, color: '#6B7280' }}
+      >
+        ←
+      </button>
+
+      {/* Header */}
+      <div style={{ paddingTop: 16, paddingBottom: 32 }}>
+        <h1 style={{ fontSize: 24, fontWeight: 800, color: '#111827', margin: '0 0 6px' }}>
+          {isRegister ? 'Hesap Oluştur' : 'Giriş Yap'}
+        </h1>
+        <p style={{ fontSize: 14, color: '#6B7280', margin: 0 }}>
+          {isRegister ? 'E-posta gerekmez — sadece kullanıcı adı ve şifre.' : 'Kullanıcı adınız ve şifrenizle giriş yapın.'}
         </p>
       </div>
 
       {/* Form */}
-      <div className="space-y-4 flex-1">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-1.5">
-            Kullanıcı Adı
-          </label>
+          <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Kullanıcı Adı</label>
           <input
-            className="w-full px-4 py-4 rounded-2xl border-2 border-gray-200 bg-white text-gray-900 font-semibold outline-none focus:border-teal transition-colors"
-            placeholder="örn: hasta42 veya ay_cicegi"
+            type="text"
             value={username}
-            onChange={e => { setUsername(e.target.value.toLowerCase()); setError(null) }}
+            onChange={e => setUsername(e.target.value)}
+            placeholder="kullanıcıadınız"
             autoCapitalize="none"
             autoCorrect="off"
-            spellCheck="false"
+            style={{
+              width: '100%', padding: '14px 16px', borderRadius: 14,
+              border: '1.5px solid #E5E7EB', fontSize: 16,
+              background: 'white', outline: 'none', boxSizing: 'border-box',
+              color: '#111827',
+            }}
           />
-          <p className="text-xs text-gray-400 mt-1 ml-1">Küçük harf, rakam, alt çizgi (_) — 3-20 karakter</p>
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-1.5">
-            Şifre
-          </label>
-          <div className="relative">
-            <input
-              type={showPass ? 'text' : 'password'}
-              className="w-full px-4 py-4 rounded-2xl border-2 border-gray-200 bg-white text-gray-900 font-semibold outline-none focus:border-teal transition-colors pr-12"
-              placeholder="En az 6 karakter"
-              value={password}
-              onChange={e => { setPassword(e.target.value); setError(null) }}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPass(v => !v)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-semibold"
-            >{showPass ? 'Gizle' : 'Göster'}</button>
-          </div>
+          <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Şifre</label>
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder={isRegister ? 'En az 6 karakter' : 'Şifreniz'}
+            style={{
+              width: '100%', padding: '14px 16px', borderRadius: 14,
+              border: '1.5px solid #E5E7EB', fontSize: 16,
+              background: 'white', outline: 'none', boxSizing: 'border-box',
+              color: '#111827',
+            }}
+          />
         </div>
 
+        {isRegister && (
+          <div>
+            <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Şifre Tekrar</label>
+            <input
+              type="password"
+              value={password2}
+              onChange={e => setPassword2(e.target.value)}
+              placeholder="Şifrenizi tekrar girin"
+              style={{
+                width: '100%', padding: '14px 16px', borderRadius: 14,
+                border: '1.5px solid #E5E7EB', fontSize: 16,
+                background: 'white', outline: 'none', boxSizing: 'border-box',
+                color: '#111827',
+              }}
+            />
+          </div>
+        )}
+
         {error && (
-          <div className="px-4 py-3 rounded-xl text-sm text-red-700" style={{background:'#fef2f2', border:'1px solid #fecaca'}}>
+          <div style={{
+            background: '#FEF2F2', border: '1px solid #FECACA',
+            borderRadius: 12, padding: '12px 14px',
+            fontSize: 13, color: '#991B1B', fontWeight: 500,
+          }}>
             {error}
           </div>
         )}
-      </div>
 
-      {/* Submit */}
-      <div className="mt-8 space-y-3">
         <button
-          onClick={handleSubmit}
-          disabled={loading || !username || !password}
-          className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98 transition-all disabled:opacity-40"
-          style={{background:'#0D7377'}}
+          onClick={isRegister ? handleRegister : handleLogin}
+          disabled={loading}
+          style={{
+            width: '100%', padding: '16px 0', borderRadius: 14,
+            background: loading ? '#9CA3AF' : 'linear-gradient(135deg, #0D7377, #14B8A6)',
+            color: 'white', fontWeight: 800, fontSize: 16, border: 'none',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            boxShadow: '0 4px 16px rgba(13,115,119,0.3)',
+            marginTop: 4,
+          }}
         >
-          {loading ? 'Lütfen bekleyin…' : tab === 'new' ? 'Hesap Oluştur →' : 'Giriş Yap →'}
+          {loading ? 'Lütfen bekleyin...' : isRegister ? 'Hesap Oluştur' : 'Giriş Yap'}
         </button>
 
-        {/* Skip */}
-        <button
-          onClick={() => onAuth({ username: null, userId: null, saved: false })}
-          className="w-full py-3.5 rounded-2xl border-2 border-gray-200 text-sm font-semibold text-gray-500 bg-white active:scale-98"
-        >
-          Kaydetmeden Devam Et
-        </button>
-        <p className="text-xs text-gray-400 text-center leading-relaxed px-2">
-          Hesap oluşturmazsanız verileriniz yalnızca bu cihazda saklanır. Cihazı değiştirirseniz veya tarayıcı geçmişini silerseniz verileriniz kaybolabilir.
+        {/* Switch mode */}
+        <p style={{ textAlign: 'center', fontSize: 13, color: '#6B7280' }}>
+          {isRegister ? 'Zaten hesabınız var mı?' : 'Hesabınız yok mu?'}{' '}
+          <button
+            onClick={() => { setMode(isRegister ? 'login' : 'register'); setError('') }}
+            style={{ background: 'none', border: 'none', color: '#0D7377', fontWeight: 700, cursor: 'pointer', fontSize: 13, padding: 0 }}
+          >
+            {isRegister ? 'Giriş Yap' : 'Oluştur'}
+          </button>
         </p>
+
+        {/* Anonymous fallback */}
+        <button
+          onClick={() => onAuth(null)}
+          style={{
+            background: 'none', border: '1.5px solid #E5E7EB', borderRadius: 12,
+            padding: '13px', color: '#6B7280', fontSize: 13, fontWeight: 600,
+            cursor: 'pointer', marginTop: 4,
+          }}
+        >
+          Hesap olmadan anonim devam et
+        </button>
       </div>
     </div>
   )
