@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import useAppStore from '../store/useAppStore'
 import { DISEASE_LIST, SCREENINGS, DISEASE_DOCTOR_SCHEDULE, DISEASE_SCREENINGS } from '../data/screenings'
 import { buildScreeningList, buildInitialDates, TIME_OPTIONS } from '../utils/engine'
@@ -85,6 +85,7 @@ export default function Onboarding() {
   const [step, setStep] = useState(1)          // 1=basicInfo, 2=diseases, 3=summary, 4=questions
   const [subPage, setSubPage] = useState(null) // null | 'cancer'
   const [showConfirmation, setShowConfirmation] = useState(false)
+  const [showConfetti, setShowConfetti] = useState(false)
 
   // Step 1 state
   const [name, setName] = useState('')
@@ -513,7 +514,7 @@ export default function Onboarding() {
     const setDoctorAnswer = (scheduleId, val) => setDoctorAnswers(prev => ({...prev, [scheduleId]: val}))
     const setAnswer = (id, val) => setAnswers(prev => ({...prev, [id]: val}))
 
-    const handleFinish = () => {
+    const finishOnboarding = () => {
       const fullList = buildScreeningList(diseases, profile)
       const allAnswers = {...answers}
       for (const s of fullList) {
@@ -536,9 +537,15 @@ export default function Onboarding() {
       )
     }
 
-    // If nothing to ask at all, finish immediately
+    // Show confetti then finish
+    const handleFinish = () => {
+      setShowConfetti(true)
+      setTimeout(finishOnboarding, 1800)
+    }
+
+    // If nothing to ask at all, finish immediately (no confetti for auto-finish)
     if (doctorQuestions.length === 0 && specialScreenings.length === 0) {
-      handleFinish()
+      finishOnboarding()
       return null
     }
 
@@ -553,6 +560,8 @@ export default function Onboarding() {
         { value: 'never', label: 'Hiç gitmedim' },
       ]
       return (
+        <>
+        {showConfetti && <Confetti />}
         <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
           <button onClick={() => setStep(3)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
           <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 4 / 4</div>
@@ -602,16 +611,19 @@ export default function Onboarding() {
             {specialScreenings.length > 0 ? 'Devam →' : 'Canım\'ı Hazırla 🚀'}
           </button>
         </div>
+        </>
       )
     }
 
     // Sub-step 1 (or 0 if no doctor questions): Special screenings
     if (specialScreenings.length === 0) {
-      handleFinish()
+      finishOnboarding()
       return null
     }
 
     return (
+      <>
+      {showConfetti && <Confetti />}
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
         <button
           onClick={() => doctorQuestions.length > 0 ? setDoctorSubStep(0) : setStep(3)}
@@ -697,8 +709,46 @@ export default function Onboarding() {
           Canım'ı Hazırla 🚀
         </button>
       </div>
+      </>
     )
   }
 
   return null
+}
+
+// ── Confetti component ─────────────────────────────────────────────────────
+const CONFETTI_COLORS = ['#0D7377','#14B8A6','#F59E0B','#EC4899','#8B5CF6','#10B981','#F97316','#06B6D4']
+
+function Confetti() {
+  const pieces = useMemo(() => (
+    Array.from({ length: 72 }, (_, i) => ({
+      id: i,
+      color: CONFETTI_COLORS[i % CONFETTI_COLORS.length],
+      left: `${(i / 72) * 100 + (Math.random() - 0.5) * 8}%`,
+      delay: `${(Math.random() * 0.7).toFixed(2)}s`,
+      dur:   `${(1.6 + Math.random() * 1.4).toFixed(2)}s`,
+      size:  `${6 + Math.floor(Math.random() * 8)}px`,
+      isCircle: i % 3 === 0,
+    }))
+  ), [])
+
+  return (
+    <div style={{ position:'fixed', inset:0, pointerEvents:'none', zIndex:9999, overflow:'hidden' }}>
+      {pieces.map(p => (
+        <div
+          key={p.id}
+          className="confetti-piece"
+          style={{
+            '--dur': p.dur,
+            '--delay': p.delay,
+            left: p.left,
+            width: p.size,
+            height: p.size,
+            background: p.color,
+            borderRadius: p.isCircle ? '50%' : '2px',
+          }}
+        />
+      ))}
+    </div>
+  )
 }

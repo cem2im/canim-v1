@@ -1,4 +1,23 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+
+// ── Count-up animation hook ────────────────────────────────────────────────
+function useCountUp(target, duration = 900) {
+  const [val, setVal] = useState(0)
+  useEffect(() => {
+    let raf
+    const start = performance.now()
+    const tick = (now) => {
+      const t = Math.min((now - start) / duration, 1)
+      // easeOutExpo
+      const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t)
+      setVal(Math.round(eased * target))
+      if (t < 1) raf = requestAnimationFrame(tick)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [target, duration])
+  return val
+}
 import useAppStore from '../store/useAppStore'
 import { scoreColor, scoreLabel, statusColor, statusLabel } from '../utils/score'
 import ScreeningDetail from '../components/ScreeningDetail'
@@ -18,6 +37,7 @@ export default function Today() {
   const [showDoctorModal, setShowDoctorModal] = useState(false)
 
   const score = getScore()
+  const animatedScore = useCountUp(score, 950)
   const cards = getScreeningCards()
   const doctorCards = getDoctorVisitCards()
   const color = scoreColor(score)
@@ -71,7 +91,7 @@ export default function Today() {
         <div className="flex items-center justify-between">
           <div>
             <div className="text-sm font-medium opacity-80 mb-1">Tarama Uyum Puanı</div>
-            <div className="text-6xl font-black tracking-tight mb-2" style={{lineHeight:1}}>{score}</div>
+            <div className="text-6xl font-black tracking-tight mb-2" style={{lineHeight:1}}>{animatedScore}</div>
             <div className="inline-block px-3 py-1 rounded-full text-sm font-bold" style={{background:'rgba(255,255,255,0.2)'}}>
               {label}
             </div>
@@ -120,7 +140,7 @@ export default function Today() {
             <h2 className="text-sm font-bold text-gray-700">🏥 Doktor Kontrolleri</h2>
             <p className="text-sm text-gray-500">Hastalıklarınıza göre düzenli ziyaret takvimi</p>
           </div>
-          <div className="px-5">
+          <div className="px-5 stagger">
             {doctorCards.map(card => (
               <DoctorVisitCard
                 key={card.id}
@@ -148,9 +168,11 @@ export default function Today() {
           </div>
         )}
 
-        {visibleCards.map(card => (
-          <ScreeningCard key={card.id} card={card} onClick={() => setSelected(card)} />
-        ))}
+        <div className="stagger">
+          {visibleCards.map(card => (
+            <ScreeningCard key={card.id} card={card} onClick={() => setSelected(card)} />
+          ))}
+        </div>
 
         {okCards.length > 0 && (
           <button
@@ -217,7 +239,10 @@ function ScreeningCard({ card, onClick }) {
               <span className="text-2xl">{card.icon}</span>
               <div className="font-bold text-gray-900 text-base leading-snug">{card.trName}</div>
             </div>
-            <span className="text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 mt-0.5" style={{background:`${color}20`, color}}>
+            <span
+              className={`text-xs font-bold px-2.5 py-1 rounded-full flex-shrink-0 mt-0.5${card.status === 'overdue' ? ' pulse-slow' : ''}`}
+              style={{background:`${color}20`, color}}
+            >
               {statusLabel(card.status, card.daysUntil)}
             </span>
           </div>
