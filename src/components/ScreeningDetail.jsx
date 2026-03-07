@@ -56,6 +56,14 @@ export default function ScreeningDetail({ screening, onBack }) {
           {statusLabel(screening.status, screening.daysUntil)}
         </div>
         <div className="text-sm text-gray-600 leading-relaxed mb-4">{screening.explanation}</div>
+
+        {/* Clinical recommendation */}
+        {screening.recommendation && (
+          <div className="mb-4 p-3 rounded-2xl" style={{background:'#e8f4f5', border:'1px solid #b2d8da'}}>
+            <div className="text-xs font-bold mb-1" style={{color:'#0A5C5F'}}>🩺 Klinik Öneri</div>
+            <div className="text-xs leading-relaxed" style={{color:'#0D7377'}}>{screening.recommendation}</div>
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-3">
           <InfoBox label="Sıklık" value={`Her ${screening.frequencyMonths} ayda bir`} />
           <InfoBox label="Son Yapılan" value={dates.lastDoneDate ? formatDate(dates.lastDoneDate) : 'Bilinmiyor'} />
