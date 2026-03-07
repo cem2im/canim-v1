@@ -93,12 +93,35 @@ export default function ScreeningDetail({ screening, onBack }) {
         )}
 
         {/* Bilgi kutuları */}
-        <div className="grid grid-cols-2 gap-3">
-          <InfoBox label="Sıklık" value={`Her ${screening.frequencyMonths} ayda bir`} />
+        <div className="grid grid-cols-2 gap-3 mb-3">
+          <InfoBox label="Tarama Sıklığı" value={`Her ${screening.frequencyMonths} ayda bir`} />
           <InfoBox label="Son Yapılan" value={dates.lastDoneDate ? formatDate(dates.lastDoneDate) : 'Bilinmiyor'} />
-          <InfoBox label="Sonraki Kontrol" value={screening.nextDate ? formatDate(screening.nextDate) : 'Belirsiz'} />
-          <InfoBox label="Uzman" value={screening.doctor || '—'} />
         </div>
+        <div className="mb-3">
+          <InfoBox
+            label="Sonraki Kontrol"
+            value={screening.nextDate ? formatDate(screening.nextDate) : 'En kısa zamanda'}
+            highlight={!screening.nextDate}
+          />
+        </div>
+
+        {/* Uzman Branşlar — tam genişlik, tüm ilgili branşlar */}
+        {screening.doctor && (
+          <div className="mt-3 bg-gray-50 rounded-2xl p-3">
+            <div className="text-xs text-gray-400 font-semibold mb-2">Hangi uzmana başvurun?</div>
+            <div className="flex flex-wrap gap-2">
+              {screening.doctor.split(' · ').map((d, i) => (
+                <span
+                  key={i}
+                  className="px-2 py-1 rounded-lg text-xs font-semibold"
+                  style={{background:'#0D737718', color:'#0D7377', border:'1px solid #0D737730'}}
+                >
+                  {d.trim()}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Aksiyon butonları */}
@@ -241,11 +264,11 @@ export default function ScreeningDetail({ screening, onBack }) {
   )
 }
 
-function InfoBox({ label, value }) {
+function InfoBox({ label, value, highlight }) {
   return (
-    <div className="bg-gray-50 rounded-2xl p-3">
-      <div className="text-xs text-gray-400 font-semibold mb-0.5">{label}</div>
-      <div className="text-sm font-bold text-gray-800">{value}</div>
+    <div className="rounded-2xl p-3" style={{background: highlight ? '#FFF3CD' : '#F9FAFB'}}>
+      <div className="text-xs font-semibold mb-0.5" style={{color: highlight ? '#856404' : '#9CA3AF'}}>{label}</div>
+      <div className="text-sm font-bold" style={{color: highlight ? '#664D03' : '#1F2937'}}>{value}</div>
     </div>
   )
 }
