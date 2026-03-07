@@ -39,10 +39,10 @@ export default function Profile() {
         </div>
       </Section>
 
-      {/* Diseases */}
+      {/* Diseases — chronic only (cancer history excluded) */}
       <Section title="Hastalıklarım">
         <div className="flex flex-wrap gap-2 py-2">
-          {DISEASE_LIST.map(d => (
+          {DISEASE_LIST.filter(d => !d.group).map(d => (
             <button key={d.id}
               onClick={() => updateDiseases(
                 diseases.includes(d.id) ? diseases.filter(x=>x!==d.id) : [...diseases, d.id]
@@ -54,6 +54,25 @@ export default function Profile() {
             </button>
           ))}
         </div>
+        {/* Cancer history indicator — read-only */}
+        {diseases.some(d => DISEASE_LIST.find(x => x.id === d)?.group === 'kanser') && (
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <div className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Ailede Kanser Öyküsü</div>
+            <div className="flex flex-wrap gap-2">
+              {diseases
+                .map(id => DISEASE_LIST.find(x => x.id === id))
+                .filter(d => d?.group === 'kanser')
+                .map(d => (
+                  <span key={d.id} className="flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-bold"
+                    style={{background:'#f3e8ff', color:'#7c3aed'}}>
+                    {d.icon} {d.label.split(' — ')[0]}
+                  </span>
+                ))
+              }
+            </div>
+            <p className="text-xs text-gray-400 mt-2">Değiştirmek için onboarding'i sıfırlayın.</p>
+          </div>
+        )}
       </Section>
 
       {/* Medications */}
