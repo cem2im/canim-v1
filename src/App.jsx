@@ -41,22 +41,20 @@ export default function App() {
     <div className="relative" style={{background:'#FAFAF8', minHeight:'100dvh'}}>
       {showTour && <TourOverlay onDone={() => setShowTour(false)} />}
 
-      {/* Tour restart button — fixed top-right, all pages */}
-      {!showTour && (
-        <button
-          onClick={() => { localStorage.removeItem(TOUR_KEY); setShowTour(true) }}
-          style={{
-            position: 'fixed', top: 14, right: 14, zIndex: 900,
-            background: 'rgba(13,115,119,0.12)', border: '1.5px solid rgba(13,115,119,0.25)',
-            borderRadius: 999, padding: '6px 12px',
-            fontSize: 12, fontWeight: 700, color: '#0D7377',
-            cursor: 'pointer', backdropFilter: 'blur(8px)',
-            display: 'flex', alignItems: 'center', gap: 5,
-          }}
-        >
-          🎯 Tanıtım
-        </button>
-      )}
+      {/* Tour restart button — fixed top-right, always visible */}
+      <button
+        onClick={() => { localStorage.removeItem(TOUR_KEY); setShowTour(true) }}
+        style={{
+          position: 'fixed', top: 14, right: 14, zIndex: 9995,
+          background: 'rgba(13,115,119,0.12)', border: '1.5px solid rgba(13,115,119,0.25)',
+          borderRadius: 999, padding: '6px 12px',
+          fontSize: 12, fontWeight: 700, color: '#0D7377',
+          cursor: 'pointer', backdropFilter: 'blur(8px)',
+          display: 'flex', alignItems: 'center', gap: 5,
+        }}
+      >
+        🎯 Tanıtım
+      </button>
 
       {/* Page */}
       <div className="overflow-y-auto" style={{minHeight:'100dvh'}}>
