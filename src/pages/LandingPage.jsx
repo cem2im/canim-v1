@@ -27,6 +27,7 @@ export default function LandingPage({ onStart }) {
     >
       {/* Hero */}
       <div
+        id="tour-landing-hero"
         style={{
           padding: '56px 24px 40px',
           display: 'flex',
@@ -148,6 +149,7 @@ export default function LandingPage({ onStart }) {
 
         {/* CTA */}
         <button
+          id="tour-landing-cta"
           onClick={onStart}
           style={{
             width: '100%',

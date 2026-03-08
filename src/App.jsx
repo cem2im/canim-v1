@@ -7,7 +7,7 @@ import Today from './pages/Today'
 import Screenings from './pages/Screenings'
 import History from './pages/Lab'
 import Profile from './pages/Profile'
-import TourOverlay, { TOUR_KEY } from './components/TourOverlay'
+import TourGuide, { resetAllTours, isScreenDone } from './components/TourGuide'
 
 const TABS = [
   { id:'today',      label:'Bugün',      icon: HomeIcon },
@@ -20,41 +20,38 @@ export default function App() {
   const onboardingDone = useAppStore(s => s.onboardingDone)
   const landingSeen    = useAppStore(s => s.landingSeen)
   const authHandled    = useAppStore(s => s.authHandled)
-  const authUser       = useAppStore(s => s.authUser)
   const setLandingSeen = useAppStore(s => s.setLandingSeen)
   const setAuthHandled = useAppStore(s => s.setAuthHandled)
   const activeTab      = useAppStore(s => s.activeTab)
   const setActiveTab   = useAppStore(s => s.setActiveTab)
 
-  const [showTour, setShowTour] = useState(
-    () => onboardingDone && !localStorage.getItem(TOUR_KEY)
-  )
+  // Determine current screen for the tour
+  const currentScreen = !onboardingDone
+    ? (!landingSeen ? 'landing' : !authHandled ? 'auth' : 'onboarding')
+    : 'app'
 
-  // Returning users who finished onboarding go straight to main
+  // Tour reset: bump a counter to force TourGuide remount
+  const [tourKey, setTourKey] = useState(0)
+  const restartTour = () => { resetAllTours(); setTourKey(k => k + 1) }
+
+  // ── Pre-onboarding screens ──────────────────────────────────────────────────
   if (!onboardingDone) {
-    if (!landingSeen) return <LandingPage onStart={setLandingSeen} />
-    if (!authHandled) return <AuthScreen onAuth={user => setAuthHandled(user)} />
-    return <Onboarding />
+    return (
+      <div style={{ position: 'relative' }}>
+        <TourGuide key={`${currentScreen}-${tourKey}`} currentScreen={currentScreen} />
+        <TourButton onRestart={restartTour} />
+        {!landingSeen && <LandingPage onStart={setLandingSeen} />}
+        {landingSeen && !authHandled && <AuthScreen onAuth={user => setAuthHandled(user)} />}
+        {landingSeen && authHandled && <Onboarding />}
+      </div>
+    )
   }
 
+  // ── Main app ────────────────────────────────────────────────────────────────
   return (
     <div className="relative" style={{background:'#FAFAF8', minHeight:'100dvh'}}>
-      {showTour && <TourOverlay onDone={() => setShowTour(false)} />}
-
-      {/* Tour restart button — fixed top-right, always visible */}
-      <button
-        onClick={() => { localStorage.removeItem(TOUR_KEY); setShowTour(true) }}
-        style={{
-          position: 'fixed', top: 14, right: 14, zIndex: 9995,
-          background: 'rgba(13,115,119,0.12)', border: '1.5px solid rgba(13,115,119,0.25)',
-          borderRadius: 999, padding: '6px 12px',
-          fontSize: 12, fontWeight: 700, color: '#0D7377',
-          cursor: 'pointer', backdropFilter: 'blur(8px)',
-          display: 'flex', alignItems: 'center', gap: 5,
-        }}
-      >
-        🎯 Tanıtım
-      </button>
+      <TourGuide key={`app-${tourKey}`} currentScreen="app" />
+      <TourButton onRestart={restartTour} />
 
       {/* Page */}
       <div className="overflow-y-auto" style={{minHeight:'100dvh'}}>
@@ -91,6 +88,26 @@ export default function App() {
   )
 }
 
+// ── Tour restart button (fixed top-right, all screens) ────────────────────────
+function TourButton({ onRestart }) {
+  return (
+    <button
+      onClick={onRestart}
+      style={{
+        position: 'fixed', top: 14, right: 14, zIndex: 9999,
+        background: 'rgba(13,115,119,0.13)', border: '1.5px solid rgba(13,115,119,0.28)',
+        borderRadius: 999, padding: '6px 13px',
+        fontSize: 12, fontWeight: 700, color: '#0D7377',
+        cursor: 'pointer', backdropFilter: 'blur(10px)',
+        display: 'flex', alignItems: 'center', gap: 5,
+        boxShadow: '0 2px 8px rgba(13,115,119,0.1)',
+      }}
+    >
+      🎯 Tanıtım
+    </button>
+  )
+}
+
 // ── TAB ICONS ──────────────────────────────────────────────────────────────────
 function HomeIcon({ active }) {
   const c = active ? '#0D7377' : '#9CA3AF'
@@ -102,7 +119,6 @@ function HomeIcon({ active }) {
     </svg>
   )
 }
-
 function CalIcon({ active }) {
   const c = active ? '#0D7377' : '#9CA3AF'
   return (
@@ -114,18 +130,15 @@ function CalIcon({ active }) {
     </svg>
   )
 }
-
 function HistoryIcon({ active }) {
   const c = active ? '#0D7377' : '#9CA3AF'
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="9" stroke={c} strokeWidth="2"/>
       <path d="M12 7v5l3 3" stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-      {active && <path d="M3 12H1M23 12h-2" stroke={c} strokeWidth="1.5" strokeLinecap="round" opacity="0.4"/>}
     </svg>
   )
 }
-
 function UserIcon({ active }) {
   const c = active ? '#0D7377' : '#9CA3AF'
   return (

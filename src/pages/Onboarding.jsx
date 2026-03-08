@@ -129,7 +129,7 @@ export default function Onboarding() {
         </div>
 
         {/* Birth year — direct number input */}
-        <div className="mb-6">
+        <div id="tour-ob-year" className="mb-6">
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Doğum Yılınız</label>
           <input
             type="number"
@@ -247,6 +247,7 @@ export default function Onboarding() {
 
         {/* Hiçbirinde Yok — TOP */}
         <button
+          id="tour-ob-diseases"
           onClick={() => { setDiseases([]); handleDiseaseDone() }}
           className="w-full flex items-center justify-center gap-3 py-4 px-4 rounded-2xl border-2 font-bold text-sm transition-all active:scale-98 mb-5"
           style={diseases.length === 0

@@ -99,6 +99,7 @@ export default function AuthScreen({ onAuth }) {
 
           {/* Anonymous — recommended */}
           <button
+            id="tour-auth-anon"
             onClick={() => onAuth(null)}
             style={{
               background: 'linear-gradient(135deg, #0D7377, #14B8A6)',
