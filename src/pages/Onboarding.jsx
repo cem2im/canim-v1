@@ -90,6 +90,7 @@ export default function Onboarding() {
   // Step 1 state
   const [name, setName] = useState('')
   const [birthYear, setBirthYear] = useState(1970)
+  const [birthYearRaw, setBirthYearRaw] = useState('1970')
   const [sex, setSex] = useState(null)
   const [height, setHeight] = useState('')
   const [weight, setWeight] = useState('')
@@ -132,17 +133,27 @@ export default function Onboarding() {
         <div id="tour-ob-year" className="mb-6">
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Doğum Yılınız</label>
           <input
-            type="number"
+            type="text"
             inputMode="numeric"
+            pattern="[0-9]*"
             className="w-full px-4 py-4 rounded-2xl border-2 border-gray-200 bg-white text-gray-900 text-3xl font-black text-center outline-none focus:border-teal transition-colors"
-            value={birthYear}
+            value={birthYearRaw}
             onChange={e => {
-              const y = parseInt(e.target.value)
-              if (!isNaN(y)) setBirthYear(Math.max(1920, Math.min(y, new Date().getFullYear() - 1)))
+              const raw = e.target.value.replace(/[^0-9]/g, '')
+              setBirthYearRaw(raw)
+              const y = parseInt(raw)
+              if (!isNaN(y) && y >= 1920 && y <= new Date().getFullYear() - 1) {
+                setBirthYear(y)
+              }
             }}
-            min="1920"
-            max={new Date().getFullYear() - 1}
+            onBlur={() => {
+              const y = parseInt(birthYearRaw)
+              const clamped = isNaN(y) ? 1970 : Math.max(1920, Math.min(y, new Date().getFullYear() - 1))
+              setBirthYear(clamped)
+              setBirthYearRaw(String(clamped))
+            }}
             placeholder="1985"
+            maxLength={4}
           />
           {age > 0 && age < 120 && (
             <div className="text-center text-sm text-gray-500 mt-2 font-medium">{age} yaşında</div>

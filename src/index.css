@@ -124,6 +124,10 @@ body {
   0%, 100% { border-color: rgba(13,115,119,0.8); box-shadow: 0 0 0 100vw rgba(0,0,0,0.72); }
   50%       { border-color: rgba(20,145,155,1);   box-shadow: 0 0 0 100vw rgba(0,0,0,0.72), 0 0 0 4px rgba(13,115,119,0.35); }
 }
+@keyframes tour-spotlight-red-pulse {
+  0%, 100% { border-color: #EF4444; box-shadow: 0 0 0 100vw rgba(0,0,0,0.75), 0 0 0 3px rgba(239,68,68,0.4); }
+  50%       { border-color: #FF1A1A; box-shadow: 0 0 0 100vw rgba(0,0,0,0.75), 0 0 0 8px rgba(239,68,68,0.6); }
+}
 @keyframes tour-bounce-up {
   0%, 100% { transform: rotate(180deg) translateY(0); }
   50%       { transform: rotate(180deg) translateY(-7px); }

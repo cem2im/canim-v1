@@ -140,12 +140,12 @@ export default function TourGuide({ currentScreen }) {
         height:        spotH,
         borderRadius:  18,
         boxShadow:     '0 0 0 100vw rgba(0,0,0,0.72)',
-        border:        '2px solid rgba(13,115,119,0.8)',
+        border:        '3px solid #EF4444',
         zIndex:        9991,
         pointerEvents: 'none',
         opacity:       visible ? 1 : 0,
         transition:    'opacity 0.3s ease, top 0.38s cubic-bezier(.4,0,.2,1), left 0.38s cubic-bezier(.4,0,.2,1), width 0.38s cubic-bezier(.4,0,.2,1), height 0.38s cubic-bezier(.4,0,.2,1)',
-        animation:     'tour-spotlight-pulse 2.4s ease-in-out infinite',
+        animation:     'tour-spotlight-red-pulse 1.1s ease-in-out infinite',
       }} />
 
       {/* Tooltip */}
@@ -201,27 +201,19 @@ export default function TourGuide({ currentScreen }) {
               {currentStep.desc}
             </p>
 
-            <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-              <button
-                onClick={next}
-                style={{
-                  flex: 1, background: 'linear-gradient(135deg, #0D7377, #14919B)',
-                  color: 'white', border: 'none', borderRadius: 12,
-                  padding: '11px 0', fontSize: 14, fontWeight: 700, cursor: 'pointer',
-                }}
-              >
-                {screenStep < totalSteps - 1 ? 'İleri →' : '✓ Anladım!'}
-              </button>
-              <button
-                onClick={finish}
-                style={{
-                  color: '#9CA3AF', background: 'none', border: 'none',
-                  fontSize: 13, cursor: 'pointer', padding: '4px 6px', whiteSpace: 'nowrap',
-                }}
-              >
-                Atla
-              </button>
-            </div>
+            <p style={{ fontSize: 12, color: '#EF4444', fontWeight: 600, margin: '0 0 10px 0', textAlign: 'center' }}>
+              ⚠️ Devam etmek için lütfen okuyun
+            </p>
+            <button
+              onClick={next}
+              style={{
+                width: '100%', background: 'linear-gradient(135deg, #0D7377, #14919B)',
+                color: 'white', border: 'none', borderRadius: 12,
+                padding: '12px 0', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+              }}
+            >
+              {screenStep < totalSteps - 1 ? 'Anladım, İleri →' : '✓ Anladım!'}
+            </button>
 
             {/* Progress dots */}
             {totalSteps > 1 && (
