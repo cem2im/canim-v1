@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import useAppStore from './store/useAppStore'
 import LandingPage from './pages/LandingPage'
 import AuthScreen from './pages/AuthScreen'
@@ -6,6 +7,7 @@ import Today from './pages/Today'
 import Screenings from './pages/Screenings'
 import History from './pages/Lab'
 import Profile from './pages/Profile'
+import TourOverlay, { TOUR_KEY } from './components/TourOverlay'
 
 const TABS = [
   { id:'today',      label:'Bugün',      icon: HomeIcon },
@@ -24,6 +26,10 @@ export default function App() {
   const activeTab      = useAppStore(s => s.activeTab)
   const setActiveTab   = useAppStore(s => s.setActiveTab)
 
+  const [showTour, setShowTour] = useState(
+    () => onboardingDone && !localStorage.getItem(TOUR_KEY)
+  )
+
   // Returning users who finished onboarding go straight to main
   if (!onboardingDone) {
     if (!landingSeen) return <LandingPage onStart={setLandingSeen} />
@@ -33,6 +39,7 @@ export default function App() {
 
   return (
     <div className="relative" style={{background:'#FAFAF8', minHeight:'100dvh'}}>
+      {showTour && <TourOverlay onDone={() => setShowTour(false)} />}
       {/* Page */}
       <div className="overflow-y-auto" style={{minHeight:'100dvh'}}>
         {activeTab === 'today'      && <Today />}
@@ -51,6 +58,7 @@ export default function App() {
             return (
               <button
                 key={tab.id}
+                id={`tour-tab-${tab.id}`}
                 onClick={() => setActiveTab(tab.id)}
                 className="flex-1 flex flex-col items-center justify-center py-3 gap-0.5 transition-all"
               >

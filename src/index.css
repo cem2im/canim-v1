@@ -104,3 +104,17 @@ body {
   50%       { opacity: 0.75; }
 }
 .pulse-slow { animation: softPulse 2.5s ease-in-out infinite; }
+
+/* ── Tour overlay animations ─────────────────────────────────────────────── */
+@keyframes tour-pulse {
+  0%, 100% { border-color: rgba(255,255,255,0.5); box-shadow: 0 0 0 100vw rgba(0,0,0,0.78); }
+  50%       { border-color: rgba(255,255,255,0.9); box-shadow: 0 0 0 100vw rgba(0,0,0,0.78), 0 0 0 5px rgba(20,145,155,0.6); }
+}
+@keyframes bounce-up {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-8px); }
+}
+@keyframes bounce-down {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(8px); }
+}

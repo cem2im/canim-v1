@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { generateHealthReport } from '../utils/generatePdf'
 import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
+import { TOUR_KEY } from '../components/TourOverlay'
 
 export default function Profile() {
   const profile  = useAppStore(s => s.profile)
@@ -211,6 +212,15 @@ export default function Profile() {
       <div className="text-center py-2 text-xs text-gray-500 mb-2">
         <div className="font-bold text-teal text-sm mb-0.5">Canım v3.0</div>
         Prof. Dr. Cem Şimşek tarafından tasarlandı
+        <div className="mt-2">
+          <button
+            onClick={() => { localStorage.removeItem(TOUR_KEY); window.location.reload() }}
+            className="text-xs font-semibold px-3 py-1.5 rounded-lg"
+            style={{background:'rgba(13,115,119,0.1)', color:'#0D7377', border:'none', cursor:'pointer'}}
+          >
+            🎯 Uygulamayı Tanıtımı Tekrar İzle
+          </button>
+        </div>
       </div>
 
       <FeedbackSection page="profile" />

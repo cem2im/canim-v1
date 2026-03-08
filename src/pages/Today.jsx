@@ -87,7 +87,7 @@ export default function Today() {
       </div>
 
       {/* Score card */}
-      <div className="mx-5 mb-4 rounded-3xl p-5 text-white overflow-hidden relative" style={{background:`linear-gradient(135deg, #0D7377, #14919B)`}}>
+      <div id="tour-score-card" className="mx-5 mb-4 rounded-3xl p-5 text-white overflow-hidden relative" style={{background:`linear-gradient(135deg, #0D7377, #14919B)`}}>
         <div className="absolute -right-6 -top-6 w-32 h-32 rounded-full opacity-10 bg-white"/>
         <div className="absolute -right-2 -bottom-8 w-24 h-24 rounded-full opacity-10 bg-white"/>
         <div className="flex items-center justify-between">
@@ -125,7 +125,7 @@ export default function Today() {
       </div>
 
       {/* Action buttons row */}
-      <div className="mx-5 mb-5 flex gap-2">
+      <div id="tour-action-btns" className="mx-5 mb-5 flex gap-2">
         <button
           onClick={() => setShowDoctorModal(true)}
           className="flex-1 py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-1.5 active:scale-98 transition-transform"
