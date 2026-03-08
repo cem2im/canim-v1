@@ -606,7 +606,7 @@ export const DISEASE_SCREENINGS = {
       { id: 'kan_sayimi', months: 6 },          // AHA/ACC 2025: başlangıç paneli — zorunlu
       { id: 'biyokimya', months: 6 },           // AHA/ACC 2025: elektrolit, kreatinin, eGFR
       { id: 'lipid', months: 6 },               // AHA/ACC 2025: PREVENT™ risk hesabı için
-      { id: 'tsh', months: 12 },                // AHA/ACC 2025: sekonder HTN tarama paneli — yeni eklendi
+      { id: 'tsh', months: 60 },                // ATA/AACE 2012: 5 yılda bir tarama — AHA/ACC 2025 sekonder HTN paneli (başlangıç + 5y tekrar)
       { id: 'idrar', months: 6 },               // AHA/ACC 2025: UACR artık zorunlu (2017'de opsiyoneldi)
       { id: 'ekg', months: 12 },                // ESC 2021: LVH tespiti
       { id: 'ekokardiyografi', months: 24 },    // ESC/ESH 2023: hedef organ hasarı
@@ -659,7 +659,7 @@ export const DISEASE_SCREENINGS = {
       { id: 'fibroscan', months: 12 },
       { id: 'ekg', months: 24 },
       { id: 'vitamin_d', months: 12 },
-      { id: 'tsh', months: 12 },
+      { id: 'tsh', months: 60 },             // ATA/AACE 2012: 5 yılda bir — obezite tiroid riskini artırır ama yıllık değil
       { id: 'asi_pnomoni', months: 999 },  // ACIP 2022: obezite (BMI≥40) pnömokok endikasyonu
     ]
   },
