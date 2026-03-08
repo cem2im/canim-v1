@@ -254,7 +254,7 @@ export default function Onboarding() {
             : {borderColor:'#D1D5DB', background:'white', color:'#6B7280'}}
         >
           <span className="text-xl">✓</span>
-          <span>Yukarıdakilerin Hiçbirinde Yok — Sağlıklıyım</span>
+          <span>Aşağıdakilerin Hiçbirinde Yok — Sağlıklıyım</span>
         </button>
 
         <div className="flex-1 overflow-y-auto -mx-6 px-6">
