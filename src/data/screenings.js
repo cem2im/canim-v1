@@ -38,7 +38,7 @@ export const SCREENINGS = {
     frequencyMonths: 60, ageMin: 20, ageMax: 120, sex: 'both', weight: 1,
     doctor: 'Aile Hekimi · İç Hastalıkları · Nefroloji · Kardiyoloji', icon: '🔬',
     sources: [
-      { name: 'ESC — CVD Prevention Guidelines 2021 (Bölüm 4.3: CV Risk Değerlendirmesi)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/CVD-Prevention-in-clinical-practice' },
+      { name: 'ESC — CVD Prevention Guidelines 2021 (Bölüm 4.3: CV Risk Değerlendirmesi)', url: 'https://doi.org/10.1093/eurheartj/ehab484' },
       { name: 'KDIGO — CKD Evaluation and Management (2024, Kidney Int 2024;105:S117–S314)', url: 'https://kdigo.org/guidelines/ckd-evaluation-and-management/' },
       { name: 'ADA — Standards of Care in Diabetes 2025', url: 'https://professional.diabetes.org/standards-of-care' },
     ],
@@ -57,7 +57,7 @@ export const SCREENINGS = {
     sources: [
       { name: 'ESC/EAS — Dyslipidaemias Guidelines (2019)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/Dyslipidaemias-Management-of' },
       { name: 'ESC/EAS — 2025 Focused Update on Dyslipidaemias', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/Dyslipidaemias-Management-of' },
-      { name: 'ESC — Cardiovascular Prevention Guidelines (2021)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/CVD-Prevention-in-clinical-practice' },
+      { name: 'ESC — Cardiovascular Prevention Guidelines (2021)', url: 'https://doi.org/10.1093/eurheartj/ehab484' },
     ],
   },
 
@@ -91,7 +91,7 @@ export const SCREENINGS = {
     sources: [
       { name: 'USPSTF — Thyroid Dysfunction Screening (2015, Grade I; Ann Intern Med 2015;162:641–650)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/thyroid-dysfunction-screening' },
       { name: 'ATA — Hypothyroidism Guidelines (2014)', url: 'https://www.liebertpub.com/doi/10.1089/thy.2014.0028' },
-      { name: 'ETA — European Thyroid Association Guidelines', url: 'https://www.eurothyroid.com/files/download/ETA-Guideline-Management-of-subclinical-hypothyroidism.pdf' },
+      { name: 'ETA — European Thyroid Association Guidelines', url: 'https://pubmed.ncbi.nlm.nih.gov/30811430/' },
     ],
   },
 
@@ -155,7 +155,7 @@ export const SCREENINGS = {
     doctor: 'Aile Hekimi · Gastroenteroloji · Enfeksiyon Hastalıkları', icon: '🫘',
     sources: [
       { name: 'USPSTF — Hepatitis C Screening (2020, Grade B)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/hepatitis-c-screening' },
-      { name: 'USPSTF — Hepatitis B Screening (2020, Grade B — risk-based)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/hepatitis-b-virus-infection-screening-adolescents-and-adults' },
+      { name: 'USPSTF — Hepatitis B Screening (2020, Grade B — risk-based)', url: 'https://pubmed.ncbi.nlm.nih.gov/32735951/' },
       { name: 'CDC MMWR — Hepatitis B Universal Screening for Adults (2023, MMWR 2023;72:RR-1)', url: 'https://www.cdc.gov/mmwr/volumes/72/rr/rr7201a1.htm' },
     ],
   },
@@ -172,8 +172,8 @@ export const SCREENINGS = {
     frequencyMonths: 12, ageMin: 40, ageMax: 120, sex: 'both', weight: 2,
     doctor: 'Aile Hekimi · Kardiyoloji · İç Hastalıkları · Endokrinoloji', icon: '📈',
     sources: [
-      { name: 'USPSTF — Resting ECG Screening (2018, Grade D for low-risk; JAMA 2018;319:2308)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/resting-ecg-screening' },
-      { name: 'ESC — Cardiovascular Prevention Guidelines (2021)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/CVD-Prevention-in-clinical-practice' },
+      { name: 'USPSTF — Resting ECG Screening (2018, Grade D for low-risk; JAMA 2018;319:2308)', url: 'https://pubmed.ncbi.nlm.nih.gov/29800181/' },
+      { name: 'ESC — Cardiovascular Prevention Guidelines (2021)', url: 'https://doi.org/10.1093/eurheartj/ehab484' },
     ],
   },
 
@@ -188,8 +188,8 @@ export const SCREENINGS = {
     frequencyMonths: 24, ageMin: 40, ageMax: 120, sex: 'both', weight: 2,
     doctor: 'Kardiyoloji · İç Hastalıkları · Nefroloji', icon: '💓',
     sources: [
-      { name: 'ESC — CVD Prevention Guidelines 2021 (Sınıf III — asemptomatik taramaya karşı)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/CVD-Prevention-in-clinical-practice' },
-      { name: 'ESC/ESH — Hypertension Guidelines (2023)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/2023-ESH-ESC-Guidelines-for-the-management-of-arterial-hypertension' },
+      { name: 'ESC — CVD Prevention Guidelines 2021 (Sınıf III — asemptomatik taramaya karşı)', url: 'https://doi.org/10.1093/eurheartj/ehab484' },
+      { name: 'ESC/ESH — Hypertension Guidelines (2023)', url: 'https://doi.org/10.1093/eurheartj/ehad758' },
     ],
   },
 
@@ -205,7 +205,7 @@ export const SCREENINGS = {
     doctor: 'Nöroloji · Kardiyoloji · Vasküler Cerrahi', icon: '🔊',
     sources: [
       { name: 'USPSTF — Carotid Artery Stenosis Screening (2021, Grade D; JAMA 2021;325:476)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/carotid-artery-stenosis-screening' },
-      { name: 'ESC — Cardiovascular Prevention Guidelines (2021, Sınıf IIb plak; Sınıf III İMT)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/CVD-Prevention-in-clinical-practice' },
+      { name: 'ESC — Cardiovascular Prevention Guidelines (2021, Sınıf IIb plak; Sınıf III İMT)', url: 'https://doi.org/10.1093/eurheartj/ehab484' },
     ],
   },
 
@@ -222,7 +222,7 @@ export const SCREENINGS = {
     doctor: 'Gastroenteroloji · Radyoloji · İç Hastalıkları · Hepatoloji', icon: '📡',
     sources: [
       { name: 'EASL-EASD-EASO — MASLD Clinical Practice Guidelines (2024)', url: 'https://www.journal-of-hepatology.eu/article/S0168-8278(24)00329-5/fulltext' },
-      { name: 'AASLD — NAFLD Practice Guidance (2023)', url: 'https://www.aasld.org/sites/default/files/2023-06/AASLD-PracticeGuidance-NAFLD-June2023.pdf' },
+      { name: 'AASLD — NAFLD Practice Guidance (2023)', url: 'https://pubmed.ncbi.nlm.nih.gov/37149139/' },
     ],
   },
 
@@ -271,7 +271,7 @@ export const SCREENINGS = {
     doctor: 'Gastroenteroloji · Genel Cerrahi · Aile Hekimi', icon: '🔭',
     sources: [
       { name: 'USPSTF — Colorectal Cancer Screening (2021)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/colorectal-cancer-screening' },
-      { name: 'ESGE — European Colonoscopy Quality Standards (2020)', url: 'https://www.esge.com/assets/downloads/pdfs/guidelines/2020_esge_european_colorectal_cancer_screening_guidelines.pdf' },
+      { name: 'ESGE — European Colonoscopy Quality Standards (2020)', url: 'https://pubmed.ncbi.nlm.nih.gov/32033961/' },
       { name: 'ACG — Colorectal Cancer Screening Guidelines (2021)', url: 'https://journals.lww.com/ajg/fulltext/2021/03000/acg_clinical_guidelines__colorectal_cancer.15.aspx' },
     ],
   },
@@ -322,7 +322,7 @@ export const SCREENINGS = {
     doctor: 'Göğüs Hastalıkları · Radyoloji · Tıbbi Onkoloji', icon: '🫁',
     sources: [
       { name: 'USPSTF — Lung Cancer Screening (2021)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/lung-cancer-screening' },
-      { name: 'ESMO — Lung Cancer Screening Guidelines', url: 'https://www.esmo.org/guidelines/lung-cancer' },
+      { name: 'ESMO — Lung Cancer Screening Guidelines', url: 'https://www.esmo.org/guidelines' },
     ],
   },
 
@@ -354,7 +354,7 @@ export const SCREENINGS = {
     doctor: 'Diş Hekimi · Periodontoloji Uzmanı', icon: '🦷',
     sources: [
       { name: 'ADA — Periodontal Disease and Diabetes (2022)', url: 'https://diabetesjournals.org/care/article/45/Supplement_1/S246/138907' },
-      { name: 'EFP — European Periodontal Guidelines (2022)', url: 'https://www.efp.org/publications/clinical-guidelines/' },
+      { name: 'EFP — European Periodontal Guidelines (2022)', url: 'https://www.efp.org/' },
     ],
   },
 
@@ -404,7 +404,7 @@ export const SCREENINGS = {
     doctor: 'Aile Hekimi · İç Hastalıkları · Kardiyoloji · Nefroloji · Endokrinoloji', icon: '🩺',
     sources: [
       { name: 'USPSTF — Hypertension Screening in Adults (2021, Grade A)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/hypertension-in-adults-screening' },
-      { name: 'ESC/ESH — Hypertension Guidelines (2023)', url: 'https://www.escardio.org/Guidelines/Clinical-Practice-Guidelines/2023-ESH-ESC-Guidelines-for-the-management-of-arterial-hypertension' },
+      { name: 'ESC/ESH — Hypertension Guidelines (2023)', url: 'https://doi.org/10.1093/eurheartj/ehad758' },
     ],
   },
 
@@ -419,7 +419,7 @@ export const SCREENINGS = {
     frequencyMonths: 12, ageMin: 19, ageMax: 120, sex: 'both', weight: 2,
     doctor: 'Aile Hekimi · Psikiyatri · Klinik Psikolog', icon: '🧠',
     sources: [
-      { name: 'USPSTF — Depression and Suicide Risk Screening in Adults (2023, Grade B)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/depression-anxiety-and-suicide-risk-screening-adults' },
+      { name: 'USPSTF — Depression and Suicide Risk Screening in Adults (2023, Grade B)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/depression-in-adults-screening' },
     ],
   },
 
@@ -491,7 +491,7 @@ export const SCREENINGS = {
     recommendation: 'ACIP Grade A: ≥6 ay tüm bireyler için yıllık influenza aşısı. ≥65 yaş için yüksek doz (HD-IIV4) veya adjuvanlı (aIIV4) tercih edilir.',
     frequencyMonths: 12, ageMin: 18, ageMax: 120, sex: 'both', weight: 2,
     doctor: 'Aile Hekimi', icon: '💉',
-    sources: [{ name: 'ACIP — Influenza Vaccine Recommendations 2024-2025', url: 'https://www.cdc.gov/vaccines/hcp/acip-recs/general-recs/influenza.html' }],
+    sources: [{ name: 'ACIP — Influenza Vaccine Recommendations 2024-2025', url: 'https://www.cdc.gov/flu/index.html' }],
   },
 
   asi_td_tdap: {
@@ -503,7 +503,7 @@ export const SCREENINGS = {
     recommendation: 'ACIP: Tüm yetişkinler için hayatında bir kez Tdap, ardından her 10 yılda bir Td booster. Gebelikte 27-36. haftada Tdap (her gebelikte).',
     frequencyMonths: 120, ageMin: 18, ageMax: 120, sex: 'both', weight: 2,
     doctor: 'Aile Hekimi', icon: '💉',
-    sources: [{ name: 'ACIP — Td/Tdap Recommendations', url: 'https://www.cdc.gov/vaccines/vpd/tetanus/hcp/recommendations.html' }],
+    sources: [{ name: 'ACIP — Td/Tdap Recommendations', url: 'https://www.cdc.gov/tetanus/index.html' }],
   },
 
   asi_zona: {
@@ -515,7 +515,7 @@ export const SCREENINGS = {
     recommendation: 'ACIP Grade A: ≥50 yaş tüm yetişkinler, bağışıklık durumundan bağımsız. 2 doz: ilk doz ardından 2-6 ay sonra ikinci doz. İmmünsuprese hastalarda da güvenli.',
     frequencyMonths: 999, ageMin: 50, ageMax: 120, sex: 'both', weight: 3,
     doctor: 'Aile Hekimi · İç Hastalıkları', icon: '💉',
-    sources: [{ name: 'ACIP — Recombinant Zoster Vaccine Recommendations (2022)', url: 'https://www.cdc.gov/vaccines/vpd/shingles/hcp/shingrix/recommendations.html' }],
+    sources: [{ name: 'ACIP — Recombinant Zoster Vaccine Recommendations (2022)', url: 'https://www.cdc.gov/shingles/index.html' }],
   },
 
   asi_pnomoni: {
@@ -527,7 +527,7 @@ export const SCREENINGS = {
     recommendation: 'ACIP 2022: ≥65 yaş için tek doz PCV20 (tercihli). 19-64 yaş; diyabet, kronik kalp/akciğer/karaciğer/böbrek hastalığı, sigara, immünsupresyon durumunda PCV20.',
     frequencyMonths: 999, ageMin: 19, ageMax: 120, sex: 'both', weight: 2,
     doctor: 'Aile Hekimi · İç Hastalıkları', icon: '💉',
-    sources: [{ name: 'ACIP — Pneumococcal Vaccine Recommendations (2022)', url: 'https://www.cdc.gov/vaccines/vpd/pneumo/hcp/recommendations.html' }],
+    sources: [{ name: 'ACIP — Pneumococcal Vaccine Recommendations (2022)', url: 'https://www.cdc.gov/pneumococcal/vaccines/index.html' }],
   },
 
   asi_hpv: {
@@ -539,7 +539,7 @@ export const SCREENINGS = {
     recommendation: 'ACIP: ≤26 yaş için rutin 9vHPV aşısı. 27-45 yaş için daha önce aşılanmamış veya eksik seride paylaşımlı karar. HPV enfeksiyonu öyküsü dışlamaz.',
     frequencyMonths: 999, ageMin: 9, ageMax: 45, sex: 'both', weight: 2,
     doctor: 'Aile Hekimi · Kadın Doğum', icon: '💉',
-    sources: [{ name: 'ACIP — HPV Vaccine Recommendations (2022)', url: 'https://www.cdc.gov/vaccines/vpd/hpv/hcp/recommendations.html' }],
+    sources: [{ name: 'ACIP — HPV Vaccine Recommendations (2022)', url: 'https://www.cdc.gov/hpv/index.html' }],
   },
 
   asi_hepatit_b: {
@@ -551,7 +551,7 @@ export const SCREENINGS = {
     recommendation: 'ACIP 2022: ≤59 yaş tüm yetişkinler için rutin HepB aşısı. ≥60 yaş: kronik hastalık, sağlık personeli, seyahat durumunda önerilir. Heplisav-B (2 doz, 1 ay ara) veya klasik 3-doz serisi.',
     frequencyMonths: 999, ageMin: 18, ageMax: 60, sex: 'both', weight: 2,
     doctor: 'Aile Hekimi · Gastroenteroloji', icon: '💉',
-    sources: [{ name: 'ACIP — Hepatitis B Vaccination of Adults (2022)', url: 'https://www.cdc.gov/vaccines/vpd/hepb/hcp/recommendations.html' }],
+    sources: [{ name: 'ACIP — Hepatitis B Vaccination of Adults (2022)', url: 'https://www.cdc.gov/hepatitis/hbv/index.htm' }],
   },
 
   obezite_tarama: {
