@@ -168,7 +168,7 @@ export default function ShareCardModal({ onClose, score, label, name, cards }) {
     ctx.font = '500 12px Inter, Arial, sans-serif'
     ctx.fillText('Prof. Dr. Cem Simsek · Hacettepe Universitesi', 40, H - 28)
     ctx.textAlign = 'right'
-    ctx.fillText('cem2im.github.io/canim-v1', W - 40, H - 28)
+    ctx.fillText('canim.uzunyasa.com', W - 40, H - 28)
 
     setDataUrl(canvas.toDataURL('image/png'))
   }, [score, label, name, cards]) // eslint-disable-line
@@ -186,7 +186,7 @@ export default function ShareCardModal({ onClose, score, label, name, cards }) {
         await navigator.share({
           files: [file],
           title: `Tarama Uyum Puanım: ${score}/100`,
-          text: `Canım uygulamasında tarama uyum puanım ${score}/100! Siz de kontrol edin: https://cem2im.github.io/canim-v1/`,
+          text: `Canım uygulamasında tarama uyum puanım ${score}/100! Siz de kontrol edin: https://canim.uzunyasa.com/`,
         })
       } else {
         // Fallback: download
@@ -210,7 +210,7 @@ export default function ShareCardModal({ onClose, score, label, name, cards }) {
   const handleWhatsApp = () => {
     if (!dataUrl) return
     // On mobile WhatsApp, best we can do is open with text (image needs to be downloaded first)
-    const text = `Canım uygulamasında tarama uyum puanım *${score}/100* (${label})! 🏥\n\nSen de kişisel sağlık tarama takvimine bak: https://cem2im.github.io/canim-v1/`
+    const text = `Canım uygulamasında tarama uyum puanım *${score}/100* (${label})! 🏥\n\nSen de kişisel sağlık tarama takvimine bak: https://canim.uzunyasa.com/`
     window.open(`https://wa.me/?text=${encodeURIComponent(text)}`)
   }
 

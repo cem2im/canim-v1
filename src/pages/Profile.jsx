@@ -163,7 +163,7 @@ export default function Profile() {
         {/* WhatsApp share */}
         <button
           onClick={() => {
-            const text = `Canım uygulamasını dene — yaşına ve hastalıklarına göre hangi taramaları ne zaman yaptırman gerektiğini gösteriyor! https://cem2im.github.io/canim-v1/`
+            const text = `Canım uygulamasını dene — yaşına ve hastalıklarına göre hangi taramaları ne zaman yaptırman gerektiğini gösteriyor! https://canim.uzunyasa.com/`
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`)
           }}
           className="w-full py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-all"
