@@ -29,25 +29,36 @@ const PAD = 10
 export default function TourOverlay({ onDone }) {
   const [step, setStep] = useState(0)
   const [rect, setRect] = useState(null)
-  const [visible, setVisible] = useState(false)
+  const [visible, setVisible] = useState(true)
 
   const currentStep = STEPS[step]
 
   const measureEl = useCallback(() => {
-    const el = document.getElementById(currentStep.id)
-    if (!el) return
-    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    setTimeout(() => {
-      const r = el.getBoundingClientRect()
-      setRect({ top: r.top, left: r.left, width: r.width, height: r.height })
-      setVisible(true)
-    }, 150)
+    let attempts = 0
+    const tryMeasure = () => {
+      const el = document.getElementById(currentStep.id)
+      if (!el) {
+        if (attempts++ < 15) setTimeout(tryMeasure, 200)
+        return
+      }
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      setTimeout(() => {
+        const r = el.getBoundingClientRect()
+        if (r.width === 0 && attempts++ < 15) { setTimeout(tryMeasure, 200); return }
+        setRect({ top: r.top, left: r.left, width: r.width, height: r.height })
+        setVisible(true)
+      }, 120)
+    }
+    tryMeasure()
   }, [currentStep.id])
 
   useEffect(() => {
-    setVisible(false)
+    if (step > 0) setVisible(false)
     setRect(null)
-    measureEl()
+    // First step needs extra time for page to render
+    const delay = step === 0 ? 700 : 200
+    const t = setTimeout(measureEl, delay)
+    return () => clearTimeout(t)
   }, [step, measureEl])
 
   const next = () => {
@@ -63,15 +74,17 @@ export default function TourOverlay({ onDone }) {
     onDone()
   }
 
-  if (!rect) return null
+  // Fallback: show centered card even if element not found yet
+  const fallbackRect = { top: window.innerHeight * 0.35, left: window.innerWidth * 0.1, width: window.innerWidth * 0.8, height: 80 }
+  const activeRect = rect || fallbackRect
 
-  const spotTop    = rect.top  - PAD
-  const spotLeft   = rect.left - PAD
-  const spotW      = rect.width  + PAD * 2
-  const spotH      = rect.height + PAD * 2
+  const spotTop    = activeRect.top  - PAD
+  const spotLeft   = activeRect.left - PAD
+  const spotW      = activeRect.width  + PAD * 2
+  const spotH      = activeRect.height + PAD * 2
 
   // Put tooltip above element if it's in the bottom 45% of screen
-  const tooltipAbove = rect.top > window.innerHeight * 0.55
+  const tooltipAbove = activeRect.top > window.innerHeight * 0.55
 
   // Tooltip horizontal center aligned with spotlight, clamped to screen
   const tipLeft = Math.max(12, Math.min(window.innerWidth - 312, spotLeft + spotW / 2 - 150))
