@@ -319,3 +319,171 @@ export function generateHealthReport({ profile, diseases, screeningCards, doctor
   const filename = `Canim-Saglik-Raporu-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.pdf`
   doc.save(filename)
 }
+
+// ── Screenings-only PDF ──────────────────────────────────────────────────────
+const SCREENING_TYPE = {
+  kan_sayimi:'blood', biyokimya:'blood', lipid:'blood', hba1c:'blood',
+  tsh:'blood', vitamin_d:'blood', b12:'blood', hepatit:'blood',
+  hiv_tarama:'blood', prostat:'blood', uacr:'blood', idrar:'urine',
+  dexa:'imaging', karin_usg:'imaging', karotis_usg:'imaging',
+  fibroscan:'imaging', mamografi:'imaging', aort_anevrizması:'imaging',
+  akci_bt:'imaging', akciger_bt:'imaging', ekokardiyografi:'imaging',
+  asi_grip:'vaccine', asi_td_tdap:'vaccine', asi_zona:'vaccine',
+  asi_pnomoni:'vaccine', asi_hpv:'vaccine', asi_hepatit_b:'vaccine',
+}
+const PDF_CATEGORIES = [
+  { key:'blood',   label:'Kan Tahlilleri' },
+  { key:'urine',   label:'Idrar Tahlilleri' },
+  { key:'imaging', label:'Radyoloji & Goruntuleme' },
+  { key:'other',   label:'Diger Tetkikler' },
+  { key:'vaccine', label:'Asilar' },
+]
+const STATUS_COLOR = {
+  overdue:  [220, 38, 38],
+  upcoming: [13, 115, 119],
+  soon:     [217, 119, 6],
+  ok:       [16, 185, 129],
+  unknown:  [107, 114, 128],
+}
+
+export function generateScreeningsPdf({ profile, screeningCards }) {
+  const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+  const W = 210, M = 16
+  const CW = W - M * 2
+  let y = 0
+  const now = new Date()
+  const reportDate = `${now.getDate()} ${MONTHS_TR[now.getMonth()]} ${now.getFullYear()}`
+  const age = profile?.birthYear ? now.getFullYear() - profile.birthYear : '?'
+
+  const newPage = () => {
+    doc.addPage(); y = 20
+    drawHeader(); drawFooter()
+  }
+  const checkY = (n = 14) => { if (y + n > 275) newPage() }
+
+  function drawHeader() {
+    doc.setFillColor(13, 115, 119)
+    doc.rect(0, 0, W, 7, 'F')
+  }
+  function drawFooter() {
+    doc.setFontSize(7.5); doc.setTextColor(160)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Canim · Prof. Dr. Cem Simsek · canim.uzunyasa.com', M, 288)
+    doc.text(reportDate, W - M, 288, { align: 'right' })
+    doc.text('Bu cikti bilgilendirme amaclidir, tibbi tavsiye niteliginde degildir.', M, 284)
+    doc.setFillColor(13, 115, 119)
+    doc.rect(0, 292, W, 5, 'F')
+  }
+
+  drawHeader(); drawFooter(); y = 16
+
+  // ── Title block ─────────────────────────────────────────────────────────
+  doc.setFillColor(13, 115, 119)
+  doc.roundedRect(M, y, CW, 34, 3, 3, 'F')
+  doc.setTextColor(255, 255, 255)
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(18)
+  doc.text('Tarama Listesi', M + 7, y + 13)
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(9)
+  doc.setTextColor(200, 240, 240)
+  const who = profile?.name ? `${tr(profile.name)}  |  ${age} yas  |  ${profile.sex === 'F' ? 'Kadin' : 'Erkek'}` : ''
+  doc.text(who, M + 7, y + 22)
+  doc.text(reportDate, W - M - 7, y + 22, { align: 'right' })
+  y += 42
+
+  // ── Urgent block (overdue + upcoming) ───────────────────────────────────
+  const urgent = screeningCards.filter(c => c.status === 'overdue' || c.status === 'upcoming')
+  if (urgent.length > 0) {
+    checkY(16)
+    doc.setFillColor(254, 242, 242)
+    doc.roundedRect(M, y, CW, 10, 2, 2, 'F')
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5)
+    doc.setTextColor(185, 28, 28)
+    doc.text(`YAPILMASI GEREKEN TARAMALAR (${urgent.length})`, M + 5, y + 6.5)
+    y += 13
+
+    for (const c of urgent) {
+      checkY(12)
+      const isOver = c.status === 'overdue'
+      doc.setFillColor(isOver ? 254 : 240, isOver ? 242 : 253, isOver ? 242 : 250)
+      doc.roundedRect(M, y, CW, 10, 2, 2, 'F')
+
+      // Status pill
+      const sc = STATUS_COLOR[c.status] || [100,100,100]
+      doc.setFillColor(...sc)
+      doc.roundedRect(M + CW - 30, y + 2.5, 28, 5.5, 1.5, 1.5, 'F')
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7)
+      doc.setTextColor(255, 255, 255)
+      doc.text(isOver ? 'GECIKTI' : 'BU AY', M + CW - 16, y + 6.2, { align: 'center' })
+
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(9)
+      doc.setTextColor(30)
+      doc.text(tr(c.trName), M + 5, y + 6.5)
+
+      if (c.nextDate) {
+        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5)
+        doc.setTextColor(120)
+        doc.text(formatDate(c.nextDate), M + CW - 32, y + 6.5, { align: 'right' })
+      }
+      y += 12
+    }
+    y += 4
+  }
+
+  // ── Category sections ───────────────────────────────────────────────────
+  for (const cat of PDF_CATEGORIES) {
+    const items = screeningCards.filter(c => (SCREENING_TYPE[c.id] || 'other') === cat.key)
+    if (items.length === 0) continue
+    const order = { overdue:0, upcoming:1, soon:2, unknown:3, ok:4 }
+    items.sort((a,b) => order[a.status] - order[b.status])
+
+    checkY(18)
+    // Section header
+    doc.setFillColor(232, 244, 245)
+    doc.roundedRect(M, y, CW, 8, 2, 2, 'F')
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(9)
+    doc.setTextColor(13, 115, 119)
+    doc.text(tr(cat.label).toUpperCase(), M + 5, y + 5.5)
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(8)
+    doc.setTextColor(100)
+    doc.text(`${items.length} tarama`, W - M - 5, y + 5.5, { align: 'right' })
+    y += 11
+
+    for (const c of items) {
+      checkY(11)
+      // Row bg alternating
+      doc.setFillColor(252, 252, 252)
+      doc.roundedRect(M, y, CW, 9.5, 1.5, 1.5, 'F')
+      doc.setDrawColor(240); doc.setLineWidth(0.2)
+      doc.roundedRect(M, y, CW, 9.5, 1.5, 1.5, 'S')
+
+      // Name
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5)
+      doc.setTextColor(30)
+      doc.text(tr(c.trName), M + 4, y + 6)
+
+      // Frequency
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5)
+      doc.setTextColor(130)
+      doc.text(freqLabel(c.frequencyMonths), M + 78, y + 6)
+
+      // Next date
+      doc.setTextColor(100)
+      const dateStr = c.nextDate ? formatDate(c.nextDate) : '-'
+      doc.text(dateStr, M + 114, y + 6)
+
+      // Status pill
+      const sc = STATUS_COLOR[c.status] || [150,150,150]
+      doc.setFillColor(...sc)
+      doc.roundedRect(M + CW - 27, y + 2, 25, 5.5, 1.5, 1.5, 'F')
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5)
+      doc.setTextColor(255, 255, 255)
+      const stLabel = { overdue:'GECIKTI', upcoming:'BU AY', soon:'YAKINDA', ok:'TAMAM', unknown:'BILINMIYOR' }
+      doc.text(stLabel[c.status] || '-', M + CW - 14.5, y + 6, { align: 'center' })
+      y += 11
+    }
+    y += 4
+  }
+
+  const filename = `Canim-Taramalarim-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.pdf`
+  doc.save(filename)
+}

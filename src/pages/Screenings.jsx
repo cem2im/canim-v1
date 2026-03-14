@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import useAppStore from '../store/useAppStore'
 import { statusColor, statusLabel } from '../utils/score'
+import { generateScreeningsPdf } from '../utils/generatePdf'
 import ScreeningDetail from '../components/ScreeningDetail'
 import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
@@ -179,13 +180,23 @@ function DoctorShowModal({ cards, onClose }) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Screenings() {
   const getScreeningCards = useAppStore(s => s.getScreeningCards)
-  const [selected, setSelected]         = useState(null)
-  const [viewMode, setViewMode]         = useState('category') // 'category' | 'doctor'
+  const profile           = useAppStore(s => s.profile)
+  const [selected, setSelected]               = useState(null)
+  const [viewMode, setViewMode]               = useState('category') // 'category' | 'doctor'
   const [showDoctorModal, setShowDoctorModal] = useState(false)
+  const [printing, setPrinting]               = useState(false)
 
   const cards = getScreeningCards()
-
   const urgentCount = cards.filter(c => c.status === 'overdue' || c.status === 'upcoming').length
+
+  function handlePrint() {
+    setPrinting(true)
+    setTimeout(() => {
+      try { generateScreeningsPdf({ profile, screeningCards: cards }) }
+      catch (e) { console.error(e) }
+      setPrinting(false)
+    }, 50)
+  }
 
   if (selected) return <ScreeningDetail screening={selected} onBack={() => setSelected(null)} />
 
@@ -260,20 +271,30 @@ export default function Screenings() {
 
       {/* Header */}
       <div className="px-5 mb-4">
-        <div className="flex items-start justify-between">
+        <div className="flex items-start justify-between gap-3">
           <div>
             <h1 className="text-xl font-extrabold text-gray-900 mb-0.5">Taramalarım</h1>
             <p className="text-sm text-gray-500">{cards.length} tarama takip ediliyor</p>
           </div>
-          {urgentCount > 0 && (
+          <div className="flex gap-2 shrink-0">
+            {urgentCount > 0 && (
+              <button
+                onClick={() => setShowDoctorModal(true)}
+                className="flex items-center gap-1 px-3 py-2 rounded-2xl text-white font-bold text-xs active:scale-95 transition-transform"
+                style={{ background: 'linear-gradient(135deg,#0D7377,#14919B)', boxShadow: '0 3px 12px rgba(13,115,119,0.3)' }}
+              >
+                🏥 Göster
+              </button>
+            )}
             <button
-              onClick={() => setShowDoctorModal(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-white font-bold text-xs active:scale-95 transition-transform"
-              style={{ background: 'linear-gradient(135deg,#0D7377,#14919B)', boxShadow: '0 3px 12px rgba(13,115,119,0.3)' }}
+              onClick={handlePrint}
+              disabled={printing}
+              className="flex items-center gap-1 px-3 py-2 rounded-2xl font-bold text-xs active:scale-95 transition-transform"
+              style={{ background: '#F3F4F6', color: printing ? '#9CA3AF' : '#374151', border: '1.5px solid #E5E7EB' }}
             >
-              🏥 Doktora Göster
+              {printing ? '⏳' : '🖨️'} Çıktı Al
             </button>
-          )}
+          </div>
         </div>
 
         {/* Urgent alert banner */}
