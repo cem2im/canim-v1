@@ -1,5 +1,31 @@
 import { useState } from 'react'
 
+function EyeIcon({ open }) {
+  return open ? (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+  ) : (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/>
+      <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+    </svg>
+  )
+}
+
+function BackButton({ onClick }) {
+  return (
+    <button onClick={onClick} style={{ background: 'none', border: 'none', padding: '20px 0 0', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, color: '#6B7280' }}>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>Geri</span>
+    </button>
+  )
+}
+
 // Simple local auth — no server, credentials stored in localStorage
 const AUTH_KEY = 'canim_local_accounts'
 
@@ -25,6 +51,8 @@ export default function AuthScreen({ onAuth }) {
   const [password2, setPassword2] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [showPwd, setShowPwd] = useState(false)
+  const [showPwd2, setShowPwd2] = useState(false)
 
   async function handleRegister() {
     setError('')
@@ -97,10 +125,9 @@ export default function AuthScreen({ onAuth }) {
         {/* Options */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12, flex: 1 }}>
 
-          {/* Anonymous — recommended */}
+          {/* Create account — PRIMARY / recommended */}
           <button
-            id="tour-auth-anon"
-            onClick={() => onAuth(null)}
+            onClick={() => { setMode('register'); setError('') }}
             style={{
               background: 'linear-gradient(135deg, #0D7377, #14B8A6)',
               border: 'none',
@@ -112,45 +139,23 @@ export default function AuthScreen({ onAuth }) {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
-              <span style={{ fontSize: 26 }}>👤</span>
+              <span style={{ fontSize: 26 }}>✨</span>
               <div>
-                <div style={{ fontSize: 16, fontWeight: 800, color: 'white' }}>Anonim Devam Et</div>
+                <div style={{ fontSize: 16, fontWeight: 800, color: 'white' }}>Hesap Oluştur</div>
                 <div style={{
                   display: 'inline-block',
-                  background: 'rgba(255,255,255,0.2)',
+                  background: 'rgba(255,255,255,0.22)',
                   borderRadius: 6,
                   padding: '2px 8px',
                   fontSize: 11,
-                  color: 'rgba(255,255,255,0.9)',
+                  color: 'rgba(255,255,255,0.95)',
                   fontWeight: 600,
                   marginTop: 2,
                 }}>Önerilen</div>
               </div>
             </div>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.5 }}>
-              Hesap oluşturmadan hemen başlayın. Verileriniz yalnızca bu cihazda saklanır. Hiçbir kişisel bilginiz bizimle paylaşılmaz.
-            </p>
-          </button>
-
-          {/* Create account */}
-          <button
-            onClick={() => { setMode('register'); setError('') }}
-            style={{
-              background: 'white',
-              border: '1.5px solid #E5E7EB',
-              borderRadius: 18,
-              padding: '18px 20px',
-              cursor: 'pointer',
-              textAlign: 'left',
-              boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
-              <span style={{ fontSize: 24 }}>✨</span>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>Hesap Oluştur</div>
-            </div>
-            <p style={{ fontSize: 13, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
-              Birden fazla cihazda erişmek veya verilerinizi yedeklemek için hesap oluşturun. Yalnızca kullanıcı adı ve şifre gerekir — e-posta sorulmaz.
+              Verilerinizi güvenle saklayın. Yalnızca kullanıcı adı ve şifre gerekir — e-posta sorulmaz.
             </p>
           </button>
 
@@ -175,10 +180,33 @@ export default function AuthScreen({ onAuth }) {
               Daha önce bir hesap oluşturduysanız giriş yapın.
             </p>
           </button>
+
+          {/* Anonymous — tertiary */}
+          <button
+            id="tour-auth-anon"
+            onClick={() => onAuth(null)}
+            style={{
+              background: 'white',
+              border: '1.5px solid #E5E7EB',
+              borderRadius: 18,
+              padding: '18px 20px',
+              cursor: 'pointer',
+              textAlign: 'left',
+              boxShadow: '0 1px 6px rgba(0,0,0,0.05)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }}>
+              <span style={{ fontSize: 24 }}>👤</span>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#111827' }}>Anonim Devam Et</div>
+            </div>
+            <p style={{ fontSize: 13, color: '#6B7280', margin: 0, lineHeight: 1.5 }}>
+              Hesap oluşturmadan başlayın. Verileriniz yalnızca bu cihazda saklanır.
+            </p>
+          </button>
         </div>
 
         <p style={{ textAlign: 'center', fontSize: 11, color: '#9CA3AF', padding: '24px 0', lineHeight: 1.5 }}>
-          Hesap oluşturursanız verileriniz bu cihazda şifreli olarak saklanır.
+          Verileriniz cihazınızda güvenli şekilde şifrelenir.
         </p>
       </div>
     )
@@ -196,12 +224,7 @@ export default function AuthScreen({ onAuth }) {
       padding: '0 20px',
     }}>
       {/* Back button */}
-      <button
-        onClick={() => { setMode('choice'); setError(''); setUsername(''); setPassword(''); setPassword2('') }}
-        style={{ background: 'none', border: 'none', padding: '20px 0 0', cursor: 'pointer', textAlign: 'left', fontSize: 28, color: '#6B7280' }}
-      >
-        ←
-      </button>
+      <BackButton onClick={() => { setMode('choice'); setError(''); setUsername(''); setPassword(''); setPassword2('') }} />
 
       {/* Header */}
       <div style={{ paddingTop: 16, paddingBottom: 32 }}>
@@ -235,35 +258,47 @@ export default function AuthScreen({ onAuth }) {
 
         <div>
           <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Şifre</label>
-          <input
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            placeholder={isRegister ? 'En az 6 karakter' : 'Şifreniz'}
-            style={{
-              width: '100%', padding: '14px 16px', borderRadius: 14,
-              border: '1.5px solid #E5E7EB', fontSize: 16,
-              background: 'white', outline: 'none', boxSizing: 'border-box',
-              color: '#111827',
-            }}
-          />
-        </div>
-
-        {isRegister && (
-          <div>
-            <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Şifre Tekrar</label>
+          <div style={{ position: 'relative' }}>
             <input
-              type="password"
-              value={password2}
-              onChange={e => setPassword2(e.target.value)}
-              placeholder="Şifrenizi tekrar girin"
+              type={showPwd ? 'text' : 'password'}
+              value={password}
+              onChange={e => setPassword(e.target.value)}
+              placeholder={isRegister ? 'En az 6 karakter' : 'Şifreniz'}
               style={{
-                width: '100%', padding: '14px 16px', borderRadius: 14,
+                width: '100%', padding: '14px 48px 14px 16px', borderRadius: 14,
                 border: '1.5px solid #E5E7EB', fontSize: 16,
                 background: 'white', outline: 'none', boxSizing: 'border-box',
                 color: '#111827',
               }}
             />
+            <button type="button" onClick={() => setShowPwd(v => !v)}
+              style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: 0, display: 'flex' }}>
+              <EyeIcon open={showPwd} />
+            </button>
+          </div>
+        </div>
+
+        {isRegister && (
+          <div>
+            <label style={{ fontSize: 13, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 6 }}>Şifre Tekrar</label>
+            <div style={{ position: 'relative' }}>
+              <input
+                type={showPwd2 ? 'text' : 'password'}
+                value={password2}
+                onChange={e => setPassword2(e.target.value)}
+                placeholder="Şifrenizi tekrar girin"
+                style={{
+                  width: '100%', padding: '14px 48px 14px 16px', borderRadius: 14,
+                  border: '1.5px solid #E5E7EB', fontSize: 16,
+                  background: 'white', outline: 'none', boxSizing: 'border-box',
+                  color: '#111827',
+                }}
+              />
+              <button type="button" onClick={() => setShowPwd2(v => !v)}
+                style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: '#9CA3AF', padding: 0, display: 'flex' }}>
+                <EyeIcon open={showPwd2} />
+              </button>
+            </div>
           </div>
         )}
 

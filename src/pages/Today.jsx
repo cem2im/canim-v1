@@ -104,13 +104,13 @@ export default function Today() {
         {/* Stat boxes — 4-column grid */}
         <div className="mt-5 pt-4 border-t border-white/20 grid grid-cols-4 gap-1">
           {[
-            { count: cards.filter(c=>c.status==='overdue').length,  label:'Gecikmiş', dot:'#FCA5A5' },
-            { count: cards.filter(c=>c.status==='upcoming').length, label:'Bu ay',    dot:'#99F6E4' },
-            { count: cards.filter(c=>c.status==='soon').length,     label:'Yakında',  dot:'#FDE68A' },
-            { count: okCards.length,                                label:'Tamam',    dot:'#99F6E4' },
+            { count: cards.filter(c=>c.status==='overdue').length,  label:'Gecikmiş', accent:'#FCA5A5' },
+            { count: cards.filter(c=>c.status==='upcoming').length, label:'Bu ay',    accent:'#93C5FD' },
+            { count: cards.filter(c=>c.status==='soon').length,     label:'Yakında',  accent:'#FDE68A' },
+            { count: okCards.length,                                label:'Tamam',    accent:'#86EFAC' },
           ].map(s => (
             <div key={s.label} className="flex flex-col items-center py-2 rounded-2xl" style={{background:'rgba(255,255,255,0.1)'}}>
-              <span className="text-2xl font-black leading-none mb-1">{s.count}</span>
+              <span className="text-2xl font-black leading-none mb-1" style={{color: s.accent}}>{s.count}</span>
               <span className="text-xs opacity-75 font-medium">{s.label}</span>
             </div>
           ))}
@@ -138,7 +138,7 @@ export default function Today() {
           className="py-3.5 px-4 rounded-2xl font-bold text-sm flex items-center gap-1.5 active:scale-98 transition-transform"
           style={{background:'rgba(13,115,119,0.1)', color:'#0D7377', border:'1.5px solid rgba(13,115,119,0.2)'}}
         >
-          📤 Paylaş
+          📤 Kartımı Paylaş
         </button>
       </div>
 

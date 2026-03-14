@@ -1,4 +1,4 @@
-import { useState } from 'react'
+// Tour removed — see src/components/_disabled_tour/ for backup
 import useAppStore from './store/useAppStore'
 import LandingPage from './pages/LandingPage'
 import AuthScreen from './pages/AuthScreen'
@@ -7,7 +7,7 @@ import Today from './pages/Today'
 import Screenings from './pages/Screenings'
 import History from './pages/Lab'
 import Profile from './pages/Profile'
-import TourGuide, { resetAllTours, isScreenDone } from './components/TourGuide'
+// TourGuide disabled — backup at src/components/_disabled_tour/TourGuide.jsx
 
 const TABS = [
   { id:'today',      label:'Bugün',      icon: HomeIcon },
@@ -25,21 +25,10 @@ export default function App() {
   const activeTab      = useAppStore(s => s.activeTab)
   const setActiveTab   = useAppStore(s => s.setActiveTab)
 
-  // Determine current screen for the tour
-  const currentScreen = !onboardingDone
-    ? (!landingSeen ? 'landing' : !authHandled ? 'auth' : 'onboarding')
-    : 'app'
-
-  // Tour reset: bump a counter to force TourGuide remount
-  const [tourKey, setTourKey] = useState(0)
-  const restartTour = () => { resetAllTours(); setTourKey(k => k + 1) }
-
   // ── Pre-onboarding screens ──────────────────────────────────────────────────
   if (!onboardingDone) {
     return (
       <div style={{ position: 'relative' }}>
-        <TourGuide key={`${currentScreen}-${tourKey}`} currentScreen={currentScreen} />
-        <TourButton onRestart={restartTour} />
         {!landingSeen && <LandingPage onStart={setLandingSeen} />}
         {landingSeen && !authHandled && <AuthScreen onAuth={user => setAuthHandled(user)} />}
         {landingSeen && authHandled && <Onboarding />}
@@ -50,8 +39,6 @@ export default function App() {
   // ── Main app ────────────────────────────────────────────────────────────────
   return (
     <div className="relative" style={{background:'#FAFAF8', minHeight:'100dvh'}}>
-      <TourGuide key={`app-${tourKey}`} currentScreen="app" />
-      <TourButton onRestart={restartTour} />
 
       {/* Page */}
       <div className="overflow-y-auto" style={{minHeight:'100dvh'}}>
@@ -88,25 +75,7 @@ export default function App() {
   )
 }
 
-// ── Tour restart button (fixed top-right, all screens) ────────────────────────
-function TourButton({ onRestart }) {
-  return (
-    <button
-      onClick={onRestart}
-      style={{
-        position: 'fixed', top: 14, right: 14, zIndex: 9999,
-        background: 'rgba(13,115,119,0.13)', border: '1.5px solid rgba(13,115,119,0.28)',
-        borderRadius: 999, padding: '6px 13px',
-        fontSize: 12, fontWeight: 700, color: '#0D7377',
-        cursor: 'pointer', backdropFilter: 'blur(10px)',
-        display: 'flex', alignItems: 'center', gap: 5,
-        boxShadow: '0 2px 8px rgba(13,115,119,0.1)',
-      }}
-    >
-      🎯 Tanıtım
-    </button>
-  )
-}
+// Tour removed — see src/components/_disabled_tour/ for backup
 
 // ── TAB ICONS ──────────────────────────────────────────────────────────────────
 function HomeIcon({ active }) {

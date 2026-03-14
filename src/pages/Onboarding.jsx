@@ -1,5 +1,20 @@
 import { useState, useMemo } from 'react'
 import useAppStore from '../store/useAppStore'
+
+// ── Step progress bar ─────────────────────────────────────────────────────────
+function StepBar({ current, total = 4 }) {
+  return (
+    <div style={{ display: 'flex', gap: 5, marginBottom: 20 }}>
+      {Array.from({ length: total }, (_, i) => (
+        <div key={i} style={{
+          flex: 1, height: 4, borderRadius: 999,
+          background: i < current ? '#0D7377' : '#E5E7EB',
+          transition: 'background 0.3s ease',
+        }} />
+      ))}
+    </div>
+  )
+}
 import { DISEASE_LIST, SCREENINGS, DISEASE_DOCTOR_SCHEDULE, DISEASE_SCREENINGS } from '../data/screenings'
 import { buildScreeningList, buildInitialDates, TIME_OPTIONS } from '../utils/engine'
 
@@ -113,6 +128,7 @@ export default function Onboarding() {
   if (step === 1) return (
     <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
       <div className="flex-1">
+        <StepBar current={1} />
         <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 1 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sizi Tanıyalım</h1>
         <p className="text-gray-500 text-sm mb-8">Kişiselleştirilmiş tarama takviminiz için gerekli.</p>
@@ -251,7 +267,8 @@ export default function Onboarding() {
 
     return (
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-        <button onClick={() => setStep(1)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+        <button onClick={() => setStep(1)} className="text-teal font-semibold text-sm mb-4 self-start">← Geri</button>
+        <StepBar current={2} />
         <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 2 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sağlık Durumunuz</h1>
         <p className="text-gray-500 text-sm mb-6">Hangi sağlık sorunlarınız var?<br/>Birden fazla seçebilirsiniz.</p>
@@ -374,7 +391,8 @@ export default function Onboarding() {
 
     return (
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-        <button onClick={() => setSubPage(null)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+        <button onClick={() => setSubPage(null)} className="text-teal font-semibold text-sm mb-4 self-start">← Geri</button>
+        <StepBar current={2} />
         <div className="mb-1 text-xs font-bold text-teal uppercase tracking-widest">Adım 2 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Ailede Kanser Öyküsü</h1>
         <div className="mb-6 px-4 py-3 rounded-2xl bg-amber-50 border border-amber-200">
@@ -443,7 +461,7 @@ export default function Onboarding() {
     return (
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
         <button onClick={() => setStep(2)} className="text-teal font-semibold text-sm mb-4 self-start">← Geri</button>
-
+        <StepBar current={3} />
         <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sizin İçin Belirlendi</h1>
         <p className="text-gray-500 text-sm mb-5">
@@ -575,7 +593,8 @@ export default function Onboarding() {
         <>
         {showConfetti && <Confetti />}
         <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-          <button onClick={() => setStep(3)} className="text-teal font-semibold text-sm mb-6 self-start">← Geri</button>
+          <button onClick={() => setStep(3)} className="text-teal font-semibold text-sm mb-4 self-start">← Geri</button>
+          <StepBar current={4} />
           <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 4 / 4</div>
           <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Doktor Ziyaretleriniz</h1>
           <p className="text-gray-500 text-sm mb-6">Hastalıklarınız için en son ne zaman doktora gittiniz?</p>
@@ -639,8 +658,9 @@ export default function Onboarding() {
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
         <button
           onClick={() => doctorQuestions.length > 0 ? setDoctorSubStep(0) : setStep(3)}
-          className="text-teal font-semibold text-sm mb-6 self-start"
+          className="text-teal font-semibold text-sm mb-4 self-start"
         >← Geri</button>
+        <StepBar current={4} />
         <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 4 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Son Kontroller</h1>
         <p className="text-gray-500 text-sm mb-2">Bu özel taramaları yaptırdınız mı?</p>

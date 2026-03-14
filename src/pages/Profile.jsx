@@ -210,8 +210,7 @@ export default function Profile() {
       {/* App info */}
       <div className="text-center py-2 text-xs text-gray-500 mb-2">
         <div className="font-bold text-teal text-sm mb-0.5">Canım v3.0</div>
-        Prof. Dr. Cem Şimşek tarafından tasarlandı
-
+        <div>Prof. Dr. Cem Şimşek tarafından tasarlandı</div>
       </div>
 
       <FeedbackSection page="profile" />
