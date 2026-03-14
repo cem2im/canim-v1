@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import useAppStore from '../store/useAppStore'
 import { statusColor } from '../utils/score'
 import { generateScreeningsPdf } from '../utils/generatePdf'
@@ -68,9 +69,9 @@ function freqLabel(months) {
 function Sheet({ title, icon, items, onSelectItem, onClose }) {
   const order = { overdue:0, unknown:0, upcoming:1, soon:2, ok:3 }
   const sorted = [...items].sort((a,b) => order[a.status] - order[b.status])
-  return (
+  return createPortal(
     <div className="fixed inset-0 flex flex-col"
-      style={{ background: 'rgba(0,0,0,0.48)', zIndex: 1000 }}
+      style={{ background: 'rgba(0,0,0,0.48)', zIndex: 9999 }}
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="flex-1" onClick={onClose} />
       <div className="bg-white rounded-t-3xl flex flex-col"
@@ -123,7 +124,7 @@ function Sheet({ title, icon, items, onSelectItem, onClose }) {
         </div>
       </div>
     </div>
-  )
+  , document.body)
 }
 
 // ── Group Row ─────────────────────────────────────────────────────────────────

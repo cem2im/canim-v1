@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import useAppStore from '../store/useAppStore'
 import { statusColor, statusLabel } from '../utils/score'
 import { TIME_OPTIONS } from '../utils/engine'
@@ -21,8 +22,8 @@ function freqLabel(months) {
 // ── "Ne Zaman Yapıldı?" bottom sheet ─────────────────────────────────────────
 function MarkDoneSheet({ onClose, onSave }) {
   const [selected, setSelected] = useState(null)
-  return (
-    <div className="fixed inset-0 flex flex-col" style={{background:'rgba(0,0,0,0.45)', zIndex:1000}}
+  return createPortal(
+    <div className="fixed inset-0 flex flex-col" style={{background:'rgba(0,0,0,0.45)', zIndex:9999}}
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="flex-1" onClick={onClose} />
       <div className="bg-white rounded-t-3xl px-5 pt-4 pb-8"
@@ -49,14 +50,14 @@ function MarkDoneSheet({ onClose, onSave }) {
         </button>
       </div>
     </div>
-  )
+  , document.body)
 }
 
 // ── Klinik Bilgi bottom sheet ─────────────────────────────────────────────────
 function ClinicalSheet({ screening, onClose }) {
   const sources = screening.sources || []
-  return (
-    <div className="fixed inset-0 flex flex-col" style={{background:'rgba(0,0,0,0.45)', zIndex:1000}}
+  return createPortal(
+    <div className="fixed inset-0 flex flex-col" style={{background:'rgba(0,0,0,0.45)', zIndex:9999}}
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="flex-1" onClick={onClose} />
       <div className="bg-white rounded-t-3xl max-h-[80dvh] flex flex-col"
@@ -116,7 +117,7 @@ function ClinicalSheet({ screening, onClose }) {
         </div>
       </div>
     </div>
-  )
+  , document.body)
 }
 
 // ── Ana bileşen ───────────────────────────────────────────────────────────────
