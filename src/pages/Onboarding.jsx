@@ -101,6 +101,7 @@ export default function Onboarding() {
   const [subPage, setSubPage] = useState(null) // null | 'cancer'
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
+  const [openGroup, setOpenGroup] = useState(null) // step 3 — group detail sheet
 
   // Step 1 state
   const [name, setName] = useState('')
@@ -443,115 +444,143 @@ export default function Onboarding() {
     )
   }
 
-  // ── STEP 3: Summary Screen — detailed grouped list ───────────────────────
+  // ── STEP 3: Single-screen summary — accordion groups ─────────────────────
   if (step === 3) {
     const allList = buildScreeningList(diseases, profile)
       .filter(s => !HIDDEN_FROM_SUMMARY.has(s.id))
     const groupedList = buildGroupedScreenings(diseases, allList)
     const total = allList.length
 
-    return (
-      <div className="min-h-dvh flex flex-col page-enter" style={{background:'#FAFAF8'}}>
+    // Summary label per group: first 2 item names + "+N" if more
+    function groupSummary(items) {
+      const names = items.slice(0, 2).map(s => screeningDisplayName(s))
+      const rest = items.length - 2
+      return names.join(', ') + (rest > 0 ? ` +${rest}` : '')
+    }
 
-        {/* Fixed header */}
-        <div className="px-5 pt-10 pb-4" style={{background:'#FAFAF8'}}>
-          <button onClick={() => setStep(2)} className="flex items-center gap-1.5 text-teal font-semibold text-sm mb-4 self-start">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            Geri — Bilgileri Düzelt
+    // Active detail group
+    const detailGroup = openGroup ? groupedList.find(g => g.key === openGroup) : null
+
+    return (
+      <div style={{ height:'100dvh', display:'flex', flexDirection:'column', background:'#FAFAF8', overflow:'hidden' }}
+        className="page-enter">
+
+        {/* Header */}
+        <div className="px-5 pt-10 pb-3" style={{flexShrink:0}}>
+          <button onClick={() => setStep(2)} className="flex items-center gap-1.5 text-teal font-semibold text-sm mb-3 self-start">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri
           </button>
           <StepBar current={3} />
-          <div className="mb-1 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
-          <h1 className="text-2xl font-extrabold text-gray-900 mb-0.5">Sizin İçin Belirlendi</h1>
-          <p className="text-gray-500 text-sm">
-            {name && <span className="font-semibold text-gray-700">{name}, </span>}
+          <h1 className="text-xl font-extrabold text-gray-900 mb-0.5">Sizin İçin Belirlendi</h1>
+          <p className="text-sm text-gray-500">
+            {name && <span className="font-semibold text-gray-700">{name} · </span>}
             {age} yaş · {sex === 'F' ? 'Kadın' : 'Erkek'}
-            {diseases.length > 0 && <span> · {diseases.length} tanı</span>}
           </p>
         </div>
 
         {/* Hero pill */}
-        <div className="mx-5 mb-4 px-5 py-4 rounded-2xl text-white flex items-center gap-4" style={{background:'linear-gradient(135deg,#0D7377,#14919B)'}}>
-          <div className="text-center">
-            <div className="text-4xl font-black leading-none">{total}</div>
-            <div className="text-xs font-semibold opacity-80 mt-0.5">tarama</div>
+        <div className="mx-5 mb-3 px-4 py-3 rounded-2xl text-white flex items-center gap-3" style={{background:'linear-gradient(135deg,#0D7377,#14919B)', flexShrink:0}}>
+          <div className="text-center shrink-0">
+            <div className="text-3xl font-black leading-none">{total}</div>
+            <div className="text-xs font-medium opacity-75">tarama</div>
           </div>
-          <div className="flex-1 text-sm font-medium opacity-90 leading-relaxed">
-            Yaşınıza, cinsiyetinize ve sağlık durumunuza özel tarama programı hazırlandı.
+          <div className="text-sm font-medium opacity-90 leading-snug">
+            Yaşınıza, cinsiyetinize ve sağlık durumunuza özel takip listesi
           </div>
         </div>
 
-        {/* Grouped screening list — scrollable */}
-        <div className="flex-1 overflow-y-auto px-5 pb-36">
-
+        {/* Group rows — no scroll, fits in screen */}
+        <div className="flex-1 px-5 flex flex-col gap-2 overflow-hidden">
           {groupedList.map(({ key, label, icon, items }) => (
-            <div key={key} className="mb-5">
-              {/* Group header */}
-              <div className="flex items-center gap-2 mb-2">
-                <span className="text-lg">{icon}</span>
-                <span className="text-xs font-black text-gray-500 uppercase tracking-wider">{label}</span>
+            <button
+              key={key}
+              onClick={() => setOpenGroup(key)}
+              className="w-full flex items-center gap-3 bg-white rounded-2xl px-4 py-3.5 text-left active:scale-98 transition-transform"
+              style={{ border:'1px solid #F3F4F6', boxShadow:'0 1px 6px rgba(0,0,0,0.04)', flexShrink:0 }}
+            >
+              <span className="text-xl shrink-0">{icon}</span>
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-bold text-gray-800 leading-tight">{label}</div>
+                <div className="text-xs text-gray-400 mt-0.5 truncate">{groupSummary(items)}</div>
               </div>
+              <span className="text-xs font-black px-2.5 py-1 rounded-full shrink-0 mr-1"
+                style={{background:'#e8f4f5', color:'#0D7377'}}>{items.length}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+          ))}
+        </div>
 
-              {/* Screening cards */}
-              <div className="flex flex-col gap-2">
-                {items.map(s => (
-                  <div key={s.id} className="bg-white rounded-2xl border border-gray-100 px-4 py-3.5"
-                    style={{boxShadow:'0 1px 6px rgba(0,0,0,0.04)'}}>
-                    <div className="flex items-start gap-3">
-                      <span className="text-2xl mt-0.5 shrink-0">{s.icon}</span>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-bold text-gray-900 text-sm leading-tight">{screeningDisplayName(s)}</div>
-                        {s.why && (
-                          <div className="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2">{s.why}</div>
+        {/* Bottom buttons */}
+        <div className="px-5 pb-8 pt-3" style={{flexShrink:0}}>
+          <button
+            onClick={() => setStep(4)}
+            className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98 mb-2"
+            style={{background:'#0D7377', boxShadow:'0 4px 16px rgba(13,115,119,0.28)'}}
+          >
+            Devam →
+          </button>
+          <button onClick={() => setStep(2)}
+            className="w-full py-2.5 text-sm font-semibold active:scale-98"
+            style={{background:'transparent', color:'#9CA3AF', border:'none'}}>
+            ← Bilgilerimi Düzeltmek İstiyorum
+          </button>
+        </div>
+
+        {/* Group detail — bottom sheet */}
+        {detailGroup && (
+          <div className="fixed inset-0 z-50 flex flex-col" style={{background:'rgba(0,0,0,0.45)'}}
+            onClick={() => setOpenGroup(null)}>
+            <div className="flex-1" />
+            <div className="bg-white rounded-t-3xl max-h-[80dvh] flex flex-col"
+              style={{animation:'slideUp 0.26s cubic-bezier(0.22,1,0.36,1)'}}
+              onClick={e => e.stopPropagation()}>
+              {/* Handle */}
+              <div className="flex justify-center pt-3 pb-1 shrink-0">
+                <div className="w-10 h-1 rounded-full bg-gray-200" />
+              </div>
+              {/* Sheet header */}
+              <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 shrink-0">
+                <span className="text-2xl">{detailGroup.icon}</span>
+                <div className="flex-1">
+                  <div className="font-extrabold text-gray-900 text-base">{detailGroup.label}</div>
+                  <div className="text-xs text-gray-400">{detailGroup.items.length} tarama</div>
+                </div>
+                <button onClick={() => setOpenGroup(null)}
+                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400"
+                  style={{background:'#F3F4F6', border:'none', cursor:'pointer', fontSize:18}}>×</button>
+              </div>
+              {/* Sheet content */}
+              <div className="overflow-y-auto px-5 py-4 flex flex-col gap-3">
+                {detailGroup.items.map(s => (
+                  <div key={s.id} className="flex items-start gap-3 bg-gray-50 rounded-2xl px-4 py-3"
+                    style={{border:'1px solid #F3F4F6'}}>
+                    <span className="text-xl mt-0.5 shrink-0">{s.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-gray-900 text-sm">{screeningDisplayName(s)}</div>
+                      {s.why && <div className="text-xs text-gray-500 mt-1 leading-relaxed">{s.why}</div>}
+                      <div className="flex gap-2 mt-2 flex-wrap">
+                        <span className="text-xs font-semibold px-2.5 py-1 rounded-full"
+                          style={{background:'#e8f4f5', color:'#0D7377'}}>🔄 {freqLabel(s.frequencyMonths)}</span>
+                        {s.guideline && (
+                          <span className="text-xs font-medium px-2.5 py-1 rounded-full"
+                            style={{background:'#F3F4F6', color:'#6B7280'}}>📋 {s.guideline.split(' ')[0]}</span>
                         )}
-                        <div className="flex flex-wrap gap-2 mt-2">
-                          {/* Frequency */}
-                          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full"
-                            style={{background:'#e8f4f5', color:'#0D7377'}}>
-                            🔄 {freqLabel(s.frequencyMonths)}
-                          </span>
-                          {/* Guideline */}
-                          {s.guideline && (
-                            <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full"
-                              style={{background:'#F3F4F6', color:'#6B7280'}}>
-                              📋 {s.guideline.split(' ')[0]}
-                            </span>
-                          )}
-                        </div>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
+              <div className="px-5 pb-8 pt-2 shrink-0">
+                <button onClick={() => setOpenGroup(null)}
+                  className="w-full py-3.5 rounded-2xl text-white font-bold text-sm"
+                  style={{background:'#0D7377', border:'none', cursor:'pointer'}}>
+                  Kapat
+                </button>
+              </div>
             </div>
-          ))}
-
-          {/* Info note */}
-          <div className="mt-2 px-4 py-3 rounded-2xl flex items-start gap-3" style={{background:'#fffbeb', border:'1px solid #fde68a'}}>
-            <span className="text-base shrink-0">💡</span>
-            <p className="text-sm text-amber-800 leading-relaxed">
-              <strong>Sonraki adımda</strong> bu taramaları en son ne zaman yaptırdığınızı soracağız. Tarihleri bilmiyorsanız "Hatırlamıyorum" diyebilirsiniz — sorun değil.
-            </p>
           </div>
-        </div>
-
-        {/* Fixed bottom buttons */}
-        <div className="fixed bottom-0 left-0 right-0 max-w-xl mx-auto px-5 pb-8 pt-3"
-          style={{background:'linear-gradient(to top, #FAFAF8 80%, transparent)'}}>
-          <button
-            onClick={() => setStep(4)}
-            className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98 mb-2"
-            style={{background:'#0D7377', boxShadow:'0 4px 16px rgba(13,115,119,0.3)'}}
-          >
-            Devam — Tarihleri Belirle →
-          </button>
-          <button
-            onClick={() => setStep(2)}
-            className="w-full py-3 rounded-2xl font-semibold text-sm active:scale-98"
-            style={{background:'transparent', color:'#9CA3AF', border:'none'}}
-          >
-            ← Bilgilerimi Düzeltmek İstiyorum
-          </button>
-        </div>
+        )}
       </div>
     )
   }
