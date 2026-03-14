@@ -161,9 +161,6 @@ function GroupRow({ icon, label, items, onClick }) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Screenings() {
   const getScreeningCards    = useAppStore(s => s.getScreeningCards)
-  const getDoctorVisitCards  = useAppStore(s => s.getDoctorVisitCards)
-  const setDoctorVisitDate   = useAppStore(s => s.setDoctorVisitDate)
-  const logDoctorVisit       = useAppStore(s => s.logDoctorVisit)
   const diseases             = useAppStore(s => s.diseases)
   const profile              = useAppStore(s => s.profile)
   const [selected, setSelected]   = useState(null)
@@ -172,7 +169,6 @@ export default function Screenings() {
   const [printing, setPrinting]   = useState(false)
 
   const cards = getScreeningCards()
-  const doctorCards = getDoctorVisitCards()
 
   const urgentCount = cards.filter(c =>
     c.status === 'overdue' || c.status === 'unknown' ||
@@ -186,16 +182,6 @@ export default function Screenings() {
       catch(e) { console.error(e) }
       setPrinting(false)
     }, 50)
-  }
-
-  // Mark doctor as visited → auto-fill related screenings
-  function handleDoctorVisit(card) {
-    const today = new Date().toISOString().slice(0, 10)
-    setDoctorVisitDate(card.id, today)
-    const screeningIds = (DISEASE_SCREENINGS[card.diseaseId]?.screenings || []).map(s => s.id)
-    if (screeningIds.length > 0) {
-      logDoctorVisit(today, card.doctor, screeningIds)
-    }
   }
 
   // Build category groups
@@ -285,36 +271,6 @@ export default function Screenings() {
         <p className="text-xs text-gray-400 mb-2">
           Aşağıda hangi taramaları yaptırmanız gerektiğini bulabilirsiniz
         </p>
-
-        {/* Doctor visit chips — "Bu doktorlara gittiniz mi?" */}
-        {doctorCards.length > 0 && (
-          <div className="mb-2">
-            <div className="text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Bu Doktorlara Gittiniz Mi?</div>
-            <div className="flex gap-2 overflow-x-auto pb-1" style={{scrollbarWidth:'none', WebkitOverflowScrolling:'touch'}}>
-              {doctorCards.map(card => {
-                const visited = card.status === 'ok'
-                return (
-                  <button
-                    key={card.id}
-                    onClick={() => !visited && handleDoctorVisit(card)}
-                    className="flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-2xl border-2 transition-all active:scale-95 min-w-[76px]"
-                    style={visited
-                      ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377'}
-                      : {borderColor:'#E5E7EB', background:'white', color:'#374151'}}
-                  >
-                    <span className="text-lg">🏥</span>
-                    <span className="text-xs font-bold leading-tight text-center" style={{maxWidth:68}}>
-                      {card.doctor.split(' ')[0]}
-                    </span>
-                    <span className="text-xs font-bold" style={{color: visited ? '#0D7377' : '#9CA3AF'}}>
-                      {visited ? '✓ Gidildi' : 'Gittim'}
-                    </span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        )}
 
         {/* View toggle — 3 seçenek */}
         <div className="flex rounded-2xl p-1 gap-1" style={{ background:'#F3F4F6' }}>

@@ -256,11 +256,17 @@ export default function Onboarding() {
         </div>
       </div>
 
+      {!skipMeasurements && height && !weight && (
+        <p className="text-xs text-red-500 text-center mb-2 font-semibold">Kilo alanını da doldurun</p>
+      )}
+      {!skipMeasurements && weight && !height && (
+        <p className="text-xs text-red-500 text-center mb-2 font-semibold">Boy alanını da doldurun</p>
+      )}
       <button
-        disabled={!name.trim() || !sex}
+        disabled={!name.trim() || !sex || (!skipMeasurements && (!height || !weight))}
         onClick={() => setStep(2)}
         className="w-full py-4 rounded-2xl text-white font-bold text-base transition-all disabled:opacity-40 active:scale-98"
-        style={{background: (!name.trim() || !sex) ? '#9CA3AF' : '#0D7377'}}
+        style={{background: (!name.trim() || !sex || (!skipMeasurements && (!height || !weight))) ? '#9CA3AF' : '#0D7377'}}
       >
         Devam →
       </button>
@@ -559,13 +565,17 @@ export default function Onboarding() {
         {/* ── BÖLÜM 1: Gitmeniz Gereken Doktorlar ──────────────────────────── */}
         {doctorQuestions.length > 0 && (
           <div className="mb-5">
-            <div className="flex items-center gap-2 mb-3">
+            <div className="flex items-center gap-2 mb-1">
               <span className="text-base">🏥</span>
               <span className="text-xs font-black text-gray-500 uppercase tracking-wider">Gitmeniz Gereken Doktorlar</span>
             </div>
+            <p className="text-xs text-gray-400 mb-3 leading-relaxed">
+              Son 6-12 ay içinde bu doktorlara gittiniz mi? Gittiyseniz ilgili tetkikler otomatik olarak güncellenir.
+            </p>
             {doctorQuestions.map(q => {
               const ans = doctorAnswers[q.id]
               const went = ans && ans !== 'never'
+              const isGeneralist = q.doctor.includes('Aile Hekimi') || q.doctor.includes('Dahiliye')
               return (
                 <div key={q.id} className="mb-3 bg-white rounded-2xl border border-gray-100 px-4 py-3.5"
                   style={{boxShadow:'0 1px 6px rgba(0,0,0,0.04)'}}>
@@ -573,20 +583,23 @@ export default function Onboarding() {
                     <span className="text-xl shrink-0">🏥</span>
                     <div className="flex-1 min-w-0">
                       <div className="font-bold text-gray-900 text-sm">{q.doctor}</div>
-                      <div className="text-xs text-gray-400">{q.diseaseLabel} · {q.intervalMonths} ayda bir</div>
+                      {isGeneralist && (
+                        <div className="text-xs font-semibold mt-0.5" style={{color:'#0D7377'}}>Genel Sağlık Kontrolü</div>
+                      )}
+                      <div className="text-xs text-gray-400 mt-0.5">{q.diseaseLabel} · {q.intervalMonths} ayda bir</div>
                     </div>
                   </div>
-                  {/* Gittim / Gitmedim */}
+                  {/* Gittim / Gitmedim — eşit renk */}
                   {!ans && (
                     <div className="flex gap-2">
                       <button onClick={() => handleDoctorAnswer(q, 'this_month')}
-                        className="flex-1 py-2.5 rounded-xl text-sm font-bold active:scale-95"
-                        style={{background:'linear-gradient(135deg,#0D7377,#14919B)', color:'white', border:'none'}}>
-                        ✓ Gittim
+                        className="flex-1 py-2.5 rounded-xl text-sm font-bold active:scale-95 transition-all"
+                        style={{background:'#F3F4F6', color:'#374151', border:'2px solid #E5E7EB'}}>
+                        Gittim
                       </button>
                       <button onClick={() => handleDoctorAnswer(q, 'never')}
-                        className="flex-1 py-2.5 rounded-xl text-sm font-bold active:scale-95"
-                        style={{background:'#F3F4F6', color:'#6B7280', border:'none'}}>
+                        className="flex-1 py-2.5 rounded-xl text-sm font-bold active:scale-95 transition-all"
+                        style={{background:'#F3F4F6', color:'#374151', border:'2px solid #E5E7EB'}}>
                         Gitmedim
                       </button>
                     </div>
