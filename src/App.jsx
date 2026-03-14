@@ -3,14 +3,12 @@ import useAppStore from './store/useAppStore'
 import LandingPage from './pages/LandingPage'
 import AuthScreen from './pages/AuthScreen'
 import Onboarding from './pages/Onboarding'
-import Today from './pages/Today'
 import Screenings from './pages/Screenings'
 import History from './pages/Lab'
 import Profile from './pages/Profile'
-// TourGuide disabled — backup at src/components/_disabled_tour/TourGuide.jsx
+// Today tab removed — archived at src/pages/Today.jsx
 
 const TABS = [
-  { id:'today',      label:'Bugün',      icon: HomeIcon },
   { id:'screenings', label:'Taramalar',  icon: CalIcon },
   { id:'lab',        label:'Geçmiş',     icon: HistoryIcon },
   { id:'profile',    label:'Profil',     icon: UserIcon },
@@ -24,6 +22,9 @@ export default function App() {
   const setAuthHandled = useAppStore(s => s.setAuthHandled)
   const activeTab      = useAppStore(s => s.activeTab)
   const setActiveTab   = useAppStore(s => s.setActiveTab)
+
+  // Migrate: 'today' tab no longer exists
+  if (activeTab === 'today') setActiveTab('screenings')
 
   // ── Pre-onboarding screens ──────────────────────────────────────────────────
   if (!onboardingDone) {
@@ -42,7 +43,6 @@ export default function App() {
 
       {/* Page */}
       <div className="overflow-y-auto" style={{minHeight:'100dvh'}}>
-        {activeTab === 'today'      && <Today />}
         {activeTab === 'screenings' && <Screenings />}
         {activeTab === 'lab'        && <History />}
         {activeTab === 'profile'    && <Profile />}

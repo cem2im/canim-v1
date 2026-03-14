@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase'
 import { generateHealthReport } from '../utils/generatePdf'
 import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
+import { scoreColor, scoreLabel } from '../utils/score'
 
 export default function Profile() {
   const profile  = useAppStore(s => s.profile)
@@ -53,7 +54,46 @@ export default function Profile() {
 
   return (
     <div className="page-enter pb-24 px-5 pt-6">
-      <h1 className="text-xl font-extrabold text-gray-900 mb-5">Profilim</h1>
+      <h1 className="text-xl font-extrabold text-gray-900 mb-4">Profilim</h1>
+
+      {/* Score card */}
+      {(() => {
+        const score = getScore()
+        const color = scoreColor(score)
+        const label = scoreLabel(score)
+        const cards = getScreeningCards()
+        const overdueCount  = cards.filter(c => c.status === 'overdue').length
+        const hemenCount    = cards.filter(c => c.daysUntil !== null && c.daysUntil <= 30 && c.status !== 'overdue').length
+        return (
+          <div className="mb-5 rounded-3xl p-5 text-white relative overflow-hidden"
+            style={{ background: `linear-gradient(135deg, #0D7377, #14919B)` }}>
+            <div className="absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-10 bg-white" />
+            <div className="flex items-center gap-4 mb-4">
+              <div>
+                <div className="text-xs font-semibold opacity-75 mb-0.5">Tarama Uyum Puanı</div>
+                <div className="text-5xl font-black leading-none">{score}</div>
+              </div>
+              <div className="flex-1" />
+              <div className="px-3 py-1.5 rounded-full text-sm font-bold"
+                style={{ background: 'rgba(255,255,255,0.2)' }}>{label}</div>
+            </div>
+            <div className="grid grid-cols-4 gap-1 pt-3 border-t border-white/20">
+              {[
+                { n: overdueCount, label: 'Gecikmiş',  accent: '#FCA5A5' },
+                { n: hemenCount,   label: 'Bu ay',     accent: '#93C5FD' },
+                { n: cards.filter(c=>c.status==='soon').length, label: 'Yakında', accent: '#FDE68A' },
+                { n: cards.filter(c=>c.status==='ok').length,   label: 'Tamam',   accent: '#86EFAC' },
+              ].map(s => (
+                <div key={s.label} className="flex flex-col items-center py-2 rounded-2xl"
+                  style={{ background: 'rgba(255,255,255,0.1)' }}>
+                  <span className="text-xl font-black leading-none mb-0.5" style={{ color: s.accent }}>{s.n}</span>
+                  <span className="text-xs opacity-70 font-medium">{s.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Personal Info */}
       <Section title="Kişisel Bilgiler">

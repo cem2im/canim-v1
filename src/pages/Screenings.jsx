@@ -1,10 +1,31 @@
 import { useState } from 'react'
 import useAppStore from '../store/useAppStore'
-import { statusColor, statusLabel } from '../utils/score'
+import { statusColor } from '../utils/score'
 import { generateScreeningsPdf } from '../utils/generatePdf'
 import ScreeningDetail from '../components/ScreeningDetail'
 import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
+
+// Zaman tabanlı etiket — "Hemen", "3 ay sonra" vb.
+function timeLabel(status, daysUntil) {
+  if (status === 'unknown') return 'Yapılmamış'
+  if (status === 'overdue' || daysUntil === null || daysUntil <= 30) return 'Hemen'
+  if (daysUntil <= 60)   return '2 ay sonra'
+  if (daysUntil <= 90)   return '3 ay sonra'
+  if (daysUntil <= 180)  return '6 ay sonra'
+  if (daysUntil <= 365)  return '1 yıl sonra'
+  if (daysUntil <= 730)  return '2 yıl sonra'
+  if (daysUntil <= 1825) return '5 yıl sonra'
+  return '5+ yıl sonra'
+}
+
+function timeLabelColor(status, daysUntil) {
+  if (status === 'overdue') return '#DC2626'
+  if (status === 'unknown') return '#9CA3AF'
+  if (daysUntil !== null && daysUntil <= 30) return '#0D7377'
+  if (daysUntil !== null && daysUntil <= 90) return '#D97706'
+  return '#6B7280'
+}
 
 // ── Category map ─────────────────────────────────────────────────────────────
 const SCREENING_TYPE = {
@@ -90,8 +111,8 @@ function Sheet({ title, icon, items, onSelectItem, onClose }) {
                   </div>
                 </div>
                 <span className="text-xs font-bold px-2.5 py-1 rounded-full shrink-0"
-                  style={{ background:`${color}15`, color }}>
-                  {statusLabel(card.status, card.daysUntil)}
+                  style={{ background:`${timeLabelColor(card.status, card.daysUntil)}18`, color: timeLabelColor(card.status, card.daysUntil) }}>
+                  {timeLabel(card.status, card.daysUntil)}
                 </span>
               </div>
             )
@@ -108,7 +129,10 @@ function Sheet({ title, icon, items, onSelectItem, onClose }) {
 
 // ── Group Row ─────────────────────────────────────────────────────────────────
 function GroupRow({ icon, label, items, onClick }) {
-  const urgentCount = items.filter(c => c.status === 'overdue' || c.status === 'upcoming').length
+  const urgentCount = items.filter(c =>
+    c.status === 'overdue' || c.status === 'unknown' ||
+    (c.daysUntil !== null && c.daysUntil <= 30)
+  ).length
   const preview = items.slice(0,3).map(c => c.icon).join(' ')
   return (
     <button onClick={onClick}
@@ -145,7 +169,10 @@ export default function Screenings() {
   const [printing, setPrinting]   = useState(false)
 
   const cards = getScreeningCards()
-  const urgentCount = cards.filter(c => c.status === 'overdue' || c.status === 'upcoming').length
+  const urgentCount = cards.filter(c =>
+    c.status === 'overdue' || c.status === 'unknown' ||
+    (c.daysUntil !== null && c.daysUntil <= 30)
+  ).length
 
   function handlePrint() {
     setPrinting(true)

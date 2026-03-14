@@ -41,7 +41,7 @@ const useAppStore = create(
       emergency: { bloodType: '', allergies: '', contactName: '', contactPhone: '' },
 
       // ── ACTIVE TAB ──────────────────────────────────────────────────────────
-      activeTab: 'today',
+      activeTab: 'screenings',
 
       // ─── ACTIONS ────────────────────────────────────────────────────────────
 
