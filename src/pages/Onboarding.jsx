@@ -135,7 +135,7 @@ export default function Onboarding() {
   if (step === 1) return (
     <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
       <div className="flex-1">
-        <StepBar current={1} />
+        <StepBar current={1} total={3} />
         <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 1 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sizi Tanıyalım</h1>
         <p className="text-gray-500 text-sm mb-8">Kişiselleştirilmiş tarama takviminiz için gerekli.</p>
@@ -282,7 +282,7 @@ export default function Onboarding() {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
             Geri
           </button>
-          <StepBar current={2} />
+          <StepBar current={2} total={3} />
           <h1 className="text-xl font-extrabold text-gray-900 mb-0.5">Sağlık Durumunuz</h1>
           <p className="text-gray-500 text-sm">Birden fazla seçebilirsiniz</p>
         </div>
@@ -294,6 +294,20 @@ export default function Onboarding() {
           style={{background:'linear-gradient(135deg,#0D7377,#14B8A6)', boxShadow:'0 4px 16px rgba(13,115,119,0.3)', flexShrink:0}}
         >
           Devam →
+        </button>
+
+        {/* Hiçbiri yok */}
+        <button
+          onClick={() => { setDiseases([]); handleDiseaseDone() }}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 font-bold text-sm transition-all active:scale-98 mb-3"
+          style={{
+            borderColor: diseases.length === 0 ? '#0D7377' : '#E5E7EB',
+            background: diseases.length === 0 ? '#e8f4f5' : 'white',
+            color: diseases.length === 0 ? '#0D7377' : '#6B7280',
+            flexShrink: 0,
+          }}
+        >
+          ✓ Aşağıdaki Durumların Hiçbiri Yok
         </button>
 
         {/* 2-kolon hastalık grid */}
@@ -377,7 +391,7 @@ export default function Onboarding() {
     return (
       <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
         <button onClick={() => setSubPage(null)} className="text-teal font-semibold text-sm mb-4 self-start">← Geri</button>
-        <StepBar current={2} />
+        <StepBar current={2} total={3} />
         <div className="mb-1 text-xs font-bold text-teal uppercase tracking-widest">Adım 2 / 4</div>
         <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Ailede Kanser Öyküsü</h1>
         <div className="mb-6 px-4 py-3 rounded-2xl bg-amber-50 border border-amber-200">
@@ -428,160 +442,16 @@ export default function Onboarding() {
     )
   }
 
-  // ── STEP 3: Single-screen summary — accordion groups ─────────────────────
+  // ── STEP 3: Sizin için belirlendi — interaktif doktor + tetkik checklist ─────
   if (step === 3) {
-    const allList = buildScreeningList(diseases, profile)
-      .filter(s => !HIDDEN_FROM_SUMMARY.has(s.id))
-    const groupedList = buildGroupedScreenings(diseases, allList)
-    const total = allList.length
+    const fullList = buildScreeningList(diseases, profile)
+    const total = fullList.filter(s => !HIDDEN_FROM_SUMMARY.has(s.id)).length
 
-    // Summary label per group: first 2 item names + "+N" if more
-    function groupSummary(items) {
-      const names = items.slice(0, 2).map(s => screeningDisplayName(s))
-      const rest = items.length - 2
-      return names.join(', ') + (rest > 0 ? ` +${rest}` : '')
-    }
-
-    // Active detail group
-    const detailGroup = openGroup ? groupedList.find(g => g.key === openGroup) : null
-
-    return (
-      <div style={{ height:'100dvh', display:'flex', flexDirection:'column', background:'#FAFAF8', overflow:'hidden' }}
-        className="page-enter">
-
-        {/* Header */}
-        <div className="px-5 pt-10 pb-3" style={{flexShrink:0}}>
-          <button onClick={() => setStep(2)} className="flex items-center gap-1.5 text-teal font-semibold text-sm mb-3 self-start">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-            Geri
-          </button>
-          <StepBar current={3} />
-          <h1 className="text-xl font-extrabold text-gray-900 mb-0.5">Sizin İçin Belirlendi</h1>
-          <p className="text-sm text-gray-500">
-            {name && <span className="font-semibold text-gray-700">{name} · </span>}
-            {age} yaş · {sex === 'F' ? 'Kadın' : 'Erkek'}
-          </p>
-        </div>
-
-        {/* Hero pill */}
-        <div className="mx-5 mb-3 px-4 py-3 rounded-2xl text-white flex items-center gap-3" style={{background:'linear-gradient(135deg,#0D7377,#14919B)', flexShrink:0}}>
-          <div className="text-center shrink-0">
-            <div className="text-3xl font-black leading-none">{total}</div>
-            <div className="text-xs font-medium opacity-75">tarama</div>
-          </div>
-          <div className="text-sm font-medium opacity-90 leading-snug">
-            Yaşınıza, cinsiyetinize ve sağlık durumunuza özel takip listesi
-          </div>
-        </div>
-
-        {/* Group rows — no scroll, fits in screen */}
-        <div className="flex-1 px-5 flex flex-col gap-2 overflow-hidden">
-          {groupedList.map(({ key, label, icon, items }) => (
-            <button
-              key={key}
-              onClick={() => setOpenGroup(key)}
-              className="w-full flex items-center gap-3 bg-white rounded-2xl px-4 py-3.5 text-left active:scale-98 transition-transform"
-              style={{ border:'1px solid #F3F4F6', boxShadow:'0 1px 6px rgba(0,0,0,0.04)', flexShrink:0 }}
-            >
-              <span className="text-xl shrink-0">{icon}</span>
-              <div className="flex-1 min-w-0">
-                <div className="text-sm font-bold text-gray-800 leading-tight">{label}</div>
-                <div className="text-xs text-gray-400 mt-0.5 truncate">{groupSummary(items)}</div>
-              </div>
-              <span className="text-xs font-black px-2.5 py-1 rounded-full shrink-0 mr-1"
-                style={{background:'#e8f4f5', color:'#0D7377'}}>{items.length}</span>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0"><polyline points="9 18 15 12 9 6"/></svg>
-            </button>
-          ))}
-        </div>
-
-        {/* Bottom buttons */}
-        <div className="px-5 pb-8 pt-3" style={{flexShrink:0}}>
-          <button
-            onClick={() => setStep(4)}
-            className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98 mb-2"
-            style={{background:'#0D7377', boxShadow:'0 4px 16px rgba(13,115,119,0.28)'}}
-          >
-            Devam →
-          </button>
-          <button onClick={() => setStep(2)}
-            className="w-full py-2.5 text-sm font-semibold active:scale-98"
-            style={{background:'transparent', color:'#9CA3AF', border:'none'}}>
-            ← Bilgilerimi Düzeltmek İstiyorum
-          </button>
-        </div>
-
-        {/* Group detail — bottom sheet */}
-        {detailGroup && (
-          <div className="fixed inset-0 z-50 flex flex-col" style={{background:'rgba(0,0,0,0.45)'}}
-            onClick={() => setOpenGroup(null)}>
-            <div className="flex-1" />
-            <div className="bg-white rounded-t-3xl max-h-[80dvh] flex flex-col"
-              style={{animation:'slideUp 0.26s cubic-bezier(0.22,1,0.36,1)'}}
-              onClick={e => e.stopPropagation()}>
-              {/* Handle */}
-              <div className="flex justify-center pt-3 pb-1 shrink-0">
-                <div className="w-10 h-1 rounded-full bg-gray-200" />
-              </div>
-              {/* Sheet header */}
-              <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 shrink-0">
-                <span className="text-2xl">{detailGroup.icon}</span>
-                <div className="flex-1">
-                  <div className="font-extrabold text-gray-900 text-base">{detailGroup.label}</div>
-                  <div className="text-xs text-gray-400">{detailGroup.items.length} tarama</div>
-                </div>
-                <button onClick={() => setOpenGroup(null)}
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-gray-400"
-                  style={{background:'#F3F4F6', border:'none', cursor:'pointer', fontSize:18}}>×</button>
-              </div>
-              {/* Sheet content */}
-              <div className="overflow-y-auto px-5 py-4 flex flex-col gap-3">
-                {detailGroup.items.map(s => (
-                  <div key={s.id} className="flex items-start gap-3 bg-gray-50 rounded-2xl px-4 py-3"
-                    style={{border:'1px solid #F3F4F6'}}>
-                    <span className="text-xl mt-0.5 shrink-0">{s.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-bold text-gray-900 text-sm">{screeningDisplayName(s)}</div>
-                      {s.why && <div className="text-xs text-gray-500 mt-1 leading-relaxed">{s.why}</div>}
-                      <div className="flex gap-2 mt-2 flex-wrap">
-                        <span className="text-xs font-semibold px-2.5 py-1 rounded-full"
-                          style={{background:'#e8f4f5', color:'#0D7377'}}>🔄 {freqLabel(s.frequencyMonths)}</span>
-                        {s.guideline && (
-                          <span className="text-xs font-medium px-2.5 py-1 rounded-full"
-                            style={{background:'#F3F4F6', color:'#6B7280'}}>📋 {s.guideline.split(' ')[0]}</span>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="px-5 pb-8 pt-2 shrink-0">
-                <button onClick={() => setOpenGroup(null)}
-                  className="w-full py-3.5 rounded-2xl text-white font-bold text-sm"
-                  style={{background:'#0D7377', border:'none', cursor:'pointer'}}>
-                  Kapat
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    )
-  }
-
-  // ── STEP 4: Doctor visit questions → then special screenings ────────────────
-  if (step === 4) {
-    const screeningList = buildScreeningList(diseases, profile)
-    const specialScreenings = screeningList
-      .filter(s => s.layer === 2 && s.weight >= 2 && !ROUTINE_IDS.has(s.id))
-      .slice(0, 5)
-
-    // Primary doctor entries for each selected disease
+    // Doctor questions (same logic as old Step 4)
     const chronicDiseaseIds = ['hipertansiyon','diyabet','hiperlipidemi','obezite','yagli_karaciger','kalp_damar','kemik_erimesi']
     const doctorQuestions = []
     const seenDoctors = new Set()
-    const diseasesToAsk = diseases.filter(d => chronicDiseaseIds.includes(d))
-    for (const diseaseId of diseasesToAsk) {
+    for (const diseaseId of diseases.filter(d => chronicDiseaseIds.includes(d))) {
       const schedules = DISEASE_DOCTOR_SCHEDULE[diseaseId] || []
       if (schedules.length > 0) {
         const primary = schedules[0]
@@ -593,203 +463,251 @@ export default function Onboarding() {
       }
     }
 
-    const setDoctorAnswer = (scheduleId, val) => setDoctorAnswers(prev => ({...prev, [scheduleId]: val}))
-    const setAnswer = (id, val) => setAnswers(prev => ({...prev, [id]: val}))
+    const DOCTOR_OPTS = [
+      { value: 'this_month', label: 'Bu ay' },
+      { value: '3m',         label: '3 ay önce' },
+      { value: '6m',         label: '6 ay önce' },
+      { value: '1y',         label: '1 yıl önce' },
+      { value: '2y',         label: '2 yıl önce' },
+      { value: 'never',      label: 'Hiç gitmedim' },
+    ]
+    const SCREENING_OPTS = [
+      { value: 'this_month', label: '1 ay önce' },
+      { value: '3m',         label: '3 ay önce' },
+      { value: '6m',         label: '6 ay önce' },
+      { value: '1y',         label: '12 ay önce' },
+      { value: '2y',         label: '2 yıl önce' },
+      { value: 'older',      label: 'Daha eski' },
+      { value: 'unknown',    label: 'Hatırlamıyorum' },
+    ]
+
+    // Auto-fill disease screenings when doctor visit marked
+    const handleDoctorAnswer = (q, timeValue) => {
+      setDoctorAnswers(prev => ({ ...prev, [q.id]: timeValue }))
+      if (timeValue === 'never') return
+      const diseaseScreenings = DISEASE_SCREENINGS[q.diseaseId]?.screenings || []
+      setAnswers(prev => {
+        const updated = { ...prev }
+        for (const { id } of diseaseScreenings) {
+          if (!updated[id]) updated[id] = timeValue
+        }
+        return updated
+      })
+    }
+
+    const setAnswer = (id, val) => setAnswers(prev => ({ ...prev, [id]: val }))
 
     const finishOnboarding = () => {
-      const fullList = buildScreeningList(diseases, profile)
-      const allAnswers = {...answers}
+      const allAnswers = { ...answers }
       for (const s of fullList) {
         if (!allAnswers[s.id]) allAnswers[s.id] = 'unknown'
       }
       const initialDates = buildInitialDates(fullList, allAnswers)
-
-      // Build doctor visit dates from onboarding answers
       const initialDoctorDates = {}
       for (const [scheduleId, timeOption] of Object.entries(doctorAnswers)) {
         const date = doctorTimeToDate(timeOption)
         if (date) initialDoctorDates[scheduleId] = date
       }
-
       completeOnboarding(
-        { name, birthYear, sex, height: skipMeasurements ? null : (height ? parseInt(height) : null), weight: skipMeasurements ? null : (weight ? parseFloat(weight) : null) },
-        diseases,
-        initialDates,
-        initialDoctorDates
+        { name, birthYear, sex,
+          height: skipMeasurements ? null : (height ? parseInt(height) : null),
+          weight: skipMeasurements ? null : (weight ? parseFloat(weight) : null) },
+        diseases, initialDates, initialDoctorDates
       )
     }
 
-    // Show confetti then finish
     const handleFinish = () => {
       setShowConfetti(true)
       setTimeout(finishOnboarding, 1800)
     }
 
-    // If nothing to ask at all, finish immediately (no confetti for auto-finish)
-    if (doctorQuestions.length === 0 && specialScreenings.length === 0) {
-      finishOnboarding()
-      return null
-    }
-
-    // Sub-step 0: Doctor visit date questions
-    if (doctorSubStep === 0 && doctorQuestions.length > 0) {
-      const DOCTOR_TIME_OPTIONS = [
-        { value: 'this_month', label: 'Bu ay' },
-        { value: '3m', label: '3 ay önce' },
-        { value: '6m', label: '6 ay önce' },
-        { value: '1y', label: '1 yıl önce' },
-        { value: '2y', label: '2 yıl önce' },
-        { value: 'never', label: 'Hiç gitmedim' },
-      ]
-      return (
-        <>
-        {showConfetti && <Confetti />}
-        <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-          <button onClick={() => setStep(3)} className="text-teal font-semibold text-sm mb-4 self-start">← Geri</button>
-          <StepBar current={4} />
-          <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 4 / 4</div>
-          <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Doktor Ziyaretleriniz</h1>
-          <p className="text-gray-500 text-sm mb-6">Hastalıklarınız için en son ne zaman doktora gittiniz?</p>
-
-          <div className="flex-1 overflow-y-auto -mx-6 px-6">
-            {doctorQuestions.map(q => (
-              <div key={q.id} className="mb-5 p-4 rounded-2xl bg-white border border-gray-200">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-xl">🏥</span>
-                  <div>
-                    <span className="font-bold text-gray-900 text-sm">{q.doctor}</span>
-                    <div className="text-xs text-gray-400">{q.diseaseLabel}</div>
-                  </div>
-                </div>
-                <p className="text-xs text-gray-400 mb-3 leading-relaxed">En son ne zaman gittin?</p>
-                <div className="flex flex-wrap gap-2">
-                  {DOCTOR_TIME_OPTIONS.map(opt => (
-                    <button
-                      key={opt.value}
-                      onClick={() => setDoctorAnswer(q.id, opt.value)}
-                      className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
-                      style={doctorAnswers[q.id] === opt.value
-                        ? {background:'#0D7377', color:'white'}
-                        : {background:'#f3f4f6', color:'#374151'}}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <button
-            onClick={() => {
-              if (specialScreenings.length > 0) {
-                setDoctorSubStep(1)
-              } else {
-                handleFinish()
-              }
-            }}
-            className="w-full py-4 rounded-2xl text-white font-bold text-base mt-4 active:scale-98"
-            style={{background:'#0D7377'}}
-          >
-            {specialScreenings.length > 0 ? 'Devam →' : 'Canım\'ı Hazırla 🚀'}
-          </button>
-        </div>
-        </>
-      )
-    }
-
-    // Sub-step 1 (or 0 if no doctor questions): Special screenings
-    if (specialScreenings.length === 0) {
-      finishOnboarding()
-      return null
-    }
+    // Screenings to show (exclude hidden)
+    const screeningRows = fullList.filter(s => !HIDDEN_FROM_SUMMARY.has(s.id))
 
     return (
       <>
       {showConfetti && <Confetti />}
-      <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-        <button
-          onClick={() => doctorQuestions.length > 0 ? setDoctorSubStep(0) : setStep(3)}
-          className="text-teal font-semibold text-sm mb-4 self-start"
-        >← Geri</button>
-        <StepBar current={4} />
-        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 4 / 4</div>
-        <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Son Kontroller</h1>
-        <p className="text-gray-500 text-sm mb-2">Bu özel taramaları yaptırdınız mı?</p>
-        <div className="mb-6 px-3 py-2 rounded-xl" style={{background:'#eff6ff', border:'1px solid #bfdbfe'}}>
-          <p className="text-xs" style={{color:'#1d4ed8'}}>💡 Kan testleri ve kan basıncı gibi rutin taramalar doktorunuz takip ettiğinden burada sorulmaz.</p>
+      <div className="min-h-dvh flex flex-col px-5 page-enter" style={{background:'#FAFAF8', paddingBottom:100}}>
+
+        {/* Header */}
+        <div style={{paddingTop:40, paddingBottom:12, flexShrink:0}}>
+          <button onClick={() => setStep(2)} className="flex items-center gap-1.5 text-teal font-semibold text-sm mb-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri — Bilgileri Düzelt
+          </button>
+          <StepBar current={3} total={3} />
+          <h1 className="text-xl font-extrabold text-gray-900 mb-0.5">Sizin İçin Belirlendi</h1>
+          <p className="text-sm text-gray-500">
+            {name && <span className="font-semibold text-gray-700">{name} · </span>}
+            {age} yaş · {sex === 'F' ? 'Kadın' : 'Erkek'} · {total} tarama
+          </p>
         </div>
 
-        <div className="flex-1 overflow-y-auto -mx-6 px-6">
-          {specialScreenings.map(s => (
-            <div key={s.id} className="mb-4 p-4 rounded-2xl bg-white border border-gray-200">
-              <div className="flex items-center gap-2 mb-1">
-                <span className="text-xl">{s.icon}</span>
-                <span className="font-bold text-gray-900 text-sm">{s.trName}</span>
-              </div>
-              {s.why && <p className="text-xs text-gray-400 mb-3 leading-relaxed">{s.why}</p>}
-              <div className="text-xs font-semibold text-gray-500 mb-2">Yaptırdınız mı?</div>
-              <div className="flex flex-wrap gap-2">
-                {!answers[s.id] ? (
-                  /* Initial state: Evet / Hayır */
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setAnswer(s.id, 'this_month')}
-                      className="px-4 py-2 rounded-xl text-sm font-semibold active:scale-95"
-                      style={{background:'#0D7377', color:'white'}}
-                    >Evet →</button>
-                    <button
-                      onClick={() => setAnswer(s.id, 'no')}
-                      className="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 active:scale-95"
-                    >Hayır / Hatırlamıyorum</button>
+        {/* ── BÖLÜM 1: Gitmeniz Gereken Doktorlar ──────────────────────────── */}
+        {doctorQuestions.length > 0 && (
+          <div className="mb-5">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="text-base">🏥</span>
+              <span className="text-xs font-black text-gray-500 uppercase tracking-wider">Gitmeniz Gereken Doktorlar</span>
+            </div>
+            {doctorQuestions.map(q => {
+              const ans = doctorAnswers[q.id]
+              const went = ans && ans !== 'never'
+              return (
+                <div key={q.id} className="mb-3 bg-white rounded-2xl border border-gray-100 px-4 py-3.5"
+                  style={{boxShadow:'0 1px 6px rgba(0,0,0,0.04)'}}>
+                  <div className="flex items-start gap-3 mb-3">
+                    <span className="text-xl shrink-0">🏥</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-gray-900 text-sm">{q.doctor}</div>
+                      <div className="text-xs text-gray-400">{q.diseaseLabel} · {q.intervalMonths} ayda bir</div>
+                    </div>
                   </div>
-                ) : answers[s.id] === 'no' ? (
-                  /* 'no' selected — show as selected */
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setAnswer(s.id, 'this_month')}
-                      className="px-4 py-2 rounded-xl text-sm font-semibold bg-gray-100 text-gray-600 active:scale-95"
-                    >Evet →</button>
-                    <button
-                      className="px-4 py-2 rounded-xl text-sm font-semibold active:scale-95"
-                      style={{background:'#374151', color:'white'}}
-                    >✓ Hayır / Hatırlamıyorum</button>
+                  {/* Gittim / Gitmedim */}
+                  {!ans && (
+                    <div className="flex gap-2">
+                      <button onClick={() => handleDoctorAnswer(q, 'this_month')}
+                        className="flex-1 py-2.5 rounded-xl text-sm font-bold active:scale-95"
+                        style={{background:'linear-gradient(135deg,#0D7377,#14919B)', color:'white', border:'none'}}>
+                        ✓ Gittim
+                      </button>
+                      <button onClick={() => handleDoctorAnswer(q, 'never')}
+                        className="flex-1 py-2.5 rounded-xl text-sm font-bold active:scale-95"
+                        style={{background:'#F3F4F6', color:'#6B7280', border:'none'}}>
+                        Gitmedim
+                      </button>
+                    </div>
+                  )}
+                  {/* Time chips — Gittim seçildiyse */}
+                  {went && (
+                    <div>
+                      <div className="text-xs font-semibold text-gray-500 mb-2">Ne zaman gittiniz?</div>
+                      <div className="flex flex-wrap gap-2">
+                        {DOCTOR_OPTS.filter(o => o.value !== 'never').map(opt => (
+                          <button key={opt.value} onClick={() => handleDoctorAnswer(q, opt.value)}
+                            className="px-3 py-1.5 rounded-xl text-xs font-semibold active:scale-95 transition-all"
+                            style={ans === opt.value
+                              ? {background:'#0D7377', color:'white'}
+                              : {background:'#F3F4F6', color:'#374151'}}>
+                            {opt.label}
+                          </button>
+                        ))}
+                        <button onClick={() => handleDoctorAnswer(q, 'never')}
+                          className="px-3 py-1.5 rounded-xl text-xs font-semibold active:scale-95"
+                          style={{background:'#FEF2F2', color:'#DC2626'}}>
+                          Gitmedim
+                        </button>
+                      </div>
+                      {went && (
+                        <p className="text-xs text-teal mt-2">
+                          ✓ İlgili tetkikler otomatik dolduruldu
+                        </p>
+                      )}
+                    </div>
+                  )}
+                  {/* Gitmedim seçildiyse */}
+                  {ans === 'never' && (
+                    <div className="flex gap-2">
+                      <button onClick={() => handleDoctorAnswer(q, 'this_month')}
+                        className="flex-1 py-2.5 rounded-xl text-sm font-bold active:scale-95"
+                        style={{background:'#F3F4F6', color:'#6B7280', border:'none'}}>
+                        ✓ Gittim
+                      </button>
+                      <button className="flex-1 py-2.5 rounded-xl text-sm font-bold"
+                        style={{background:'#374151', color:'white', border:'none'}}>
+                        ✓ Gitmedim
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
+        )}
+
+        {/* ── BÖLÜM 2: Yapmanız Gereken Tetkikler ─────────────────────────── */}
+        <div className="mb-4">
+          <div className="flex items-center gap-2 mb-3">
+            <span className="text-base">🔬</span>
+            <span className="text-xs font-black text-gray-500 uppercase tracking-wider">Yapmanız Gereken Tetkikler</span>
+          </div>
+          <p className="text-xs text-gray-400 mb-3">Bu tetkikleri daha önce yaptırdınız mı? Yaptırdıysanız ne zaman?</p>
+          {screeningRows.map(s => {
+            const ans = answers[s.id]
+            const done = ans && ans !== 'no' && ans !== 'unknown'
+            const notDone = ans === 'no' || ans === 'unknown'
+            return (
+              <div key={s.id} className="mb-2.5 bg-white rounded-2xl border border-gray-100 px-4 py-3"
+                style={{boxShadow:'0 1px 4px rgba(0,0,0,0.04)'}}>
+                <div className="flex items-center gap-2 mb-2.5">
+                  <span className="text-lg shrink-0">{s.icon}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-semibold text-gray-900 text-sm leading-tight">{s.trName}</div>
+                    <div className="text-xs text-gray-400">{freqLabel(s.frequencyMonths)}</div>
                   </div>
-                ) : (
-                  /* Time option selected */
-                  <div className="w-full">
-                    <div className="flex flex-wrap gap-2 mb-2">
-                      {[
-                        { value: 'this_month', label: 'Bu ay' },
-                        { value: '6m', label: '6 ay önce' },
-                        { value: '1y', label: '1 yıl önce' },
-                        { value: '2y', label: '2 yıl önce' },
-                        { value: 'older', label: '5+ yıl önce' },
-                      ].map(opt => (
-                        <button
-                          key={opt.value}
-                          onClick={() => setAnswer(s.id, opt.value)}
-                          className="px-3 py-1.5 rounded-xl text-xs font-semibold transition-all active:scale-95"
-                          style={answers[s.id] === opt.value ? {background:'#0D7377', color:'white'} : {background:'#f3f4f6', color:'#374151'}}
-                        >{opt.label}</button>
+                </div>
+                {/* Yaptım / Yapmadım — initial */}
+                {!ans && (
+                  <div className="flex gap-2">
+                    <button onClick={() => setAnswer(s.id, 'this_month')}
+                      className="flex-1 py-2 rounded-xl text-xs font-bold active:scale-95"
+                      style={{background:'linear-gradient(135deg,#0D7377,#14919B)', color:'white', border:'none'}}>
+                      ✓ Yaptım
+                    </button>
+                    <button onClick={() => setAnswer(s.id, 'no')}
+                      className="flex-1 py-2 rounded-xl text-xs font-bold active:scale-95"
+                      style={{background:'#F3F4F6', color:'#6B7280', border:'none'}}>
+                      Yapmadım
+                    </button>
+                  </div>
+                )}
+                {/* Yapmadım seçildiyse */}
+                {notDone && (
+                  <div className="flex gap-2">
+                    <button onClick={() => setAnswer(s.id, 'this_month')}
+                      className="flex-1 py-2 rounded-xl text-xs font-bold active:scale-95"
+                      style={{background:'#F3F4F6', color:'#6B7280', border:'none'}}>
+                      Yaptım
+                    </button>
+                    <button className="flex-1 py-2 rounded-xl text-xs font-bold"
+                      style={{background:'#374151', color:'white', border:'none'}}>
+                      ✓ Yapmadım
+                    </button>
+                  </div>
+                )}
+                {/* Yaptım + tarih seçimi */}
+                {done && (
+                  <div>
+                    <div className="flex flex-wrap gap-1.5 mb-1.5">
+                      {SCREENING_OPTS.map(opt => (
+                        <button key={opt.value} onClick={() => setAnswer(s.id, opt.value)}
+                          className="px-2.5 py-1 rounded-lg text-xs font-semibold active:scale-95 transition-all"
+                          style={ans === opt.value
+                            ? {background:'#0D7377', color:'white'}
+                            : {background:'#F3F4F6', color:'#374151'}}>
+                          {opt.label}
+                        </button>
                       ))}
                     </div>
-                    <button
-                      onClick={() => setAnswer(s.id, 'no')}
-                      className="text-xs text-gray-400 underline"
-                    >Hayır / Hatırlamıyorum</button>
+                    <button onClick={() => setAnswer(s.id, 'no')}
+                      className="text-xs text-gray-400 underline">
+                      Aslında yapmadım
+                    </button>
                   </div>
                 )}
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
 
-        <button
-          onClick={handleFinish}
-          className="w-full py-4 rounded-2xl text-white font-bold text-base mt-4 active:scale-98"
-          style={{background:'#0D7377'}}
-        >
+      </div>
+
+      {/* Fixed bottom button */}
+      <div className="fixed bottom-0 left-0 right-0 max-w-xl mx-auto px-5 pb-8 pt-4"
+        style={{background:'linear-gradient(to top, #FAFAF8 70%, transparent)'}}>
+        <button onClick={handleFinish}
+          className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98"
+          style={{background:'linear-gradient(135deg,#0D7377,#14919B)', boxShadow:'0 4px 20px rgba(13,115,119,0.35)'}}>
           Canım'ı Hazırla 🚀
         </button>
       </div>
@@ -799,7 +717,6 @@ export default function Onboarding() {
 
   return null
 }
-
 // ── Confetti component ─────────────────────────────────────────────────────
 const CONFETTI_COLORS = ['#0D7377','#14B8A6','#F59E0B','#EC4899','#8B5CF6','#10B981','#F97316','#06B6D4']
 

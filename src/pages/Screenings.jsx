@@ -163,7 +163,7 @@ export default function Screenings() {
   const getScreeningCards = useAppStore(s => s.getScreeningCards)
   const profile           = useAppStore(s => s.profile)
   const [selected, setSelected]   = useState(null)
-  const [viewMode, setViewMode]   = useState('category')
+  const [viewMode, setViewMode]   = useState('doctor')
   const [openSheet, setOpenSheet] = useState(null) // { icon, label, items }
   const [printing, setPrinting]   = useState(false)
 
@@ -244,8 +244,8 @@ export default function Screenings() {
         {/* View toggle */}
         <div className="flex rounded-2xl p-1 gap-1" style={{ background:'#F3F4F6' }}>
           {[
-            { key:'category', label:'🗂️ Test Türüne Göre' },
             { key:'doctor',   label:'🏥 Doktora Göre' },
+            { key:'category', label:'🗂️ Test Türüne Göre' },
           ].map(v => (
             <button key={v.key} onClick={() => setViewMode(v.key)}
               className="flex-1 py-2 rounded-xl text-sm font-bold transition-all"
