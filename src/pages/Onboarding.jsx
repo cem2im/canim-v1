@@ -443,76 +443,115 @@ export default function Onboarding() {
     )
   }
 
-  // ── STEP 3: Summary Screen — counts only, no full list ──────────────────
+  // ── STEP 3: Summary Screen — detailed grouped list ───────────────────────
   if (step === 3) {
     const allList = buildScreeningList(diseases, profile)
       .filter(s => !HIDDEN_FROM_SUMMARY.has(s.id))
     const groupedList = buildGroupedScreenings(diseases, allList)
     const total = allList.length
 
-    // Category counts for quick stats
-    const catCounts = {}
-    for (const s of allList) {
-      const cat = SCREENING_CATEGORY[s.id] || 'other'
-      catCounts[cat] = (catCounts[cat] || 0) + 1
-    }
-    const catDisplay = CATEGORIES.filter(c => catCounts[c.key] > 0)
-
     return (
-      <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-        <button onClick={() => setStep(2)} className="text-teal font-semibold text-sm mb-4 self-start">← Geri</button>
-        <StepBar current={3} />
-        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
-        <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sizin İçin Belirlendi</h1>
-        <p className="text-gray-500 text-sm mb-5">
-          {name && <span className="font-semibold text-gray-700">{name}, </span>}
-          {age} yaş · {sex === 'F' ? 'Kadın' : 'Erkek'}
-          {diseases.length > 0 && <span> · {diseases.length} tanı</span>}
-        </p>
+      <div className="min-h-dvh flex flex-col page-enter" style={{background:'#FAFAF8'}}>
 
-        {/* Hero stat */}
-        <div className="mb-5 rounded-3xl p-6 text-white text-center" style={{background:'linear-gradient(135deg,#0D7377,#14919B)'}}>
-          <div className="text-6xl font-black mb-1">{total}</div>
-          <div className="text-lg font-bold opacity-90">kişisel tarama belirlendi</div>
-          <div className="mt-3 pt-3 border-t border-white/20 grid grid-cols-2 gap-2">
-            {catDisplay.map(c => (
-              <div key={c.key} className="flex items-center justify-center gap-2 py-2 rounded-xl" style={{background:'rgba(255,255,255,0.12)'}}>
-                <span className="text-base">{c.icon}</span>
-                <span className="text-sm font-bold">{catCounts[c.key]} {c.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Group summary rows — title + count only */}
-        <div className="flex flex-col gap-2 mb-5">
-          {groupedList.map(({ key, label, icon, items }) => (
-            <div key={key} className="flex items-center gap-3 px-4 py-3.5 bg-white rounded-2xl border border-gray-100"
-              style={{boxShadow:'0 1px 6px rgba(0,0,0,0.04)'}}>
-              <span className="text-xl shrink-0">{icon}</span>
-              <span className="text-sm font-semibold text-gray-800 flex-1">{label}</span>
-              <span className="text-sm font-black px-3 py-1 rounded-full" style={{background:'#e8f4f5', color:'#0D7377'}}>
-                {items.length}
-              </span>
-            </div>
-          ))}
-        </div>
-
-        {/* Info note */}
-        <div className="mb-5 px-4 py-3 rounded-2xl flex items-start gap-3" style={{background:'#fffbeb', border:'1px solid #fde68a'}}>
-          <span className="text-base shrink-0">💡</span>
-          <p className="text-sm text-amber-800 leading-relaxed">
-            <strong>Sonraki adımda</strong> bu taramaları en son ne zaman yaptırdığınızı soracağız. Tarihleri bilmiyorsanız "Hatırlamıyorum" diyebilirsiniz — sorun değil. Tüm detaylar <strong>Taramalar sekmesinde</strong> görünecek.
+        {/* Fixed header */}
+        <div className="px-5 pt-10 pb-4" style={{background:'#FAFAF8'}}>
+          <button onClick={() => setStep(2)} className="flex items-center gap-1.5 text-teal font-semibold text-sm mb-4 self-start">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri — Bilgileri Düzelt
+          </button>
+          <StepBar current={3} />
+          <div className="mb-1 text-xs font-bold text-teal uppercase tracking-widest">Adım 3 / 4</div>
+          <h1 className="text-2xl font-extrabold text-gray-900 mb-0.5">Sizin İçin Belirlendi</h1>
+          <p className="text-gray-500 text-sm">
+            {name && <span className="font-semibold text-gray-700">{name}, </span>}
+            {age} yaş · {sex === 'F' ? 'Kadın' : 'Erkek'}
+            {diseases.length > 0 && <span> · {diseases.length} tanı</span>}
           </p>
         </div>
 
-        <button
-          onClick={() => setStep(4)}
-          className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98"
-          style={{background:'#0D7377'}}
-        >
-          Devam — Tarihleri Belirle →
-        </button>
+        {/* Hero pill */}
+        <div className="mx-5 mb-4 px-5 py-4 rounded-2xl text-white flex items-center gap-4" style={{background:'linear-gradient(135deg,#0D7377,#14919B)'}}>
+          <div className="text-center">
+            <div className="text-4xl font-black leading-none">{total}</div>
+            <div className="text-xs font-semibold opacity-80 mt-0.5">tarama</div>
+          </div>
+          <div className="flex-1 text-sm font-medium opacity-90 leading-relaxed">
+            Yaşınıza, cinsiyetinize ve sağlık durumunuza özel tarama programı hazırlandı.
+          </div>
+        </div>
+
+        {/* Grouped screening list — scrollable */}
+        <div className="flex-1 overflow-y-auto px-5 pb-36">
+
+          {groupedList.map(({ key, label, icon, items }) => (
+            <div key={key} className="mb-5">
+              {/* Group header */}
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-lg">{icon}</span>
+                <span className="text-xs font-black text-gray-500 uppercase tracking-wider">{label}</span>
+              </div>
+
+              {/* Screening cards */}
+              <div className="flex flex-col gap-2">
+                {items.map(s => (
+                  <div key={s.id} className="bg-white rounded-2xl border border-gray-100 px-4 py-3.5"
+                    style={{boxShadow:'0 1px 6px rgba(0,0,0,0.04)'}}>
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl mt-0.5 shrink-0">{s.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-bold text-gray-900 text-sm leading-tight">{screeningDisplayName(s)}</div>
+                        {s.why && (
+                          <div className="text-xs text-gray-500 mt-1 leading-relaxed line-clamp-2">{s.why}</div>
+                        )}
+                        <div className="flex flex-wrap gap-2 mt-2">
+                          {/* Frequency */}
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full"
+                            style={{background:'#e8f4f5', color:'#0D7377'}}>
+                            🔄 {freqLabel(s.frequencyMonths)}
+                          </span>
+                          {/* Guideline */}
+                          {s.guideline && (
+                            <span className="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full"
+                              style={{background:'#F3F4F6', color:'#6B7280'}}>
+                              📋 {s.guideline.split(' ')[0]}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+
+          {/* Info note */}
+          <div className="mt-2 px-4 py-3 rounded-2xl flex items-start gap-3" style={{background:'#fffbeb', border:'1px solid #fde68a'}}>
+            <span className="text-base shrink-0">💡</span>
+            <p className="text-sm text-amber-800 leading-relaxed">
+              <strong>Sonraki adımda</strong> bu taramaları en son ne zaman yaptırdığınızı soracağız. Tarihleri bilmiyorsanız "Hatırlamıyorum" diyebilirsiniz — sorun değil.
+            </p>
+          </div>
+        </div>
+
+        {/* Fixed bottom buttons */}
+        <div className="fixed bottom-0 left-0 right-0 max-w-xl mx-auto px-5 pb-8 pt-3"
+          style={{background:'linear-gradient(to top, #FAFAF8 80%, transparent)'}}>
+          <button
+            onClick={() => setStep(4)}
+            className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98 mb-2"
+            style={{background:'#0D7377', boxShadow:'0 4px 16px rgba(13,115,119,0.3)'}}
+          >
+            Devam — Tarihleri Belirle →
+          </button>
+          <button
+            onClick={() => setStep(2)}
+            className="w-full py-3 rounded-2xl font-semibold text-sm active:scale-98"
+            style={{background:'transparent', color:'#9CA3AF', border:'none'}}
+          >
+            ← Bilgilerimi Düzeltmek İstiyorum
+          </button>
+        </div>
       </div>
     )
   }
