@@ -26,8 +26,8 @@ function MarkDoneSheet({ onClose, onSave }) {
     <div className="fixed inset-0 flex flex-col" style={{background:'rgba(0,0,0,0.45)', zIndex:9999}}
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="flex-1" onClick={onClose} />
-      <div className="bg-white rounded-t-3xl px-5 pt-4 pb-8"
-        style={{animation:'slideUp 0.24s cubic-bezier(0.22,1,0.36,1)'}}>
+      <div className="bg-white rounded-t-3xl px-5 pt-4"
+        style={{animation:'slideUp 0.24s cubic-bezier(0.22,1,0.36,1)', paddingBottom:'max(env(safe-area-inset-bottom, 0px), 32px)'}}>
         <div className="flex justify-center mb-3">
           <div className="w-10 h-1 rounded-full bg-gray-200" />
         </div>
@@ -60,8 +60,8 @@ function ClinicalSheet({ screening, onClose }) {
     <div className="fixed inset-0 flex flex-col" style={{background:'rgba(0,0,0,0.45)', zIndex:9999}}
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="flex-1" onClick={onClose} />
-      <div className="bg-white rounded-t-3xl max-h-[80dvh] flex flex-col"
-        style={{animation:'slideUp 0.24s cubic-bezier(0.22,1,0.36,1)'}}>
+      <div className="bg-white rounded-t-3xl flex flex-col"
+        style={{animation:'slideUp 0.24s cubic-bezier(0.22,1,0.36,1)', maxHeight:'70dvh'}}>
         <div className="flex justify-center pt-3 pb-2 shrink-0">
           <div className="w-10 h-1 rounded-full bg-gray-200" />
         </div>
@@ -71,7 +71,7 @@ function ClinicalSheet({ screening, onClose }) {
             className="w-9 h-9 rounded-full flex items-center justify-center"
             style={{background:'#E5E7EB', fontSize:20, color:'#374151', fontWeight:700}}>×</button>
         </div>
-        <div className="overflow-y-auto flex-1 min-h-0 px-5 py-4">
+        <div className="overflow-y-auto flex-1 min-h-0 px-5 py-4" style={{paddingBottom:80}}>
           {screening.recommendation && (
             <div className="p-4 rounded-2xl mb-4" style={{background:'#e8f4f5', border:'1px solid #b2d8da'}}>
               <div className="text-xs font-bold mb-2" style={{color:'#0A5C5F'}}>🩺 Klinik Öneri</div>
@@ -110,7 +110,8 @@ function ClinicalSheet({ screening, onClose }) {
             </div>
           )}
         </div>
-        <div className="px-5 pb-8 pt-2 shrink-0">
+        <div className="px-5 pt-2 shrink-0"
+          style={{paddingBottom:'max(env(safe-area-inset-bottom, 0px), 32px)'}}>
           <button onClick={onClose}
             className="w-full py-3 rounded-2xl text-white font-bold text-sm"
             style={{background:'#0D7377'}}>Kapat</button>

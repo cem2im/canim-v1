@@ -75,7 +75,7 @@ function Sheet({ title, icon, items, onSelectItem, onClose }) {
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="flex-1" onClick={onClose} />
       <div className="bg-white rounded-t-3xl flex flex-col"
-        style={{ animation: 'slideUp 0.26s cubic-bezier(0.22,1,0.36,1)', maxHeight: 'calc(85dvh - env(safe-area-inset-bottom, 0px))' }}
+        style={{ animation: 'slideUp 0.26s cubic-bezier(0.22,1,0.36,1)', maxHeight: '70dvh' }}
         onClick={e => e.stopPropagation()}>
         {/* Handle */}
         <div className="flex justify-center pt-3 pb-1 shrink-0">
@@ -95,7 +95,7 @@ function Sheet({ title, icon, items, onSelectItem, onClose }) {
           </button>
         </div>
         {/* Items */}
-        <div className="overflow-y-auto flex-1 min-h-0 px-4 py-3 flex flex-col gap-2" style={{paddingBottom:32}}>
+        <div className="overflow-y-auto flex-1 min-h-0 px-4 py-3 flex flex-col gap-2" style={{paddingBottom:80}}>
           {sorted.map(card => {
             const color = statusColor(card.status)
             const isUrgent = card.status === 'overdue' || card.status === 'upcoming'
