@@ -87,11 +87,14 @@ function Sheet({ title, icon, items, onSelectItem, onClose }) {
             <div className="font-extrabold text-gray-900">{title}</div>
             <div className="text-xs text-gray-400">{items.length} tarama</div>
           </div>
-          <button onClick={onClose} className="w-8 h-8 rounded-full flex items-center justify-center"
-            style={{ background:'#F3F4F6', border:'none', cursor:'pointer', fontSize:18, color:'#6B7280' }}>×</button>
+          <button onClick={onClose}
+            className="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-transform"
+            style={{ background:'#E5E7EB', border:'none', cursor:'pointer', fontSize:22, fontWeight:700, color:'#374151' }}>
+            ×
+          </button>
         </div>
         {/* Items */}
-        <div className="overflow-y-auto px-4 py-3 flex flex-col gap-2">
+        <div className="overflow-y-auto px-4 py-3 flex flex-col gap-2 pb-6">
           {sorted.map(card => {
             const color = statusColor(card.status)
             const isUrgent = card.status === 'overdue' || card.status === 'upcoming'
@@ -117,10 +120,6 @@ function Sheet({ title, icon, items, onSelectItem, onClose }) {
               </div>
             )
           })}
-        </div>
-        <div className="px-5 pb-8 pt-2 shrink-0">
-          <button onClick={onClose} className="w-full py-3.5 rounded-2xl text-white font-bold text-sm"
-            style={{ background:'#0D7377', border:'none', cursor:'pointer' }}>Kapat</button>
         </div>
       </div>
     </div>
