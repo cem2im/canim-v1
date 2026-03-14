@@ -962,6 +962,19 @@ export const DISEASE_DOCTOR_SCHEDULE = {
       ],
       guideline: 'AACE/OMA Obezite Kılavuzu 2025',
     },
+    {
+      id: 'obz_endokrin',
+      doctor: 'Endokrinoloji',
+      intervalMonths: 6,
+      purpose: 'Tiroid fonksiyonları, insülin direnci, hormonal değerlendirme, ilaç yönetimi',
+      screenings: ['tsh', 'hba1c', 'vitamin_d', 'biyokimya'],
+      earlyTriggers: [
+        'Kilo verme direnci (diyet ve egzersife rağmen)',
+        'Saç dökülmesi, yorgunluk, üşüme (tiroid belirtileri)',
+        'İnsülin direnci belirtileri',
+      ],
+      guideline: 'Endocrine Society Obezite Tedavisi 2024',
+    },
   ],
 
   yagli_karaciger: [
@@ -1001,7 +1014,7 @@ export const DISEASE_DOCTOR_SCHEDULE = {
   kemik_erimesi: [
     {
       id: 'kem_endokrin',
-      doctor: 'Endokrinoloji / Romatoloji',
+      doctor: 'Endokrinoloji',
       intervalMonths: 12,
       purpose: 'DEXA kemik yoğunluğu, D vitamini, kalsiyum değerlendirmesi',
       screenings: ['dexa', 'vitamin_d', 'biyokimya'],

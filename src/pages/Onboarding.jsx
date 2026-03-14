@@ -108,6 +108,7 @@ export default function Onboarding() {
   const [showConfirmation, setShowConfirmation] = useState(false)
   const [showConfetti, setShowConfetti] = useState(false)
   const [openGroup, setOpenGroup] = useState(null) // step 3 — group detail sheet
+  const [warnDoctors, setWarnDoctors] = useState(false)
 
   // Step 1 state
   const [name, setName] = useState('')
@@ -466,19 +467,19 @@ export default function Onboarding() {
     const fullList = buildScreeningList(diseases, profile)
     const total = fullList.filter(s => !HIDDEN_FROM_SUMMARY.has(s.id)).length
 
-    // Doctor questions (same logic as old Step 4)
+    // Doctor questions — all schedules per disease, deduplicated by primary doctor name
+    const normDoc = s => s.split('/')[0].split('·')[0].trim()
     const chronicDiseaseIds = ['hipertansiyon','diyabet','hiperlipidemi','obezite','yagli_karaciger','kalp_damar','kemik_erimesi']
     const doctorQuestions = []
     const seenDoctors = new Set()
     for (const diseaseId of diseases.filter(d => chronicDiseaseIds.includes(d))) {
       const schedules = DISEASE_DOCTOR_SCHEDULE[diseaseId] || []
-      if (schedules.length > 0) {
-        const primary = schedules[0]
-        if (!seenDoctors.has(primary.doctor)) {
-          seenDoctors.add(primary.doctor)
-          const diseaseLabel = DISEASE_LIST.find(d => d.id === diseaseId)?.label || diseaseId
-          doctorQuestions.push({ ...primary, diseaseId, diseaseLabel })
-        }
+      for (const schedule of schedules) {
+        const key = normDoc(schedule.doctor)
+        if (seenDoctors.has(key)) continue
+        seenDoctors.add(key)
+        const diseaseLabel = DISEASE_LIST.find(d => d.id === diseaseId)?.label || diseaseId
+        doctorQuestions.push({ ...schedule, diseaseId, diseaseLabel })
       }
     }
 
@@ -536,6 +537,14 @@ export default function Onboarding() {
     }
 
     const handleFinish = () => {
+      if (doctorQuestions.length > 0) {
+        const unanswered = doctorQuestions.filter(q => !doctorAnswers[q.id])
+        if (unanswered.length > 0) {
+          setWarnDoctors(true)
+          setTimeout(() => setWarnDoctors(false), 3500)
+          return
+        }
+      }
       setShowConfetti(true)
       setTimeout(finishOnboarding, 1800)
     }
@@ -546,6 +555,26 @@ export default function Onboarding() {
     return (
       <>
       {showConfetti && <Confetti />}
+
+      {/* Uyarı: doktor soruları cevaplanmadı */}
+      {warnDoctors && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-3xl px-8 py-8 mx-6 text-center shadow-2xl">
+            <div className="text-4xl mb-3">🏥</div>
+            <div className="text-lg font-extrabold text-gray-900 mb-2">Doktor ziyaretlerini işaretleyin</div>
+            <div className="text-sm text-gray-500 leading-relaxed">
+              Tüm doktorlar için "Gittim" veya "Gitmedim" seçeneğini işaretleyip devam edebilirsiniz.
+            </div>
+            <button
+              onClick={() => setWarnDoctors(false)}
+              className="mt-5 px-6 py-2.5 rounded-2xl text-white text-sm font-bold"
+              style={{background:'#0D7377'}}>
+              Tamam
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="min-h-dvh flex flex-col px-5 page-enter" style={{background:'#FAFAF8', paddingBottom:100}}>
 
         {/* Header */}
@@ -650,81 +679,6 @@ export default function Onboarding() {
             })}
           </div>
         )}
-
-        {/* ── BÖLÜM 2: Yapmanız Gereken Tetkikler ─────────────────────────── */}
-        <div className="mb-4">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-base">🔬</span>
-            <span className="text-xs font-black text-gray-500 uppercase tracking-wider">Yapmanız Gereken Tetkikler</span>
-          </div>
-          <p className="text-xs text-gray-400 mb-3">Bu tetkikleri daha önce yaptırdınız mı? Yaptırdıysanız ne zaman?</p>
-          {screeningRows.map(s => {
-            const ans = answers[s.id]
-            const done = ans && ans !== 'no' && ans !== 'unknown'
-            const notDone = ans === 'no' || ans === 'unknown'
-            return (
-              <div key={s.id} className="mb-2.5 bg-white rounded-2xl border border-gray-100 px-4 py-3"
-                style={{boxShadow:'0 1px 4px rgba(0,0,0,0.04)'}}>
-                <div className="flex items-center gap-2 mb-2.5">
-                  <span className="text-lg shrink-0">{s.icon}</span>
-                  <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-gray-900 text-sm leading-tight">{s.trName}</div>
-                    <div className="text-xs text-gray-400">{freqLabel(s.frequencyMonths)}</div>
-                  </div>
-                </div>
-                {/* Yaptım / Yapmadım — initial */}
-                {!ans && (
-                  <div className="flex gap-2">
-                    <button onClick={() => setAnswer(s.id, 'this_month')}
-                      className="flex-1 py-2 rounded-xl text-xs font-bold active:scale-95"
-                      style={{background:'linear-gradient(135deg,#0D7377,#14919B)', color:'white', border:'none'}}>
-                      ✓ Yaptım
-                    </button>
-                    <button onClick={() => setAnswer(s.id, 'no')}
-                      className="flex-1 py-2 rounded-xl text-xs font-bold active:scale-95"
-                      style={{background:'#F3F4F6', color:'#6B7280', border:'none'}}>
-                      Yapmadım
-                    </button>
-                  </div>
-                )}
-                {/* Yapmadım seçildiyse */}
-                {notDone && (
-                  <div className="flex gap-2">
-                    <button onClick={() => setAnswer(s.id, 'this_month')}
-                      className="flex-1 py-2 rounded-xl text-xs font-bold active:scale-95"
-                      style={{background:'#F3F4F6', color:'#6B7280', border:'none'}}>
-                      Yaptım
-                    </button>
-                    <button className="flex-1 py-2 rounded-xl text-xs font-bold"
-                      style={{background:'#374151', color:'white', border:'none'}}>
-                      ✓ Yapmadım
-                    </button>
-                  </div>
-                )}
-                {/* Yaptım + tarih seçimi */}
-                {done && (
-                  <div>
-                    <div className="flex flex-wrap gap-1.5 mb-1.5">
-                      {SCREENING_OPTS.map(opt => (
-                        <button key={opt.value} onClick={() => setAnswer(s.id, opt.value)}
-                          className="px-2.5 py-1 rounded-lg text-xs font-semibold active:scale-95 transition-all"
-                          style={ans === opt.value
-                            ? {background:'#0D7377', color:'white'}
-                            : {background:'#F3F4F6', color:'#374151'}}>
-                          {opt.label}
-                        </button>
-                      ))}
-                    </div>
-                    <button onClick={() => setAnswer(s.id, 'no')}
-                      className="text-xs text-gray-400 underline">
-                      Aslında yapmadım
-                    </button>
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
 
       </div>
 
