@@ -467,8 +467,11 @@ export default function Onboarding() {
     const fullList = buildScreeningList(diseases, profile)
     const total = fullList.filter(s => !HIDDEN_FROM_SUMMARY.has(s.id)).length
 
-    // Doctor questions — all schedules per disease, deduplicated by primary doctor name
-    const normDoc = s => s.split('/')[0].split('·')[0].trim()
+    // Doctor questions — deduplicated; "Dahiliye" anywhere in string = same doctor
+    const normDoc = s => {
+      if (s.includes('Dahiliye')) return 'Dahiliye'
+      return s.split('/')[0].split('·')[0].trim()
+    }
     const chronicDiseaseIds = ['hipertansiyon','diyabet','hiperlipidemi','obezite','yagli_karaciger','kalp_damar','kemik_erimesi']
     const doctorQuestions = []
     const seenDoctors = new Set()
@@ -604,7 +607,7 @@ export default function Onboarding() {
             {doctorQuestions.map(q => {
               const ans = doctorAnswers[q.id]
               const went = ans && ans !== 'never'
-              const isGeneralist = q.doctor.includes('Aile Hekimi') || q.doctor.includes('Dahiliye')
+              const isGeneralist = q.doctor.includes('Aile Hekimi') && !q.doctor.includes('Dahiliye')
               return (
                 <div key={q.id} className="mb-3 bg-white rounded-2xl border border-gray-100 px-4 py-3.5"
                   style={{boxShadow:'0 1px 6px rgba(0,0,0,0.04)'}}>
@@ -618,17 +621,17 @@ export default function Onboarding() {
                       <div className="text-xs text-gray-400 mt-0.5">{q.diseaseLabel} · {q.intervalMonths} ayda bir</div>
                     </div>
                   </div>
-                  {/* Gittim / Gitmedim — eşit renk */}
+                  {/* Gittim / Gitmedim */}
                   {!ans && (
                     <div className="flex gap-2">
                       <button onClick={() => handleDoctorAnswer(q, 'this_month')}
                         className="flex-1 py-2.5 rounded-xl text-sm font-bold active:scale-95 transition-all"
-                        style={{background:'#F3F4F6', color:'#374151', border:'2px solid #E5E7EB'}}>
-                        Gittim
+                        style={{background:'#e8f4f5', color:'#0D7377', border:'2px solid #0D737755'}}>
+                        ✓ Gittim
                       </button>
                       <button onClick={() => handleDoctorAnswer(q, 'never')}
                         className="flex-1 py-2.5 rounded-xl text-sm font-bold active:scale-95 transition-all"
-                        style={{background:'#F3F4F6', color:'#374151', border:'2px solid #E5E7EB'}}>
+                        style={{background:'#FEF2F2', color:'#DC2626', border:'2px solid #DC262640'}}>
                         Gitmedim
                       </button>
                     </div>
