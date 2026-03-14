@@ -202,7 +202,7 @@ export const SCREENINGS = {
     explanation: 'Boyun damarlarında (karotis) plak birikimini ve damar duvarı kalınlığını (IMT) gösterir.',
     recommendation: 'ÖNEMLİ GÜNCELLEME — Kılavuzlar arasında ayrım yapılması gerekir: Karotis İMT (intima-media kalınlığı): USPSTF 2021 (JAMA 2021;325:476), genel yetişkin popülasyonunda asemptomatik karotis darlığı taramasına aktif olarak karşı çıkmaktadır (Grade D). ACC/AHA 2013: İlk kardiyovasküler olay riski değerlendirmesinde rutin KİMT ölçümü önerilmez (Sınıf III — Yarar yok; 2010 önerisinden geri adım). Karotis Plak Değerlendirmesi (İMT\'den farklıdır): ESC 2021, KAK yoksa veya uygulanamıyorsa, tedavi eşiği yakınındaki hastalarda risk değiştirici olarak dikkate alınabilir (Sınıf IIb, Düzey B). Plak tanımı: çevre duvarın >%50 kalınlaşması veya fokal İMT ≥1,5 mm. Bu uygulama boyun damar USG\'yi yalnızca hipertansiyon veya yüksek KVH riski olan hastalara göstermektedir.',
     frequencyMonths: 24, ageMin: 45, ageMax: 120, sex: 'both', weight: 2,
-    doctor: 'Nöroloji · Kardiyoloji · Vasküler Cerrahi', icon: '🔊',
+    doctor: 'Radyoloji · Kardiyoloji · Vasküler Cerrahi', icon: '🔊',
     sources: [
       { name: 'USPSTF — Carotid Artery Stenosis Screening (2021, Grade D; JAMA 2021;325:476)', url: 'https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/carotid-artery-stenosis-screening' },
       { name: 'ESC — Cardiovascular Prevention Guidelines (2021, Sınıf IIb plak; Sınıf III İMT)', url: 'https://doi.org/10.1093/eurheartj/ehab484' },

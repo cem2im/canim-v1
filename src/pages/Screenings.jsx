@@ -143,9 +143,9 @@ function GroupRow({ icon, label, items, onClick }) {
         <div className="text-xs text-gray-400 mt-0.5">{preview} {items.length > 3 ? `+${items.length-3}` : ''}</div>
       </div>
       {urgentCount > 0 && (
-        <span className="text-xs font-bold px-2 py-0.5 rounded-full shrink-0 mr-1"
+        <span className="text-xs font-bold px-2.5 py-1 rounded-full shrink-0 mr-1"
           style={{ background:'#FEF2F2', color:'#DC2626' }}>
-          {urgentCount} bekliyor
+          Hemen
         </span>
       )}
       <span className="text-xs font-black px-2.5 py-1 rounded-full shrink-0"
