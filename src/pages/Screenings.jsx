@@ -291,8 +291,8 @@ export default function Screenings() {
         </div>
       </div>
 
-      {/* Group rows */}
-      <div style={{ flex:1, padding:'8px 20px 16px', display:'flex', flexDirection:'column', gap:8, overflow:'hidden' }}>
+      {/* Group rows — scrollable if groups don't fit */}
+      <div style={{ flex:1, padding:'8px 20px 16px', display:'flex', flexDirection:'column', gap:8, overflowY:'auto' }}>
         {groups.map(g => (
           <GroupRow key={g.key} icon={g.icon} label={g.label} items={g.items}
             onClick={() => setOpenSheet({ icon: g.icon, label: g.label, items: g.items })} />

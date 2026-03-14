@@ -504,18 +504,9 @@ export default function Onboarding() {
       { value: 'unknown',    label: 'Hatırlamıyorum' },
     ]
 
-    // Auto-fill disease screenings when doctor visit marked
+    // Doctor visit answer — only tracks doctor dates, NOT individual screening dates
     const handleDoctorAnswer = (q, timeValue) => {
       setDoctorAnswers(prev => ({ ...prev, [q.id]: timeValue }))
-      if (timeValue === 'never') return
-      const diseaseScreenings = DISEASE_SCREENINGS[q.diseaseId]?.screenings || []
-      setAnswers(prev => {
-        const updated = { ...prev }
-        for (const { id } of diseaseScreenings) {
-          if (!updated[id]) updated[id] = timeValue
-        }
-        return updated
-      })
     }
 
     const setAnswer = (id, val) => setAnswers(prev => ({ ...prev, [id]: val }))

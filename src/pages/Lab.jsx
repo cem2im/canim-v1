@@ -89,11 +89,11 @@ export default function History() {
             <div className="font-bold text-gray-700 text-lg mb-2">Henüz tamamlanan tarama yok.</div>
             <div className="text-sm text-gray-500 mb-6">Kontrole gittiğinizde taramalarınızı buraya ekleyin.</div>
             <button
-              onClick={() => setActiveTab('today')}
+              onClick={() => setActiveTab('screenings')}
               className="px-6 py-3 rounded-2xl text-white font-bold text-sm active:scale-98"
               style={{background:'#0D7377'}}
             >
-              🏥 Kontrole Gittim →
+              📋 Taramalarıma Git →
             </button>
           </div>
         </div>
@@ -132,10 +132,10 @@ export default function History() {
           {/* CTA to add more */}
           <div className="mt-2 text-center">
             <button
-              onClick={() => setActiveTab('today')}
+              onClick={() => setActiveTab('screenings')}
               className="text-sm font-semibold text-teal underline"
             >
-              + Yeni Doktor Ziyareti Ekle
+              📋 Taramalarıma Git
             </button>
           </div>
         </div>
