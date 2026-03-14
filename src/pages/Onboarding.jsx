@@ -4,14 +4,20 @@ import useAppStore from '../store/useAppStore'
 // ── Step progress bar ─────────────────────────────────────────────────────────
 function StepBar({ current, total = 4 }) {
   return (
-    <div style={{ display: 'flex', gap: 5, marginBottom: 20 }}>
+    <div style={{ display: 'flex', gap: 6, marginBottom: 16, alignItems: 'center' }}>
       {Array.from({ length: total }, (_, i) => (
         <div key={i} style={{
-          flex: 1, height: 4, borderRadius: 999,
-          background: i < current ? '#0D7377' : '#E5E7EB',
+          flex: 1, height: 8, borderRadius: 999,
+          background: i < current
+            ? 'linear-gradient(90deg, #0D7377, #14B8A6)'
+            : '#E5E7EB',
           transition: 'background 0.3s ease',
+          boxShadow: i < current ? '0 2px 8px rgba(13,115,119,0.35)' : 'none',
         }} />
       ))}
+      <span style={{ fontSize: 11, fontWeight: 800, color: '#0D7377', marginLeft: 4, whiteSpace: 'nowrap' }}>
+        {current} / {total}
+      </span>
     </div>
   )
 }
@@ -267,81 +273,83 @@ export default function Onboarding() {
     }
 
     return (
-      <div className="min-h-dvh flex flex-col px-6 py-10 page-enter">
-        <button onClick={() => setStep(1)} className="text-teal font-semibold text-sm mb-4 self-start">← Geri</button>
-        <StepBar current={2} />
-        <div className="mb-2 text-xs font-bold text-teal uppercase tracking-widest">Adım 2 / 4</div>
-        <h1 className="text-2xl font-extrabold text-gray-900 mb-1">Sağlık Durumunuz</h1>
-        <p className="text-gray-500 text-sm mb-6">Hangi sağlık sorunlarınız var?<br/>Birden fazla seçebilirsiniz.</p>
+      <div style={{height:'100dvh', display:'flex', flexDirection:'column', padding:'0 20px', overflow:'hidden', background:'#FAFAF8'}}
+        className="page-enter">
 
-        {/* Hiçbirinde Yok — TOP */}
+        {/* Header */}
+        <div style={{paddingTop:40, paddingBottom:8, flexShrink:0}}>
+          <button onClick={() => setStep(1)} className="flex items-center gap-1.5 text-teal font-semibold text-sm mb-3">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Geri
+          </button>
+          <StepBar current={2} />
+          <h1 className="text-xl font-extrabold text-gray-900 mb-0.5">Sağlık Durumunuz</h1>
+          <p className="text-gray-500 text-sm">Birden fazla seçebilirsiniz</p>
+        </div>
+
+        {/* Devam — üstte, her zaman görünür */}
+        <button
+          onClick={handleDiseaseDone}
+          className="w-full py-3.5 rounded-2xl text-white font-bold text-base active:scale-98 mb-3"
+          style={{background:'linear-gradient(135deg,#0D7377,#14B8A6)', boxShadow:'0 4px 16px rgba(13,115,119,0.3)', flexShrink:0}}
+        >
+          Devam →
+        </button>
+
+        {/* Sağlıklıyım — tek buton */}
         <button
           id="tour-ob-diseases"
           onClick={() => { setDiseases([]); handleDiseaseDone() }}
-          className="w-full flex items-center justify-center gap-3 py-4 px-4 rounded-2xl border-2 font-bold text-sm transition-all active:scale-98 mb-5"
-          style={diseases.length === 0
-            ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377'}
-            : {borderColor:'#D1D5DB', background:'white', color:'#6B7280'}}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 font-bold text-sm transition-all active:scale-98 mb-3"
+          style={{
+            borderColor: diseases.length === 0 ? '#0D7377' : '#E5E7EB',
+            background: diseases.length === 0 ? '#e8f4f5' : 'white',
+            color: diseases.length === 0 ? '#0D7377' : '#9CA3AF',
+            flexShrink: 0,
+          }}
         >
-          <span className="text-xl">✓</span>
-          <span>Aşağıdakilerin Hiçbirinde Yok — Sağlıklıyım</span>
+          <span>✓</span>
+          <span>Hiçbirinde Yok — Sağlıklıyım</span>
         </button>
 
-        <div className="flex-1 overflow-y-auto -mx-6 px-6">
-          {/* Kronik Hastalıklar */}
-          <div className="mb-2 flex items-center gap-2">
-            <span className="text-base">💊</span>
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Kronik Hastalıklar</span>
-          </div>
-          <div className="flex flex-col gap-2 mb-6">
-            {chronicDiseases.map(d => (
+        {/* 2-kolon hastalık grid */}
+        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, flexShrink:0, marginBottom:8}}>
+          {chronicDiseases.map(d => {
+            const sel = diseases.includes(d.id)
+            return (
               <button
                 key={d.id}
                 onClick={() => toggleDisease(d.id)}
-                className="flex items-center gap-3 py-3.5 px-4 rounded-2xl border-2 font-semibold transition-all active:scale-98 text-left"
-                style={diseases.includes(d.id)
+                className="flex items-center gap-2.5 px-3 py-3 rounded-2xl border-2 font-semibold transition-all active:scale-95 text-left"
+                style={sel
                   ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377'}
                   : {borderColor:'#E5E7EB', background:'white', color:'#374151'}}
               >
-                <span className="text-2xl shrink-0">{d.icon}</span>
-                <span className="text-sm flex-1 leading-snug">{d.label}</span>
-                <div
-                  className="w-6 h-6 rounded-full border-2 flex items-center justify-center shrink-0 transition-all"
-                  style={diseases.includes(d.id)
-                    ? {borderColor:'#0D7377', background:'#0D7377'}
-                    : {borderColor:'#D1D5DB', background:'white'}}
-                >
-                  {diseases.includes(d.id) && <span className="text-white text-xs font-black">✓</span>}
-                </div>
+                <span className="text-xl shrink-0">{d.icon}</span>
+                <span className="text-xs font-bold leading-tight flex-1">{d.label}</span>
+                {sel && <span className="text-xs font-black shrink-0" style={{color:'#0D7377'}}>✓</span>}
               </button>
-            ))}
-          </div>
-
-          {/* Ailede Kanser Öyküsü */}
-          <div className="mb-2 flex items-center gap-2">
-            <span className="text-base">🧬</span>
-            <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Ailede Kanser Öyküsü</span>
-          </div>
-          <button
-            onClick={() => setSubPage('cancer')}
-            className="w-full flex items-center justify-between px-4 py-4 rounded-2xl border-2 transition-all active:scale-98 mb-6"
-            style={selectedCancerCount > 0
-              ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377'}
-              : {borderColor:'#E5E7EB', background:'white', color:'#374151'}
-            }
-          >
-            <div className="flex items-center gap-3">
-              <span className="text-2xl">🧬</span>
-              <div className="text-left">
-                <div className="font-bold text-sm">Ailede Kanser Öyküsü</div>
-                <div className="text-xs mt-0.5" style={{color: selectedCancerCount > 0 ? '#0D7377' : '#9CA3AF'}}>
-                  {selectedCancerCount > 0 ? `${selectedCancerCount} seçenek işaretlendi ✓` : 'Varsa belirtmek için dokunun'}
-                </div>
-              </div>
-            </div>
-            <span className="text-gray-400 font-bold text-lg">→</span>
-          </button>
+            )
+          })}
         </div>
+
+        {/* Ailede Kanser Öyküsü */}
+        <button
+          onClick={() => setSubPage('cancer')}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all active:scale-98"
+          style={selectedCancerCount > 0
+            ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377', flexShrink:0}
+            : {borderColor:'#E5E7EB', background:'white', color:'#374151', flexShrink:0}}
+        >
+          <span className="text-xl">🧬</span>
+          <div className="flex-1 text-left">
+            <div className="font-bold text-sm">Ailede Kanser Öyküsü</div>
+            <div className="text-xs mt-0.5" style={{color: selectedCancerCount > 0 ? '#0D7377' : '#9CA3AF'}}>
+              {selectedCancerCount > 0 ? `${selectedCancerCount} seçenek işaretlendi ✓` : 'Varsa belirtmek için dokunun'}
+            </div>
+          </div>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
 
         {/* Confirmation overlay */}
         {showConfirmation && (
@@ -353,14 +361,6 @@ export default function Onboarding() {
             </div>
           </div>
         )}
-
-        <button
-          onClick={handleDiseaseDone}
-          className="w-full py-4 rounded-2xl text-white font-bold text-base active:scale-98"
-          style={{background:'#0D7377'}}
-        >
-          Devam →
-        </button>
       </div>
     )
   }
