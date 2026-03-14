@@ -24,6 +24,12 @@ export default function Profile() {
   const getScore = useAppStore(s => s.getScore)
 
   const [generatingPdf, setGeneratingPdf] = useState(false)
+  const [recalculating, setRecalculating] = useState(false)
+
+  const triggerRecalc = () => {
+    setRecalculating(true)
+    setTimeout(() => setRecalculating(false), 1800)
+  }
 
   const handleGeneratePdf = () => {
     setGeneratingPdf(true)
@@ -95,6 +101,28 @@ export default function Profile() {
         )
       })()}
 
+      {/* Quick Actions — WhatsApp + PDF (en üstte) */}
+      <div className="flex gap-3 mb-5">
+        <button
+          onClick={() => {
+            const text = `Canım uygulamasını dene — yaşına ve hastalıklarına göre hangi taramaları ne zaman yaptırman gerektiğini gösteriyor! https://canim.uzunyasa.com/`
+            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`)
+          }}
+          className="flex-1 py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-all"
+          style={{background:'#25D366'}}
+        >
+          💬 Paylaş
+        </button>
+        <button
+          onClick={handleGeneratePdf}
+          disabled={generatingPdf}
+          className="flex-1 py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-all disabled:opacity-60"
+          style={{background: generatingPdf ? '#6B7280' : 'linear-gradient(135deg, #0D7377, #14919B)'}}
+        >
+          {generatingPdf ? '⏳' : '📄'} Rapor
+        </button>
+      </div>
+
       {/* Personal Info */}
       <Section title="Kişisel Bilgiler">
         <EditField label="Ad" value={profile?.name || ''} onSave={v => updateProfile({ name: v })} />
@@ -110,6 +138,20 @@ export default function Profile() {
             ))}
           </div>
         </div>
+        <EditField
+          label="Boy (cm)"
+          value={profile?.height?.toString() || ''}
+          type="number"
+          placeholder="170"
+          onSave={v => { updateProfile({ height: v ? parseInt(v) : null }); triggerRecalc() }}
+        />
+        <EditField
+          label="Kilo (kg)"
+          value={profile?.weight?.toString() || ''}
+          type="number"
+          placeholder="70"
+          onSave={v => { updateProfile({ weight: v ? parseFloat(v) : null }); triggerRecalc() }}
+        />
       </Section>
 
       {/* Diseases — chronic only (cancer history excluded) */}
@@ -183,36 +225,6 @@ export default function Profile() {
         <EditField label="Telefon" value={emergency.contactPhone} onSave={v => saveEmergency('contactPhone', v)} placeholder="05XX XXX XX XX" type="tel" />
       </Section>
 
-      {/* PDF Report + WhatsApp Share */}
-      <div className="mb-5 bg-white rounded-2xl border border-gray-100 overflow-hidden p-4" style={{boxShadow:'0 1px 8px rgba(0,0,0,0.04)'}}>
-        <h2 className="text-sm font-bold text-gray-700 mb-3">Raporlar & Paylaşım</h2>
-
-        {/* PDF Report */}
-        <button
-          onClick={handleGeneratePdf}
-          disabled={generatingPdf}
-          className="w-full py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-all mb-3 disabled:opacity-60"
-          style={{background: generatingPdf ? '#6B7280' : 'linear-gradient(135deg, #0D7377, #14919B)'}}
-        >
-          {generatingPdf ? '⏳ Hazırlanıyor…' : '📄 Sağlık Raporumu İndir (PDF)'}
-        </button>
-        <p className="text-xs text-gray-500 mb-4 leading-relaxed">
-          Tarama durumunuzu, doktor takvimini ve uyum puanınızı içeren kişisel rapor. Doktorunuza göstermek için kullanabilirsiniz.
-        </p>
-
-        {/* WhatsApp share */}
-        <button
-          onClick={() => {
-            const text = `Canım uygulamasını dene — yaşına ve hastalıklarına göre hangi taramaları ne zaman yaptırman gerektiğini gösteriyor! https://canim.uzunyasa.com/`
-            window.open(`https://wa.me/?text=${encodeURIComponent(text)}`)
-          }}
-          className="w-full py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-all"
-          style={{background:'#25D366'}}
-        >
-          💬 Arkadaşlarına Öner (WhatsApp)
-        </button>
-      </div>
-
       {/* Data save status */}
       <div className="mb-5 px-4 py-4 rounded-2xl flex items-center gap-3"
         style={authUser?.saved
@@ -255,6 +267,17 @@ export default function Profile() {
 
       <FeedbackSection page="profile" />
       <Disclaimer />
+
+      {/* Recalculating overlay */}
+      {recalculating && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-3xl px-10 py-8 shadow-2xl text-center mx-6">
+            <div className="text-4xl mb-3">⏳</div>
+            <div className="text-lg font-extrabold text-gray-900 mb-1">Tekrar hazırlanıyor…</div>
+            <div className="text-sm text-gray-500">Taramalarınız güncelleniyor</div>
+          </div>
+        </div>
+      )}
 
       {/* Add Medication Modal */}
       {editingMed && (

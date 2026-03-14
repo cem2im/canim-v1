@@ -202,16 +202,29 @@ export default function Onboarding() {
           </div>
         </div>
 
-        {/* Height & Weight — optional */}
+        {/* Height & Weight — Biliyorum / Bilmiyorum */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <label className="text-xs font-bold text-gray-400 uppercase tracking-wide">Boy & Kilo (İsteğe Bağlı)</label>
+          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Boy & Kilo</label>
+          <div className="grid grid-cols-2 gap-3 mb-3">
             <button
-              onClick={() => setSkipMeasurements(v => !v)}
-              className="text-xs font-semibold px-3 py-1 rounded-full transition-all"
-              style={skipMeasurements ? {background:'#0D7377', color:'white'} : {background:'#f3f4f6', color:'#6B7280'}}
+              onClick={() => setSkipMeasurements(false)}
+              className="flex flex-col items-center py-4 rounded-2xl border-2 font-bold transition-all active:scale-95"
+              style={!skipMeasurements
+                ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377'}
+                : {borderColor:'#E5E7EB', background:'white', color:'#6B7280'}}
             >
-              {skipMeasurements ? '✓ Şu an bilmiyorum' : 'Şu an bilmiyorum'}
+              <span className="text-2xl mb-1">📏</span>
+              <span className="text-sm font-bold">Biliyorum</span>
+            </button>
+            <button
+              onClick={() => setSkipMeasurements(true)}
+              className="flex flex-col items-center py-4 rounded-2xl border-2 font-bold transition-all active:scale-95"
+              style={skipMeasurements
+                ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377'}
+                : {borderColor:'#E5E7EB', background:'white', color:'#6B7280'}}
+            >
+              <span className="text-2xl mb-1">🤷</span>
+              <span className="text-sm font-bold">Bilmiyorum</span>
             </button>
           </div>
           {!skipMeasurements && (

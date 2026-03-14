@@ -5,6 +5,7 @@ import { generateScreeningsPdf } from '../utils/generatePdf'
 import ScreeningDetail from '../components/ScreeningDetail'
 import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
+import { DISEASE_LIST, DISEASE_SCREENINGS } from '../data/screenings'
 
 // unknown = hiç yapılmamış → Hemen (gecikmiş sayılır)
 function timeLabel(status, daysUntil) {
@@ -160,14 +161,20 @@ function GroupRow({ icon, label, items, onClick }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Screenings() {
-  const getScreeningCards = useAppStore(s => s.getScreeningCards)
-  const profile           = useAppStore(s => s.profile)
+  const getScreeningCards    = useAppStore(s => s.getScreeningCards)
+  const getDoctorVisitCards  = useAppStore(s => s.getDoctorVisitCards)
+  const setDoctorVisitDate   = useAppStore(s => s.setDoctorVisitDate)
+  const logDoctorVisit       = useAppStore(s => s.logDoctorVisit)
+  const diseases             = useAppStore(s => s.diseases)
+  const profile              = useAppStore(s => s.profile)
   const [selected, setSelected]   = useState(null)
   const [viewMode, setViewMode]   = useState('doctor')
-  const [openSheet, setOpenSheet] = useState(null) // { icon, label, items }
+  const [openSheet, setOpenSheet] = useState(null)
   const [printing, setPrinting]   = useState(false)
 
   const cards = getScreeningCards()
+  const doctorCards = getDoctorVisitCards()
+
   const urgentCount = cards.filter(c =>
     c.status === 'overdue' || c.status === 'unknown' ||
     (c.daysUntil !== null && c.daysUntil <= 30)
@@ -180,6 +187,16 @@ export default function Screenings() {
       catch(e) { console.error(e) }
       setPrinting(false)
     }, 50)
+  }
+
+  // Mark doctor as visited → auto-fill related screenings
+  function handleDoctorVisit(card) {
+    const today = new Date().toISOString().slice(0, 10)
+    setDoctorVisitDate(card.id, today)
+    const screeningIds = (DISEASE_SCREENINGS[card.diseaseId]?.screenings || []).map(s => s.id)
+    if (screeningIds.length > 0) {
+      logDoctorVisit(today, card.doctor, screeningIds)
+    }
   }
 
   // Build category groups
@@ -207,7 +224,38 @@ export default function Screenings() {
       })
   }
 
-  const groups = viewMode === 'category' ? getCategoryGroups() : getDoctorGroups()
+  // Build disease groups
+  function getDiseaseGroups() {
+    const assigned = new Set()
+    const groups = []
+    for (const diseaseId of diseases) {
+      const data = DISEASE_SCREENINGS[diseaseId]
+      if (!data) continue
+      const meta = DISEASE_LIST.find(d => d.id === diseaseId)
+      const items = []
+      for (const { id } of data.screenings) {
+        if (assigned.has(id)) continue
+        const card = cards.find(c => c.id === id)
+        if (!card) continue
+        assigned.add(id)
+        items.push(card)
+      }
+      if (items.length > 0) {
+        groups.push({ key: diseaseId, icon: meta?.icon || '💊', label: meta?.label || diseaseId, items })
+      }
+    }
+    const baseItems = cards.filter(c => !assigned.has(c.id))
+    if (baseItems.length > 0) {
+      groups.push({ key: 'base', icon: '🩺', label: 'Yaş & Cinsiyete Göre', items: baseItems })
+    }
+    return groups
+  }
+
+  const groups = viewMode === 'category'
+    ? getCategoryGroups()
+    : viewMode === 'disease'
+      ? getDiseaseGroups()
+      : getDoctorGroups()
 
   // Detail view for a screening
   if (selected) return <ScreeningDetail screening={selected} onBack={() => setSelected(null)} />
@@ -217,7 +265,7 @@ export default function Screenings() {
       className="page-enter">
 
       {/* Header */}
-      <div style={{ padding:'24px 20px 12px', flexShrink:0 }}>
+      <div style={{ padding:'20px 20px 8px', flexShrink:0 }}>
         <div className="flex items-center justify-between mb-1">
           <h1 className="text-xl font-extrabold text-gray-900">Sağlık Takiplerim</h1>
           <button onClick={handlePrint} disabled={printing}
@@ -226,8 +274,6 @@ export default function Screenings() {
             {printing ? '⏳' : '🖨️'} Çıktı
           </button>
         </div>
-
-        {/* Alert satırı */}
         {urgentCount > 0 ? (
           <p className="text-sm font-bold mb-1" style={{ color:'#DC2626' }}>
             ⚠️ {urgentCount} taramanızda gecikme var
@@ -237,18 +283,49 @@ export default function Screenings() {
             ✓ Tüm takipler güncel
           </p>
         )}
-        <p className="text-xs text-gray-400 mb-3">
+        <p className="text-xs text-gray-400 mb-2">
           Aşağıda hangi taramaları yaptırmanız gerektiğini bulabilirsiniz
         </p>
 
-        {/* View toggle */}
+        {/* Doctor visit chips — "Bu doktorlara gittiniz mi?" */}
+        {doctorCards.length > 0 && (
+          <div className="mb-2">
+            <div className="text-xs font-black text-gray-500 uppercase tracking-wider mb-2">Bu Doktorlara Gittiniz Mi?</div>
+            <div className="flex gap-2 overflow-x-auto pb-1" style={{scrollbarWidth:'none', WebkitOverflowScrolling:'touch'}}>
+              {doctorCards.map(card => {
+                const visited = card.status === 'ok'
+                return (
+                  <button
+                    key={card.id}
+                    onClick={() => !visited && handleDoctorVisit(card)}
+                    className="flex-shrink-0 flex flex-col items-center gap-1 px-3 py-2.5 rounded-2xl border-2 transition-all active:scale-95 min-w-[76px]"
+                    style={visited
+                      ? {borderColor:'#0D7377', background:'#e8f4f5', color:'#0D7377'}
+                      : {borderColor:'#E5E7EB', background:'white', color:'#374151'}}
+                  >
+                    <span className="text-lg">🏥</span>
+                    <span className="text-xs font-bold leading-tight text-center" style={{maxWidth:68}}>
+                      {card.doctor.split(' ')[0]}
+                    </span>
+                    <span className="text-xs font-bold" style={{color: visited ? '#0D7377' : '#9CA3AF'}}>
+                      {visited ? '✓ Gidildi' : 'Gittim'}
+                    </span>
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* View toggle — 3 seçenek */}
         <div className="flex rounded-2xl p-1 gap-1" style={{ background:'#F3F4F6' }}>
           {[
-            { key:'doctor',   label:'🏥 Doktora Göre' },
-            { key:'category', label:'🗂️ Test Türüne Göre' },
+            { key:'doctor',   label:'🏥 Doktora' },
+            { key:'category', label:'🗂️ Test Türü' },
+            { key:'disease',  label:'🦠 Hastalığa' },
           ].map(v => (
             <button key={v.key} onClick={() => setViewMode(v.key)}
-              className="flex-1 py-2 rounded-xl text-sm font-bold transition-all"
+              className="flex-1 py-2 rounded-xl text-xs font-bold transition-all"
               style={viewMode === v.key
                 ? { background:'white', color:'#0D7377', boxShadow:'0 1px 6px rgba(0,0,0,0.08)' }
                 : { background:'transparent', color:'#9CA3AF', border:'none' }}>
@@ -258,8 +335,8 @@ export default function Screenings() {
         </div>
       </div>
 
-      {/* Group rows — fills remaining screen, no scroll */}
-      <div style={{ flex:1, padding:'0 20px 16px', display:'flex', flexDirection:'column', gap:8, overflow:'hidden' }}>
+      {/* Group rows */}
+      <div style={{ flex:1, padding:'8px 20px 16px', display:'flex', flexDirection:'column', gap:8, overflow:'hidden' }}>
         {groups.map(g => (
           <GroupRow key={g.key} icon={g.icon} label={g.label} items={g.items}
             onClick={() => setOpenSheet({ icon: g.icon, label: g.label, items: g.items })} />
