@@ -144,13 +144,6 @@ export default function ScreeningDetail({ screening, onBack }) {
         >
           ✓ Yapıldı — İşaretle
         </button>
-        <button
-          onClick={() => { setShowCustomDate(true); setShowMarkDone(false) }}
-          className="w-full py-4 rounded-2xl border-2 font-bold text-base"
-          style={{borderColor:'#0D7377', color:'#0D7377', background:'white'}}
-        >
-          📅 Doktorum farklı tarih önerdi
-        </button>
       </div>
 
       {/* Yapıldı paneli */}
@@ -183,26 +176,7 @@ export default function ScreeningDetail({ screening, onBack }) {
         </div>
       )}
 
-      {/* Tarih paneli */}
-      {showCustomDate && (
-        <div className="mx-5 mb-6 p-5 bg-white rounded-3xl border border-gray-200">
-          <h3 className="font-bold text-gray-900 mb-3">Sonraki kontrol tarihi</h3>
-          <input
-            type="date"
-            value={customDate}
-            onChange={e => setCustomDate(e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 text-gray-900 font-semibold mb-4 focus:border-teal outline-none"
-          />
-          <button
-            disabled={!customDate}
-            onClick={handleCustomDate}
-            className="w-full py-3 rounded-xl text-white font-bold disabled:opacity-40"
-            style={{background:'#0D7377'}}
-          >
-            Kaydet
-          </button>
-        </div>
-      )}
+      {/* Tarih paneli kaldırıldı */}
 
       {/* ── FOOTNOTE REFERANS BÖLÜMÜ — yalnızca Klinik Bilgi açıkken görünür ── */}
       {showClinical && sources.length > 0 && (

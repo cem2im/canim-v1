@@ -6,10 +6,10 @@ import ScreeningDetail from '../components/ScreeningDetail'
 import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
 
-// Zaman tabanlı etiket — "Hemen", "3 ay sonra" vb.
+// unknown = hiç yapılmamış → Hemen (gecikmiş sayılır)
 function timeLabel(status, daysUntil) {
-  if (status === 'unknown') return 'Yapılmamış'
-  if (status === 'overdue' || daysUntil === null || daysUntil <= 30) return 'Hemen'
+  if (status === 'overdue' || status === 'unknown') return 'Hemen'
+  if (daysUntil === null || daysUntil <= 30) return 'Hemen'
   if (daysUntil <= 60)   return '2 ay sonra'
   if (daysUntil <= 90)   return '3 ay sonra'
   if (daysUntil <= 180)  return '6 ay sonra'
@@ -20,8 +20,7 @@ function timeLabel(status, daysUntil) {
 }
 
 function timeLabelColor(status, daysUntil) {
-  if (status === 'overdue') return '#DC2626'
-  if (status === 'unknown') return '#9CA3AF'
+  if (status === 'overdue' || status === 'unknown') return '#DC2626'
   if (daysUntil !== null && daysUntil <= 30) return '#0D7377'
   if (daysUntil !== null && daysUntil <= 90) return '#D97706'
   return '#6B7280'
@@ -66,7 +65,7 @@ function freqLabel(months) {
 
 // ── Bottom Sheet ──────────────────────────────────────────────────────────────
 function Sheet({ title, icon, items, onSelectItem, onClose }) {
-  const order = { overdue:0, upcoming:1, soon:2, unknown:3, ok:4 }
+  const order = { overdue:0, unknown:0, upcoming:1, soon:2, ok:3 }
   const sorted = [...items].sort((a,b) => order[a.status] - order[b.status])
   return (
     <div className="fixed inset-0 z-50 flex flex-col"
@@ -219,30 +218,33 @@ export default function Screenings() {
 
       {/* Header */}
       <div style={{ padding:'24px 20px 12px', flexShrink:0 }}>
-        <div className="flex items-center justify-between mb-3">
-          <div>
-            <h1 className="text-xl font-extrabold text-gray-900">Taramalarım</h1>
-            <p className="text-xs text-gray-400">{cards.length} tarama · dokunarak detay gör</p>
-          </div>
-          <div className="flex gap-2">
-            {urgentCount > 0 && (
-              <div className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold"
-                style={{ background:'#FEF2F2', color:'#DC2626' }}>
-                ⚠️ {urgentCount}
-              </div>
-            )}
-            <button onClick={handlePrint} disabled={printing}
-              className="flex items-center gap-1 px-3 py-2 rounded-xl font-bold text-xs active:scale-95"
-              style={{ background:'#F3F4F6', color: printing ? '#9CA3AF' : '#374151', border:'1.5px solid #E5E7EB' }}>
-              {printing ? '⏳' : '🖨️'} Çıktı
-            </button>
-          </div>
+        <div className="flex items-center justify-between mb-1">
+          <h1 className="text-xl font-extrabold text-gray-900">Sağlık Takiplerim</h1>
+          <button onClick={handlePrint} disabled={printing}
+            className="flex items-center gap-1 px-3 py-2 rounded-xl font-bold text-xs active:scale-95"
+            style={{ background:'#F3F4F6', color: printing ? '#9CA3AF' : '#374151', border:'1.5px solid #E5E7EB' }}>
+            {printing ? '⏳' : '🖨️'} Çıktı
+          </button>
         </div>
+
+        {/* Alert satırı */}
+        {urgentCount > 0 ? (
+          <p className="text-sm font-bold mb-1" style={{ color:'#DC2626' }}>
+            ⚠️ {urgentCount} taramanızda gecikme var
+          </p>
+        ) : (
+          <p className="text-sm font-semibold mb-1" style={{ color:'#0D7377' }}>
+            ✓ Tüm takipler güncel
+          </p>
+        )}
+        <p className="text-xs text-gray-400 mb-3">
+          Aşağıda hangi taramaları yaptırmanız gerektiğini bulabilirsiniz
+        </p>
 
         {/* View toggle */}
         <div className="flex rounded-2xl p-1 gap-1" style={{ background:'#F3F4F6' }}>
           {[
-            { key:'category', label:'🗂️ Kategoriye Göre' },
+            { key:'category', label:'🗂️ Test Türüne Göre' },
             { key:'doctor',   label:'🏥 Doktora Göre' },
           ].map(v => (
             <button key={v.key} onClick={() => setViewMode(v.key)}

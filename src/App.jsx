@@ -9,7 +9,7 @@ import Profile from './pages/Profile'
 // Today tab removed — archived at src/pages/Today.jsx
 
 const TABS = [
-  { id:'screenings', label:'Taramalar',  icon: CalIcon },
+  { id:'screenings', label:'Taramalarım', icon: CalIcon },
   { id:'lab',        label:'Geçmiş',     icon: HistoryIcon },
   { id:'profile',    label:'Profil',     icon: UserIcon },
 ]
