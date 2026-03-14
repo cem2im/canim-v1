@@ -66,9 +66,20 @@ function freqLabel(months) {
 }
 
 // ── Bottom Sheet ──────────────────────────────────────────────────────────────
-function Sheet({ title, icon, items, onSelectItem, onClose }) {
+function Sheet({ title, icon, items, onSelectItem, onClose, type, onBulkDone }) {
+  const [bulkDone, setBulkDone] = useState(false)
   const order = { overdue:0, unknown:0, upcoming:1, soon:2, ok:3 }
   const sorted = [...items].sort((a,b) => order[a.status] - order[b.status])
+
+  const handleBulk = () => {
+    onBulkDone(items)
+    setBulkDone(true)
+    setTimeout(() => { onClose() }, 800)
+  }
+
+  const bulkLabel = type === 'doctor' ? '🏥 Bu Doktora Gittim' : '✓ Tümünü Tamamladım'
+  const allDone = items.every(c => c.status === 'ok')
+
   return createPortal(
     <div className="fixed inset-0 flex flex-col"
       style={{ background: 'rgba(0,0,0,0.48)', zIndex: 9999 }}
@@ -94,6 +105,19 @@ function Sheet({ title, icon, items, onSelectItem, onClose }) {
             ×
           </button>
         </div>
+        {/* Bulk action button */}
+        {!allDone && (
+          <div className="px-4 pt-3 pb-2 shrink-0">
+            <button
+              onClick={handleBulk}
+              disabled={bulkDone}
+              className="w-full py-3 rounded-2xl text-white font-bold text-sm active:scale-98 transition-all disabled:opacity-60"
+              style={{background: bulkDone ? '#6B7280' : 'linear-gradient(135deg,#0D7377,#14919B)'}}>
+              {bulkDone ? '✓ Kaydedildi' : bulkLabel}
+            </button>
+          </div>
+        )}
+
         {/* Items */}
         <div className="overflow-y-auto flex-1 min-h-0 px-4 py-3 flex flex-col gap-2" style={{paddingBottom:80}}>
           {sorted.map(card => {
@@ -162,6 +186,8 @@ function GroupRow({ icon, label, items, onClick }) {
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Screenings() {
   const getScreeningCards    = useAppStore(s => s.getScreeningCards)
+  const logDoctorVisit       = useAppStore(s => s.logDoctorVisit)
+  const markDone             = useAppStore(s => s.markDone)
   const diseases             = useAppStore(s => s.diseases)
   const profile              = useAppStore(s => s.profile)
   const [selected, setSelected]   = useState(null)
@@ -183,6 +209,19 @@ export default function Screenings() {
       catch(e) { console.error(e) }
       setPrinting(false)
     }, 50)
+  }
+
+  // Toplu işlem: tüm group'u bugün yapıldı işaretle
+  function handleBulkDone(items, type, label) {
+    const today = new Date().toISOString().slice(0, 10)
+    const ids = items.map(c => c.id)
+    if (type === 'doctor') {
+      logDoctorVisit(today, label, ids)
+    } else {
+      for (const card of items) {
+        markDone(card.id, today)
+      }
+    }
   }
 
   // Build category groups
@@ -295,7 +334,7 @@ export default function Screenings() {
       <div style={{ flex:1, padding:'8px 20px 16px', display:'flex', flexDirection:'column', gap:8, overflowY:'auto' }}>
         {groups.map(g => (
           <GroupRow key={g.key} icon={g.icon} label={g.label} items={g.items}
-            onClick={() => setOpenSheet({ icon: g.icon, label: g.label, items: g.items })} />
+            onClick={() => setOpenSheet({ icon: g.icon, label: g.label, items: g.items, type: viewMode })} />
         ))}
 
         <div style={{ marginTop:'auto', paddingTop:8 }}>
@@ -310,8 +349,10 @@ export default function Screenings() {
           icon={openSheet.icon}
           label={openSheet.label}
           items={openSheet.items}
+          type={openSheet.type}
           onSelectItem={setSelected}
           onClose={() => setOpenSheet(null)}
+          onBulkDone={(items) => handleBulkDone(items, openSheet.type, openSheet.label)}
         />
       )}
     </div>
