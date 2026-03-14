@@ -50,7 +50,7 @@ export default function App() {
 
       {/* Bottom tab bar */}
       <div className="fixed bottom-0 left-0 right-0 max-w-xl mx-auto pb-safe"
-        style={{background:'rgba(250,250,248,0.92)', backdropFilter:'blur(12px)', borderTop:'1px solid #E5E7EB'}}>
+        style={{background:'rgba(250,250,248,0.92)', backdropFilter:'blur(12px)', borderTop:'1px solid #E5E7EB', zIndex:40}}>
         <div className="flex">
           {TABS.map(tab => {
             const active = activeTab === tab.id
