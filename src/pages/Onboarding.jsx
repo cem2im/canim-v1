@@ -588,11 +588,11 @@ export default function Onboarding() {
         {/* ── BÖLÜM 1: Gitmeniz Gereken Doktorlar ──────────────────────────── */}
         {doctorQuestions.length > 0 && (
           <div className="mb-5">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-base">🏥</span>
-              <span className="text-xs font-black text-gray-500 uppercase tracking-wider">Gitmeniz Gereken Doktorlar</span>
+            <div className="flex items-center gap-2 mb-2">
+              <span className="text-xl">🏥</span>
+              <span className="text-base font-black text-gray-800 uppercase tracking-wide">Gitmeniz Gereken Doktorlar</span>
             </div>
-            <p className="text-xs text-gray-400 mb-3 leading-relaxed">
+            <p className="text-sm text-gray-500 mb-3 leading-relaxed">
               Son 6-12 ay içinde bu doktorlara gittiniz mi? Gittiyseniz ilgili tetkikler otomatik olarak güncellenir.
             </p>
             {doctorQuestions.map(q => {
