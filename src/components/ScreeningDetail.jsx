@@ -148,7 +148,7 @@ export default function ScreeningDetail({ screening, onBack }) {
     : []
 
   return (
-    <div style={{height:'100dvh', display:'flex', flexDirection:'column', background:'#FAFAF8', overflow:'hidden'}}
+    <div style={{position:'fixed', inset:0, zIndex:50, display:'flex', flexDirection:'column', background:'#FAFAF8', overflow:'hidden'}}
       className="page-enter">
 
       {/* Header — compact */}
@@ -235,8 +235,8 @@ export default function ScreeningDetail({ screening, onBack }) {
         </div>
       </div>
 
-      {/* Yapıldı butonu — sabitlemiş altta */}
-      <div style={{padding:'12px 14px', paddingBottom:'max(env(safe-area-inset-bottom, 0px), 80px)', flexShrink:0}}>
+      {/* Yapıldı butonu — altta, home indicator clearance */}
+      <div style={{padding:'12px 14px', paddingBottom:'calc(env(safe-area-inset-bottom, 0px) + 20px)', flexShrink:0}}>
         <button
           onClick={() => setShowMarkDone(true)}
           className="w-full rounded-2xl text-white font-bold text-base active:scale-98 transition-all"
