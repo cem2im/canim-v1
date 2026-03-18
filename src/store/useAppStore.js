@@ -14,6 +14,7 @@ const useAppStore = create(
 
       // ── ONBOARDING ──────────────────────────────────────────────────────────
       onboardingDone: false,
+      onboardingCompletedAt: null, // ISO date string
       profile: null,        // { name, birthYear, sex, height, weight }
       diseases: [],         // ['hipertansiyon', 'diyabet', ...]
       
@@ -54,6 +55,7 @@ const useAppStore = create(
         screeningDates: initialDates,
         doctorVisitDates: initialDoctorDates || {},
         onboardingDone: true,
+        onboardingCompletedAt: new Date().toISOString(),
       }),
 
       setActiveTab: (tab) => set({ activeTab: tab }),

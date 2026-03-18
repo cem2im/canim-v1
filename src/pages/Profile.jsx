@@ -21,8 +21,9 @@ export default function Profile() {
   const removeMedication = useAppStore(s => s.removeMedication)
   const getScreeningCards  = useAppStore(s => s.getScreeningCards)
   const getDoctorVisitCards = useAppStore(s => s.getDoctorVisitCards)
-  const getScore     = useAppStore(s => s.getScore)
-  const setActiveTab = useAppStore(s => s.setActiveTab)
+  const getScore              = useAppStore(s => s.getScore)
+  const setActiveTab          = useAppStore(s => s.setActiveTab)
+  const onboardingCompletedAt = useAppStore(s => s.onboardingCompletedAt)
 
   const [generatingPdf, setGeneratingPdf] = useState(false)
   const [recalculating, setRecalculating] = useState(false)
@@ -69,25 +70,51 @@ export default function Profile() {
         const color = scoreColor(score)
         const label = scoreLabel(score)
         const cards = getScreeningCards()
-        const overdueCount  = cards.filter(c => c.status === 'overdue').length
-        const hemenCount    = cards.filter(c => c.daysUntil !== null && c.daysUntil <= 30 && c.status !== 'overdue').length
+        const overdueCount = cards.filter(c => c.status === 'overdue').length
+        const hemenCount   = cards.filter(c => c.daysUntil !== null && c.daysUntil <= 30 && c.status !== 'overdue').length
+        const monthsSince  = onboardingCompletedAt
+          ? Math.floor((Date.now() - new Date(onboardingCompletedAt)) / (1000*60*60*24*30))
+          : 0
+
+        const shareScore = () => {
+          const emoji = score >= 85 ? '🟢' : score >= 65 ? '🟡' : '🔴'
+          const text = `${emoji} Canım Sağlık Skorumu paylaşıyorum: ${score}/100 — ${label}!\n\nSenin sağlık skorun kaç? Ücretsiz öğren 👇\ncanim.uzunyasa.com`
+          window.open(`https://wa.me/?text=${encodeURIComponent(text)}`)
+        }
+
         return (
           <div className="mb-5 rounded-3xl p-5 text-white relative overflow-hidden"
             style={{ background: `linear-gradient(135deg, #0D7377, #14919B)` }}>
             <div className="absolute -right-4 -top-4 w-24 h-24 rounded-full opacity-10 bg-white" />
-            <div className="flex items-center gap-4 mb-4">
+
+            <div className="flex items-center gap-4 mb-1">
               <div>
-                <div className="text-xs font-semibold opacity-75 mb-0.5">Tarama Uyum Puanı</div>
-                <div className="text-5xl font-black leading-none">{score}</div>
+                <div className="text-xs font-semibold opacity-75 mb-0.5">Canım Sağlık Skoru</div>
+                <div className="text-5xl font-black leading-none">{score}
+                  <span className="text-lg font-bold opacity-50">/100</span>
+                </div>
               </div>
               <div className="flex-1" />
-              <div className="px-3 py-1.5 rounded-full text-sm font-bold"
-                style={{ background: 'rgba(255,255,255,0.2)' }}>{label}</div>
+              <div className="flex flex-col items-end gap-1.5">
+                <div className="px-3 py-1.5 rounded-full text-sm font-bold"
+                  style={{ background: 'rgba(255,255,255,0.2)' }}>{label}</div>
+                {monthsSince >= 1 && (
+                  <div className="text-xs opacity-70 font-semibold">🔥 {monthsSince} aydır takipte</div>
+                )}
+              </div>
             </div>
+
+            {/* Share button */}
+            <button onClick={shareScore}
+              className="w-full mt-3 mb-3 py-2 rounded-2xl text-sm font-bold flex items-center justify-center gap-2 active:scale-98 transition-all"
+              style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)' }}>
+              💬 Skoru WhatsApp'ta Paylaş — "Benin kaç?"
+            </button>
+
             <div className="grid grid-cols-4 gap-1 pt-3 border-t border-white/20">
               {[
-                { n: overdueCount, label: 'Gecikmiş',  accent: '#FCA5A5' },
-                { n: hemenCount,   label: 'Bu ay',     accent: '#93C5FD' },
+                { n: overdueCount, label: 'Gecikmiş', accent: '#FCA5A5' },
+                { n: hemenCount,   label: 'Bu ay',    accent: '#93C5FD' },
                 { n: cards.filter(c=>c.status==='soon').length, label: 'Yakında', accent: '#FDE68A' },
                 { n: cards.filter(c=>c.status==='ok').length,   label: 'Tamam',   accent: '#86EFAC' },
               ].map(s => (
@@ -102,11 +129,46 @@ export default function Profile() {
         )
       })()}
 
-      {/* Quick Actions — WhatsApp + PDF + Geçmiş */}
+      {/* Sağlıklı Yaşam Tahmini */}
+      {(() => {
+        const score = getScore()
+        const sex   = profile?.sex
+        const age   = profile?.birthYear ? new Date().getFullYear() - profile.birthYear : null
+        if (!age || !sex) return null
+        // Turkey TÜİK 2023: men healthspan ~55y, women ~60y avg
+        const base  = sex === 'F' ? 60 : 55
+        const bonus = score >= 90 ? 8 : score >= 75 ? 6 : score >= 60 ? 4 : score >= 45 ? 2 : 0
+        const healthyYears = base + bonus
+        const yearsLeft    = Math.max(0, healthyYears - age)
+        const bgColor      = score >= 75 ? '#F0FDF4' : score >= 50 ? '#FFFBEB' : '#FEF2F2'
+        const txtColor     = score >= 75 ? '#15803D' : score >= 50 ? '#B45309' : '#B91C1C'
+        const borderColor  = score >= 75 ? '#BBF7D0' : score >= 50 ? '#FDE68A' : '#FECACA'
+        return (
+          <div className="mb-4 rounded-2xl px-4 py-4"
+            style={{ background: bgColor, border: `1.5px solid ${borderColor}` }}>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xl">⏳</span>
+              <span className="text-sm font-extrabold" style={{ color: txtColor }}>Sağlıklı Yaşam Tahmini</span>
+            </div>
+            <div className="flex items-baseline gap-1 mb-1">
+              <span className="text-3xl font-black" style={{ color: txtColor }}>{yearsLeft}</span>
+              <span className="text-sm font-bold" style={{ color: txtColor }}>yıl daha sağlıklı yaşam</span>
+            </div>
+            <p className="text-xs leading-relaxed" style={{ color: txtColor, opacity: 0.8 }}>
+              Türkiye ortalaması baz alındı (TÜİK 2023). Taramalarını düzenli yaptırdıkça bu sayı artar.
+              {bonus > 0 && ` Mevcut uyum puanınız sayesinde +${bonus} yıl kazancınız var.`}
+            </p>
+          </div>
+        )
+      })()}
+
+      {/* Quick Actions — PDF + Geçmiş */}
       <div className="flex gap-3 mb-5">
         <button
           onClick={() => {
-            const text = `Canım uygulamasını dene — yaşına ve hastalıklarına göre hangi taramaları ne zaman yaptırman gerektiğini gösteriyor! https://canim.uzunyasa.com/`
+            const score = getScore()
+            const label = scoreLabel(score)
+            const text = `🎯 Canım Sağlık Skorumu paylaşıyorum!\n\nSkorun: ${score}/100 — ${label}\n\nSenin sağlık skorun kaç? Ücretsiz öğrenmek için:\ncanim.uzunyasa.com`
             window.open(`https://wa.me/?text=${encodeURIComponent(text)}`)
           }}
           className="flex-1 py-3.5 rounded-2xl text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-98 transition-all"
@@ -137,6 +199,53 @@ export default function Profile() {
           <polyline points="9 18 15 12 9 6"/>
         </svg>
       </button>
+
+      {/* Rozetlerim */}
+      {(() => {
+        const score  = getScore()
+        const cards  = getScreeningCards()
+        const BLOOD_IDS   = new Set(['kan_sayimi','biyokimya','lipid','hba1c','tsh','vitamin_d','b12','hepatit','hiv_tarama','prostat','uacr'])
+        const VACCINE_IDS = new Set(['asi_grip','asi_td_tdap','asi_zona','asi_pnomoni','asi_hpv','asi_hepatit_b'])
+        const bloodCards   = cards.filter(c => BLOOD_IDS.has(c.id))
+        const vaccineCards = cards.filter(c => VACCINE_IDS.has(c.id))
+        const monthsSince  = onboardingCompletedAt
+          ? Math.floor((Date.now() - new Date(onboardingCompletedAt)) / (1000*60*60*24*30))
+          : 0
+        const badges = [
+          { icon:'✅', label:'İlk Adım',        desc:'Profil oluşturuldu',            earned: true },
+          { icon:'🏆', label:'Tam Takip',        desc:'Tüm taramalar güncel',          earned: cards.length > 0 && cards.every(c=>c.status==='ok') },
+          { icon:'🩸', label:'Tahlil Uzmanı',    desc:'Tüm kan tahlilleri güncel',     earned: bloodCards.length > 0 && bloodCards.every(c=>c.status==='ok') },
+          { icon:'💉', label:'Aşı Şampiyonu',    desc:'Tüm aşılar güncel',             earned: vaccineCards.length > 0 && vaccineCards.every(c=>c.status==='ok') },
+          { icon:'⭐', label:'90+ Skor',          desc:'Sağlık skoru 90 üzeri',         earned: score >= 90 },
+          { icon:'🔥', label:'3 Ay Takip',        desc:'3 aydır düzenli takip',         earned: monthsSince >= 3 },
+          { icon:'💎', label:'6 Ay Takip',        desc:'6 aydır düzenli takip',         earned: monthsSince >= 6 },
+        ]
+        const earnedCount = badges.filter(b=>b.earned).length
+        return (
+          <div className="mb-5 bg-white rounded-2xl border border-gray-100 overflow-hidden p-4"
+            style={{boxShadow:'0 1px 8px rgba(0,0,0,0.04)'}}>
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-bold text-gray-700">🏅 Rozetlerim</h2>
+              <span className="text-xs font-bold px-2 py-1 rounded-full"
+                style={{background:'#e8f4f5', color:'#0D7377'}}>{earnedCount}/{badges.length}</span>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {badges.map(b => (
+                <div key={b.label}
+                  className="flex flex-col items-center text-center p-2.5 rounded-2xl"
+                  style={b.earned
+                    ? {background:'linear-gradient(135deg,#e8f4f5,#f0fdfa)', border:'1.5px solid #b2dfdb'}
+                    : {background:'#F9FAFB', border:'1.5px solid #F3F4F6', opacity:0.5}}>
+                  <span className="text-2xl mb-1" style={b.earned ? {} : {filter:'grayscale(1)'}}>{b.icon}</span>
+                  <span className="text-xs font-bold text-gray-800 leading-tight">{b.label}</span>
+                  <span className="text-xs text-gray-400 mt-0.5 leading-tight">{b.desc}</span>
+                  {b.earned && <span className="text-xs font-bold mt-1" style={{color:'#0D7377'}}>✓ Kazanıldı</span>}
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
 
       {/* Personal Info */}
       <Section title="Kişisel Bilgiler">
