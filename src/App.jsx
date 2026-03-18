@@ -5,13 +5,15 @@ import AuthScreen from './pages/AuthScreen'
 import Onboarding from './pages/Onboarding'
 import Screenings from './pages/Screenings'
 import History from './pages/Lab'
+import Tahliller from './pages/Tahliller'
 import Profile from './pages/Profile'
 // Today tab removed — archived at src/pages/Today.jsx
 
 const TABS = [
   { id:'screenings', label:'Taramalarım', icon: CalIcon },
-  { id:'lab',        label:'Geçmiş',     icon: HistoryIcon },
-  { id:'profile',    label:'Profil',     icon: UserIcon },
+  { id:'tahliller',  label:'Tahliller',   icon: BloodIcon },
+  { id:'lab',        label:'Geçmiş',      icon: HistoryIcon },
+  { id:'profile',    label:'Profil',      icon: UserIcon },
 ]
 
 export default function App() {
@@ -44,6 +46,7 @@ export default function App() {
       {/* Page */}
       <div className="overflow-y-auto" style={{minHeight:'100dvh'}}>
         {activeTab === 'screenings' && <Screenings />}
+        {activeTab === 'tahliller'  && <Tahliller />}
         {activeTab === 'lab'        && <History />}
         {activeTab === 'profile'    && <Profile />}
       </div>
@@ -96,6 +99,17 @@ function CalIcon({ active }) {
       <path d="M8 2v4M16 2v4M3 10h18" stroke={c} strokeWidth="2" strokeLinecap="round"/>
       {active && <circle cx="9" cy="16" r="1.5" fill={c}/>}
       {active && <circle cx="15" cy="16" r="1.5" fill={c}/>}
+    </svg>
+  )
+}
+function BloodIcon({ active }) {
+  const c = active ? '#0D7377' : '#9CA3AF'
+  return (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+      <path d="M12 2L7 10C5.5 12.5 5 14 5 16a7 7 0 0014 0c0-2-.5-3.5-2-6L12 2z"
+        stroke={c} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        fill={active ? `${c}22` : 'none'} />
+      {active && <path d="M9 16a3 3 0 006 0" stroke={c} strokeWidth="1.5" strokeLinecap="round" />}
     </svg>
   )
 }
