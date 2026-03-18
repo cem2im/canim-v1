@@ -316,20 +316,6 @@ export default function Onboarding() {
           Devam →
         </button>
 
-        {/* Hiçbiri yok */}
-        <button
-          onClick={() => { setDiseases([]); handleDiseaseDone() }}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl border-2 font-bold text-sm transition-all active:scale-98 mb-3"
-          style={{
-            borderColor: diseases.length === 0 ? '#0D7377' : '#E5E7EB',
-            background: diseases.length === 0 ? '#e8f4f5' : 'white',
-            color: diseases.length === 0 ? '#0D7377' : '#6B7280',
-            flexShrink: 0,
-          }}
-        >
-          ✓ Aşağıdaki Durumların Hiçbiri Yok
-        </button>
-
         {/* 2-kolon hastalık grid */}
         <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, flexShrink:0, marginBottom:8}}>
           {chronicDiseases.map(d => {
