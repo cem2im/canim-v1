@@ -29,8 +29,8 @@ function groupByMonth(items) {
 
 export default function History() {
   const screeningDates = useAppStore(s => s.screeningDates)
-  const visitHistory = useAppStore(s => s.visitHistory)
-  const setActiveTab = useAppStore(s => s.setActiveTab)
+  const visitHistory   = useAppStore(s => s.visitHistory)
+  const setActiveTab   = useAppStore(s => s.setActiveTab)
 
   // Build a flat list of all completed screenings
   const completedItems = []
@@ -79,6 +79,14 @@ export default function History() {
 
   return (
     <div className="page-enter pb-24 px-5 pt-6">
+      <button onClick={() => setActiveTab('profile')}
+        className="flex items-center gap-1.5 text-sm font-semibold mb-4 active:opacity-70"
+        style={{ color: '#0D7377' }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="15 18 9 12 15 6"/>
+        </svg>
+        Profilime Dön
+      </button>
       <h1 className="text-xl font-extrabold text-gray-900 mb-1">Geçmişim</h1>
       <p className="text-sm text-gray-500 mb-5">Tamamlanan tarama ve doktor ziyaretleri</p>
 

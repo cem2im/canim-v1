@@ -21,7 +21,8 @@ export default function Profile() {
   const removeMedication = useAppStore(s => s.removeMedication)
   const getScreeningCards  = useAppStore(s => s.getScreeningCards)
   const getDoctorVisitCards = useAppStore(s => s.getDoctorVisitCards)
-  const getScore = useAppStore(s => s.getScore)
+  const getScore     = useAppStore(s => s.getScore)
+  const setActiveTab = useAppStore(s => s.setActiveTab)
 
   const [generatingPdf, setGeneratingPdf] = useState(false)
   const [recalculating, setRecalculating] = useState(false)
@@ -101,7 +102,7 @@ export default function Profile() {
         )
       })()}
 
-      {/* Quick Actions — WhatsApp + PDF (en üstte) */}
+      {/* Quick Actions — WhatsApp + PDF + Geçmiş */}
       <div className="flex gap-3 mb-5">
         <button
           onClick={() => {
@@ -122,6 +123,20 @@ export default function Profile() {
           {generatingPdf ? '⏳' : '📄'} Rapor
         </button>
       </div>
+
+      {/* Geçmiş link */}
+      <button
+        onClick={() => setActiveTab('lab')}
+        className="w-full flex items-center justify-between px-4 py-3 rounded-2xl mb-5 active:scale-98 transition-transform"
+        style={{ background: '#F9FAFB', border: '1.5px solid #F3F4F6' }}>
+        <div className="flex items-center gap-2">
+          <span className="text-base">📋</span>
+          <span className="text-sm font-semibold text-gray-700">Tarama Geçmişim</span>
+        </div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </button>
 
       {/* Personal Info */}
       <Section title="Kişisel Bilgiler">

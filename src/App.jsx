@@ -12,7 +12,6 @@ import Profile from './pages/Profile'
 const TABS = [
   { id:'screenings', label:'Taramalarım', icon: CalIcon },
   { id:'tahliller',  label:'Tahliller',   icon: BloodIcon },
-  { id:'lab',        label:'Geçmiş',      icon: HistoryIcon },
   { id:'profile',    label:'Profil',      icon: UserIcon },
 ]
 
