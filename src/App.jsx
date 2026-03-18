@@ -11,7 +11,6 @@ import Profile from './pages/Profile'
 
 const TABS = [
   { id:'screenings', label:'Taramalarım', icon: CalIcon },
-  { id:'tahliller',  label:'Tahliller',   icon: BloodIcon },
   { id:'profile',    label:'Profil',      icon: UserIcon },
 ]
 
@@ -24,8 +23,8 @@ export default function App() {
   const activeTab      = useAppStore(s => s.activeTab)
   const setActiveTab   = useAppStore(s => s.setActiveTab)
 
-  // Migrate: 'today' tab no longer exists
-  if (activeTab === 'today') setActiveTab('screenings')
+  // Migrate: removed tabs
+  if (activeTab === 'today' || activeTab === 'tahliller') setActiveTab('screenings')
 
   // ── Pre-onboarding screens ──────────────────────────────────────────────────
   if (!onboardingDone) {
