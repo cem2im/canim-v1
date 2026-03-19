@@ -6,6 +6,7 @@ import ScreeningDetail from '../components/ScreeningDetail'
 import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
 import { DISEASE_LIST, DISEASE_SCREENINGS } from '../data/screenings'
+import { generateICS, buildWhatsAppReminder } from '../utils/generateICS'
 
 // Blood test IDs
 const BLOOD_IDS = new Set([
@@ -156,6 +157,114 @@ function GroupRow({ icon, label, items, onClick }) {
   )
 }
 
+// ── Reminder Sheet ───────────────────────────────────────────────────────────
+function ReminderSheet({ cards, profileName, onClose }) {
+  const [icsLoading, setIcsLoading] = useState(false)
+  const [icsDone,    setIcsDone]    = useState(false)
+
+  const urgentCount = cards.filter(c =>
+    c.status === 'overdue' || c.status === 'unknown' ||
+    (c.daysUntil !== null && c.daysUntil <= 30)
+  ).length
+  const soonCount = cards.filter(c =>
+    c.daysUntil !== null && c.daysUntil > 30 && c.daysUntil <= 90
+  ).length
+
+  const handleICS = () => {
+    setIcsLoading(true)
+    setTimeout(() => {
+      generateICS(cards)
+      setIcsLoading(false)
+      setIcsDone(true)
+    }, 300)
+  }
+
+  const handleWhatsApp = () => {
+    const msg = buildWhatsAppReminder(cards, profileName)
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`)
+  }
+
+  return createPortal(
+    <div className="fixed inset-0 flex flex-col"
+      style={{ background: 'rgba(0,0,0,0.48)', zIndex: 9999 }}
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="flex-1" onClick={onClose} />
+      <div className="bg-white rounded-t-3xl"
+        style={{ animation: 'slideUp 0.26s cubic-bezier(0.22,1,0.36,1)', padding: '0 0 40px' }}
+        onClick={e => e.stopPropagation()}>
+
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-1">
+          <div className="w-10 h-1 rounded-full bg-gray-200" />
+        </div>
+
+        {/* Header */}
+        <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100">
+          <span className="text-2xl">🔔</span>
+          <div className="flex-1">
+            <div className="font-extrabold text-gray-900">Hatırlatma Kur</div>
+            <div className="text-xs text-gray-400">
+              {urgentCount > 0 && `${urgentCount} acil`}{urgentCount > 0 && soonCount > 0 && ' · '}{soonCount > 0 && `${soonCount} yakında`}
+              {urgentCount === 0 && soonCount === 0 && 'Tüm taramalar güncel'}
+            </div>
+          </div>
+          <button onClick={onClose}
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{ background: '#E5E7EB', fontSize: 22, fontWeight: 700, color: '#374151' }}>
+            ×
+          </button>
+        </div>
+
+        <div className="px-5 pt-5 flex flex-col gap-3">
+
+          {/* Option 1: Calendar */}
+          <button onClick={handleICS} disabled={icsLoading}
+            className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-left active:scale-98 transition-all"
+            style={{ background: icsDone ? '#F0FDF4' : '#F9FAFB', border: `1.5px solid ${icsDone ? '#BBF7D0' : '#E5E7EB'}` }}>
+            <span className="text-3xl shrink-0">{icsDone ? '✅' : icsLoading ? '⏳' : '📅'}</span>
+            <div className="flex-1">
+              <div className="font-bold text-gray-900 text-sm">
+                {icsDone ? 'Takvim dosyası indirildi!' : 'Takvime Ekle (.ics)'}
+              </div>
+              <div className="text-xs text-gray-500 mt-0.5">
+                {icsDone
+                  ? 'Telefon takviminize ekleyin, sistem hatırlatır'
+                  : 'iPhone/Android takvimine ekle — otomatik bildirim gelir'}
+              </div>
+            </div>
+            {!icsDone && (
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/>
+              </svg>
+            )}
+          </button>
+
+          {/* Option 2: WhatsApp self-send */}
+          <button onClick={handleWhatsApp}
+            className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-left active:scale-98 transition-all"
+            style={{ background: '#F0FDF4', border: '1.5px solid #BBF7D0' }}>
+            <span className="text-3xl shrink-0">💬</span>
+            <div className="flex-1">
+              <div className="font-bold text-gray-900 text-sm">WhatsApp'ta Gönder</div>
+              <div className="text-xs text-gray-500 mt-0.5">
+                Tarama listenizi kendinize veya ailenize WhatsApp mesajı olarak gönderin
+              </div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="9 18 15 12 9 6"/>
+            </svg>
+          </button>
+
+          {/* Info note */}
+          <p className="text-xs text-gray-400 text-center px-2">
+            Gerçek zamanlı bildirim için .ics dosyasını telefon takviminize açın
+          </p>
+        </div>
+      </div>
+    </div>
+  , document.body)
+}
+
 // ── Mark-done sheet (for Tahliller tab) ──────────────────────────────────────
 function MarkDoneSheet({ card, onDone, onClose }) {
   const [date, setDate] = useState(new Date().toISOString().slice(0,10))
@@ -191,11 +300,13 @@ export default function Screenings() {
   const getScreeningCards = useAppStore(s => s.getScreeningCards)
   const logDoctorVisit    = useAppStore(s => s.logDoctorVisit)
   const markDone          = useAppStore(s => s.markDone)
+  const profile           = useAppStore(s => s.profile)
 
-  const [selected,   setSelected]   = useState(null)
-  const [mainTab,    setMainTab]    = useState('taramalar') // 'taramalar' | 'tahliller'
-  const [openSheet,  setOpenSheet]  = useState(null)
-  const [markCard,   setMarkCard]   = useState(null)
+  const [selected,       setSelected]       = useState(null)
+  const [mainTab,        setMainTab]        = useState('taramalar')
+  const [openSheet,      setOpenSheet]      = useState(null)
+  const [markCard,       setMarkCard]       = useState(null)
+  const [showReminder,   setShowReminder]   = useState(false)
 
   const cards = getScreeningCards()
   const urgentCount = cards.filter(c =>
@@ -246,7 +357,14 @@ export default function Screenings() {
 
       {/* Header */}
       <div style={{ padding:'20px 20px 10px', flexShrink:0 }}>
-        <h1 className="text-xl font-extrabold text-gray-900 mb-1">Sağlık Takiplerim</h1>
+        <div className="flex items-center justify-between mb-1">
+          <h1 className="text-xl font-extrabold text-gray-900">Sağlık Takiplerim</h1>
+          <button onClick={() => setShowReminder(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-xs active:scale-95 transition-transform"
+            style={{ background: '#FEF9C3', color: '#92400E', border: '1.5px solid #FDE68A' }}>
+            🔔 Hatırlatma
+          </button>
+        </div>
         {urgentCount > 0 ? (
           <p className="text-sm font-bold mb-3" style={{ color:'#DC2626' }}>
             ⚠️ {urgentCount} taramanızda gecikme var
@@ -359,6 +477,15 @@ export default function Screenings() {
           card={markCard}
           onDone={(id, date) => markDone(id, date)}
           onClose={() => setMarkCard(null)}
+        />
+      )}
+
+      {/* Reminder sheet */}
+      {showReminder && (
+        <ReminderSheet
+          cards={cards}
+          profileName={profile?.name}
+          onClose={() => setShowReminder(false)}
         />
       )}
     </div>
