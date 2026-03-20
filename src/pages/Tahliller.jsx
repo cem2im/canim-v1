@@ -7,7 +7,7 @@ import FeedbackSection from '../components/FeedbackSection'
 // Blood test screening IDs
 const BLOOD_IDS = new Set([
   'kan_sayimi','biyokimya','lipid','hba1c','tsh','vitamin_d',
-  'b12','hepatit','hiv_tarama','prostat','uacr',
+  'b12','hepatit','hiv_tarama','prostat','idrar',
 ])
 
 function timeLabel(status, daysUntil) {

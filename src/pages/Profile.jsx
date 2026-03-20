@@ -204,7 +204,7 @@ export default function Profile() {
       {(() => {
         const score  = getScore()
         const cards  = getScreeningCards()
-        const BLOOD_IDS   = new Set(['kan_sayimi','biyokimya','lipid','hba1c','tsh','vitamin_d','b12','hepatit','hiv_tarama','prostat','uacr'])
+        const BLOOD_IDS   = new Set(['kan_sayimi','biyokimya','lipid','hba1c','tsh','vitamin_d','b12','hepatit','hiv_tarama','prostat','idrar'])
         const VACCINE_IDS = new Set(['asi_grip','asi_td_tdap','asi_zona','asi_pnomoni','asi_hpv','asi_hepatit_b'])
         const bloodCards   = cards.filter(c => BLOOD_IDS.has(c.id))
         const vaccineCards = cards.filter(c => VACCINE_IDS.has(c.id))
