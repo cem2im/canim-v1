@@ -283,10 +283,9 @@ export default function Screenings() {
 
   const cards = getScreeningCards()
 
-  const urgentCount = cards.filter(c =>
-    c.status === 'overdue' || c.status === 'unknown' ||
-    (c.daysUntil !== null && c.daysUntil <= 30)
-  ).length
+  const hemenCount    = cards.filter(c => c.status === 'overdue' || c.status === 'unknown').length
+  const yaklasanCount = cards.filter(c => c.status === 'upcoming' || c.status === 'soon').length
+  const urgentCount   = hemenCount + yaklasanCount
 
   // Category groups
   const categoryGroups = CATEGORIES
@@ -334,9 +333,13 @@ export default function Screenings() {
             🔔 Hatırlatma
           </button>
         </div>
-        {urgentCount > 0 ? (
+        {hemenCount > 0 ? (
           <p className="text-sm font-bold mb-2" style={{ color: '#DC2626' }}>
-            ⚠️ {urgentCount} taramanızda gecikme var
+            ⚠️ {hemenCount} tanesi hemen yapılmalı
+          </p>
+        ) : yaklasanCount > 0 ? (
+          <p className="text-sm font-bold mb-2" style={{ color: '#D97706' }}>
+            📅 {yaklasanCount} tanesi yaklaşıyor
           </p>
         ) : (
           <p className="text-sm font-semibold mb-2" style={{ color: '#0D7377' }}>
