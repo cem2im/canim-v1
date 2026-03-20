@@ -325,14 +325,14 @@ export default function Screenings() {
 
       {/* Header */}
       <div style={{ padding: '20px 20px 10px', flexShrink: 0 }}>
-        <div className="flex items-center justify-between mb-1">
-          <h1 className="text-xl font-extrabold text-gray-900">Sağlık Takiplerim</h1>
-          <button onClick={() => setShowReminder(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl font-bold text-xs active:scale-95"
-            style={{ background: '#FEF9C3', color: '#92400E', border: '1.5px solid #FDE68A' }}>
-            🔔 Hatırlatma
-          </button>
-        </div>
+        {/* Reminder button — full width at top */}
+        <button onClick={() => setShowReminder(true)}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-sm active:scale-95 mb-3"
+          style={{ background: '#FEF9C3', color: '#92400E', border: '1.5px solid #FDE68A', boxShadow: '0 1px 4px rgba(0,0,0,0.06)' }}>
+          🔔 Kendine hatırlatma kur
+        </button>
+
+        <h1 className="text-xl font-extrabold text-gray-900 mb-1">Sağlık Takiplerim</h1>
         {hemenCount > 0 ? (
           <p className="text-sm font-bold mb-2" style={{ color: '#DC2626' }}>
             ⚠️ {hemenCount} tanesi hemen yapılmalı
