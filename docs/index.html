@@ -1,17 +1,447 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="tr">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230D7377'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' font-size='18' font-weight='900' fill='white' font-family='sans-serif'>C</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#0D7377" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <title>Canım — Kişisel Sağlık Takibi</title>
-    <script type="module" crossorigin src="/assets/index-jwkYGQhJ.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-OlyXhewR.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+<!--
+   ______                            __
+  / ____/___  ____ ___  ____  __  __/ /____  _____
+ / /   / __ \/ __ `__ \/ __ \/ / / / __/ _ \/ ___/
+/ /___/ /_/ / / / / / / /_/ / /_/ / /_/  __/ /
+\____/\____/_/ /_/ /_/ .___/\__,_/\__/\___/_/
+                    /_/
+-->
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Canım — Kişiselleştirilmiş Sağlık Tarama Planı</title>
+<meta name="description" content="Yaşına, cinsiyetine ve sağlık geçmişine göre kişiselleştirilmiş tarama planı. Güncel tıbbi kılavuzlara dayalı. Tamamen ücretsiz.">
+<meta name="theme-color" content="#0D7377">
+<meta property="og:title" content="Canım — Kişiselleştirilmiş Sağlık Tarama Planı">
+<meta property="og:description" content="Hangi taramayı, ne zaman yaptırmalısın? Canım bilir. Güncel tıbbi kılavuzlara dayalı ücretsiz sağlık tarama planı.">
+<meta property="og:type" content="website">
+
+<!-- Fontshare for display -->
+<link href="https://api.fontshare.com/v2/css?f[]=zodiak@400,500,700&display=swap" rel="stylesheet">
+<!-- Google for body -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300..700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="./style.css">
+</head>
+<body>
+
+<!-- ============ NAVIGATION ============ -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="#" class="nav__brand" aria-label="Canım Ana Sayfa">
+      <svg class="nav__logo" width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+        <rect width="36" height="36" rx="8" fill="#0D7377"/>
+        <text x="18" y="25" text-anchor="middle" font-family="'Zodiak', Georgia, serif" font-weight="700" font-size="22" fill="#fff">C</text>
+      </svg>
+      <span class="nav__wordmark">Canım</span>
+    </a>
+    <nav class="nav__links" aria-label="Ana navigasyon">
+      <a href="#nasil-calisir" class="nav__link">Nasıl Çalışır</a>
+      <a href="#ozellikler" class="nav__link">Özellikler</a>
+      <a href="#kilavuzlar" class="nav__link">Kılavuzlar</a>
+      <a href="#sss" class="nav__link">SSS</a>
+    </nav>
+    <a href="/app/" class="btn btn--primary btn--sm nav__cta">Hemen Başla →</a>
+    <button class="nav__hamburger" aria-label="Menüyü aç" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <!-- Mobile menu -->
+  <div class="nav__mobile" aria-hidden="true">
+    <a href="#nasil-calisir" class="nav__mobile-link">Nasıl Çalışır</a>
+    <a href="#ozellikler" class="nav__mobile-link">Özellikler</a>
+    <a href="#kilavuzlar" class="nav__mobile-link">Kılavuzlar</a>
+    <a href="#sss" class="nav__mobile-link">SSS</a>
+    <a href="/app/" class="btn btn--primary nav__mobile-cta">Hemen Başla →</a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="hero">
+  <!-- Floating decoration dots -->
+  <div class="hero__decoration">
+    <div class="hero__dot hero__dot--1"></div>
+    <div class="hero__dot hero__dot--2"></div>
+    <div class="hero__dot hero__dot--3"></div>
+  </div>
+  <div class="hero__inner">
+    <div class="hero__content">
+      <div class="hero__badge">
+        <span class="badge">✓ Ücretsiz · Kayıt gerekmez · Veriler cihazında</span>
+      </div>
+      <h1 class="hero__title">
+        Hangi taramayı, ne zaman yaptırmalısın?<br>
+        <span class="hero__title-accent">Canım bilir.</span>
+      </h1>
+      <p class="hero__subtitle">
+        Yaşına, cinsiyetine ve sağlık geçmişine göre kişiselleştirilmiş tarama planı. Güncel tıbbi kılavuzlara dayalı. Tamamen ücretsiz.
+      </p>
+      <div class="hero__actions">
+        <a href="/app/" class="btn btn--primary btn--lg">Hemen Başla →</a>
+        <a href="#nasil-calisir" class="btn btn--outline btn--lg">Nasıl Çalışır?</a>
+      </div>
+    </div>
+    <div class="hero__phone">
+      <div class="phone-mockup">
+        <div class="phone-mockup__notch"></div>
+        <div class="phone-mockup__screen">
+          <div class="phone-ui">
+            <div class="phone-ui__header">Taramalarım</div>
+            <div class="phone-ui__list">
+              <div class="phone-ui__item phone-ui__item--done">
+                <span class="phone-ui__icon">✅</span>
+                <div class="phone-ui__text">
+                  <strong>Kolorektal Kanser</strong>
+                  <span>Tamamlandı</span>
+                </div>
+              </div>
+              <div class="phone-ui__item phone-ui__item--due">
+                <span class="phone-ui__icon">🔔</span>
+                <div class="phone-ui__text">
+                  <strong>Meme Kanseri</strong>
+                  <span>Bu yıl yapılmalı</span>
+                </div>
+              </div>
+              <div class="phone-ui__item phone-ui__item--future">
+                <span class="phone-ui__icon">⏳</span>
+                <div class="phone-ui__text">
+                  <strong>Akciğer BT</strong>
+                  <span>2028'de başlayacak</span>
+                </div>
+              </div>
+              <div class="phone-ui__item phone-ui__item--done">
+                <span class="phone-ui__icon">✅</span>
+                <div class="phone-ui__text">
+                  <strong>Serviks Kanseri</strong>
+                  <span>Tamamlandı</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ STATS ============ -->
+<section class="stats">
+  <div class="stats__inner">
+    <div class="stat fade-in">
+      <div class="stat__number" data-target="50">0</div>
+      <div class="stat__label">Tarama & Test Türü</div>
+    </div>
+    <div class="stat fade-in">
+      <div class="stat__number" data-target="8">0</div>
+      <div class="stat__label">Uluslararası Kılavuz</div>
+    </div>
+    <div class="stat fade-in">
+      <div class="stat__number" data-target="2" data-suffix=" dk">0</div>
+      <div class="stat__label">Kurulum Süresi</div>
+    </div>
+    <div class="stat fade-in">
+      <div class="stat__number" data-target="0" data-display="Ücretsiz">Ücretsiz</div>
+      <div class="stat__label">Sonsuza Kadar</div>
+    </div>
+  </div>
+</section>
+
+<!-- Wave Divider -->
+<svg class="wave-divider" viewBox="0 0 1440 48" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+  <path d="M0 48h1440V24C1320 8 1200 0 1080 4 960 8 840 24 720 28 600 32 480 24 360 20 240 16 120 16 60 20L0 24v24z" fill="#FAF7F2"/>
+</svg>
+
+<!-- ============ TRUST BAR ============ -->
+<section class="trust" id="kilavuzlar">
+  <div class="trust__inner">
+    <p class="trust__label">Öneriler şu kılavuzlara dayanır:</p>
+    <div class="trust__badges">
+      <span class="trust__badge">USPSTF</span>
+      <span class="trust__badge">ADA 2025</span>
+      <span class="trust__badge">AHA/ACC</span>
+      <span class="trust__badge">ESC/ESH</span>
+      <span class="trust__badge">ACIP</span>
+      <span class="trust__badge">GOLD 2024</span>
+      <span class="trust__badge">EASL-EASD-EASO</span>
+      <span class="trust__badge">ESMO</span>
+    </div>
+    <div class="trust__creator">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+        <path d="M6 12v5c0 1.66 2.69 3 6 3s6-1.34 6-3v-5"/>
+      </svg>
+      <span>Prof. Dr. Cem Şimşek tarafından tasarlandı — Hacettepe Üniversitesi</span>
+    </div>
+  </div>
+</section>
+
+<!-- Wave Divider -->
+<svg class="wave-divider wave-divider--flip" viewBox="0 0 1440 48" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+  <path d="M0 48h1440V24C1320 8 1200 0 1080 4 960 8 840 24 720 28 600 32 480 24 360 20 240 16 120 16 60 20L0 24v24z" fill="#FAF7F2"/>
+</svg>
+
+<!-- ============ NASIL ÇALIŞIR ============ -->
+<section class="steps" id="nasil-calisir">
+  <div class="steps__inner">
+    <h2 class="section-title">3 Adımda Sağlığını Takip Et</h2>
+    <div class="steps__grid">
+      <div class="step-card step-card--1 fade-in">
+        <span class="step-card__number">01</span>
+        <div class="step-card__icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <h3 class="step-card__title">Kendini Tanıt</h3>
+        <p class="step-card__text">Yaş, cinsiyet, mevcut hastalıklar ve aile öyküsünü gir. Sadece 2 dakika.</p>
+      </div>
+      <div class="step-card step-card--2 fade-in">
+        <span class="step-card__number">02</span>
+        <div class="step-card__icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l3 3L22 4"/>
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+          </svg>
+        </div>
+        <h3 class="step-card__title">Planını Al</h3>
+        <p class="step-card__text">Sana özel tarama, aşı ve kan tahlili takvimini gör. Hangi testi ne zaman yaptırmalısın, bir bakışta.</p>
+      </div>
+      <div class="step-card step-card--3 fade-in">
+        <span class="step-card__number">03</span>
+        <div class="step-card__icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+            <path d="M8 14l2 2 4-4"/>
+          </svg>
+        </div>
+        <h3 class="step-card__title">Takip Et</h3>
+        <p class="step-card__text">Yaptırdıklarını işaretle, sıradakini planla. Sağlık geçmişin her zaman yanında.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FEATURES ============ -->
+<section class="features" id="ozellikler">
+  <div class="features__inner">
+    <h2 class="section-title">Kapsamlı Sağlık Takibi</h2>
+    <div class="features__grid">
+      <div class="feature-card fade-in">
+        <div class="feature-card__icon">🔬</div>
+        <h3 class="feature-card__title">Kanser Taramaları</h3>
+        <p class="feature-card__text">Kolorektal, meme, akciğer, serviks, prostat, over kanseri ve daha fazlası</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-card__icon">💉</div>
+        <h3 class="feature-card__title">Aşılar</h3>
+        <p class="feature-card__text">Hepatit B, Zoster, PCV20, Td/Tdap, HPV, İnfluenza</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-card__icon">🩸</div>
+        <h3 class="feature-card__title">Kan Tahlilleri</h3>
+        <p class="feature-card__text">HbA1c, lipid paneli, tam kan sayımı, eGFR, FIB-4</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-card__icon">💊</div>
+        <h3 class="feature-card__title">İlaç Takibi</h3>
+        <p class="feature-card__text">İlaç listesi, dozajlar ve kullanım takibi</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-card__icon">🏥</div>
+        <h3 class="feature-card__title">Kronik Hastalıklar</h3>
+        <p class="feature-card__text">Diyabet, hipertansiyon, KOAH, yağlı karaciğer, obezite</p>
+      </div>
+      <div class="feature-card fade-in">
+        <div class="feature-card__icon">🚨</div>
+        <h3 class="feature-card__title">Acil Bilgiler</h3>
+        <p class="feature-card__text">Kan grubu, alerjiler, acil durum iletişim bilgileri</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ VALUE PROPOSITION ============ -->
+<section class="value" id="neden-canim">
+  <div class="value__inner">
+    <h2 class="section-title">Arabanı her yıl muayeneye götürürsün.<br>Peki ya kendi vücudunu?</h2>
+    <div class="value__grid">
+      <div class="value-card fade-in">
+        <div class="value-card__icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+        </div>
+        <h3 class="value-card__title">Gizlilik Öncelikli</h3>
+        <p class="value-card__text">Veriler yalnızca cihazında saklanır. Sunucuya hiçbir bilgi gönderilmez.</p>
+      </div>
+      <div class="value-card fade-in">
+        <div class="value-card__icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+            <polyline points="10 9 9 9 8 9"/>
+          </svg>
+        </div>
+        <h3 class="value-card__title">Kanıta Dayalı</h3>
+        <p class="value-card__text">Tüm öneriler uluslararası tıbbi kılavuzlara dayanır. Kopyala-yapıştır bilgi değil.</p>
+      </div>
+      <div class="value-card fade-in">
+        <div class="value-card__icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="12" y1="8" x2="12" y2="16"/>
+            <line x1="8" y1="12" x2="16" y2="12"/>
+          </svg>
+        </div>
+        <h3 class="value-card__title">Tamamen Ücretsiz</h3>
+        <p class="value-card__text">Gizli ücret yok, abonelik yok, reklam yok. Herkes için erişilebilir sağlık bilgisi.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CAR ANALOGY ============ -->
+<section class="analogy">
+  <div class="analogy__inner">
+    <div class="analogy__cards">
+      <div class="analogy__card analogy__card--car fade-in">
+        <div class="analogy__card-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 17h14M5 17a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h1l2-3h8l2 3h1a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2M5 17l-1 2h1M19 17l1 2h-1"/>
+            <circle cx="7.5" cy="14.5" r="1.5"/>
+            <circle cx="16.5" cy="14.5" r="1.5"/>
+          </svg>
+        </div>
+        <p class="analogy__card-text">Arabanı yılda 1 kez<br><strong>muayeneye götürürsün</strong></p>
+      </div>
+      <div class="analogy__arrow fade-in">
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="2" y1="12" x2="42" y2="12"/>
+          <polyline points="36 6 42 12 36 18"/>
+        </svg>
+      </div>
+      <div class="analogy__card analogy__card--body fade-in">
+        <div class="analogy__card-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+          </svg>
+        </div>
+        <p class="analogy__card-text">Vücudun için de<br><strong>aynısını yapabilirsin</strong></p>
+      </div>
+    </div>
+    <p class="analogy__caption fade-in">Canım, sana hangi kontrolleri ne zaman yaptırman gerektiğini söyler.</p>
+  </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="faq" id="sss">
+  <div class="faq__inner">
+    <h2 class="section-title">Sıkça Sorulan Sorular</h2>
+    <div class="faq__list">
+      <details class="faq__item fade-in">
+        <summary class="faq__question">Canım nedir?</summary>
+        <div class="faq__answer">
+          <p>Canım, yaşınıza, cinsiyetinize ve sağlık geçmişinize göre kişiselleştirilmiş koruyucu sağlık tarama planı oluşturan ücretsiz bir web uygulamasıdır.</p>
+        </div>
+      </details>
+      <details class="faq__item fade-in">
+        <summary class="faq__question">Verilerim güvende mi?</summary>
+        <div class="faq__answer">
+          <p>Evet. Tüm verileriniz yalnızca cihazınızda saklanır. Hiçbir bilgi sunucuya gönderilmez veya üçüncü taraflarla paylaşılmaz.</p>
+        </div>
+      </details>
+      <details class="faq__item fade-in">
+        <summary class="faq__question">Kayıt olmam gerekiyor mu?</summary>
+        <div class="faq__answer">
+          <p>Hayır. Anonim olarak kullanabilirsiniz. İsterseniz hesap oluşturarak verilerinizi yedekleyebilirsiniz.</p>
+        </div>
+      </details>
+      <details class="faq__item fade-in">
+        <summary class="faq__question">Hangi kılavuzlar kullanılıyor?</summary>
+        <div class="faq__answer">
+          <p>USPSTF, ADA Standards of Care 2025, AHA/ACC, ESC/ESH, ACIP, GOLD 2024, EASL-EASD-EASO MASLD 2024, ESMO ve daha fazlası.</p>
+        </div>
+      </details>
+      <details class="faq__item fade-in">
+        <summary class="faq__question">Canım bir doktor yerine geçer mi?</summary>
+        <div class="faq__answer">
+          <p>Hayır. Canım bilgilendirme amaçlıdır ve tıbbi tavsiye yerine geçmez. Tarama planınızı doktorunuzla paylaşmanızı öneririz.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINAL CTA ============ -->
+<section class="cta-final" id="cta-final">
+  <div class="cta-final__inner">
+    <h2 class="cta-final__title">Sağlığını erteleme.</h2>
+    <p class="cta-final__subtitle">2 dakikada kişisel tarama planını oluştur.</p>
+    <a href="/app/" class="btn btn--white btn--lg">Ücretsiz Başla →</a>
+    <p class="cta-final__note">Kayıt gerekmez · Veriler cihazında kalır</p>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="footer__logo-row">
+          <svg width="28" height="28" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+            <rect width="36" height="36" rx="8" fill="#0D7377"/>
+            <text x="18" y="25" text-anchor="middle" font-family="'Zodiak', Georgia, serif" font-weight="700" font-size="22" fill="#fff">C</text>
+          </svg>
+          <span class="footer__wordmark">Canım</span>
+        </div>
+        <p class="footer__creator">Prof. Dr. Cem Şimşek tarafından tasarlandı</p>
+        <p class="footer__uni">Hacettepe Üniversitesi</p>
+      </div>
+      <div class="footer__columns">
+        <div class="footer__col">
+          <h4 class="footer__col-title">Uygulama</h4>
+          <a href="/app/" class="footer__link">Hemen Başla</a>
+          <a href="#nasil-calisir" class="footer__link">Nasıl Çalışır</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__col-title">Kaynaklar</h4>
+          <a href="https://www.uspreventiveservicestaskforce.org" target="_blank" rel="noopener noreferrer" class="footer__link">USPSTF</a>
+          <a href="https://diabetesjournals.org/care" target="_blank" rel="noopener noreferrer" class="footer__link">ADA</a>
+          <a href="https://www.escardio.org" target="_blank" rel="noopener noreferrer" class="footer__link">ESC</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__col-title">İletişim</h4>
+          <a href="mailto:cem.simsek@hacettepe.edu.tr" class="footer__link">E-posta</a>
+        </div>
+      </div>
+      <div class="footer__share">
+        <a href="https://wa.me/?text=Sa%C4%9Fl%C4%B1k%20taramalar%C4%B1n%C4%B1%20takip%20etmek%20i%C3%A7in%20bu%20%C3%BCcretsiz%20uygulamaya%20bak%3A%20Can%C4%B1m" target="_blank" rel="noopener noreferrer" class="btn btn--whatsapp">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+          </svg>
+          Ailene gönder 💚
+        </a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 Canım. Tüm hakları saklıdır.</span>
+      
+    </div>
+  </div>
+</footer>
+
+<script src="./app.js"></script>
 </html>
