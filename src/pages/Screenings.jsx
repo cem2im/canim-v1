@@ -276,9 +276,10 @@ export default function Screenings() {
   const profile           = useAppStore(s => s.profile)
 
   const [selected,     setSelected]     = useState(null)
-  const [openSheet,    setOpenSheet]    = useState(null) // { icon, label, items }
+  const [openSheet,    setOpenSheet]    = useState(null)
   const [markCard,     setMarkCard]     = useState(null)
   const [showReminder, setShowReminder] = useState(false)
+  const [viewMode,     setViewMode]     = useState('category') // 'category' | 'doctor'
 
   const cards = getScreeningCards()
 
@@ -287,8 +288,8 @@ export default function Screenings() {
     (c.daysUntil !== null && c.daysUntil <= 30)
   ).length
 
-  // Build category groups, sorted internally by urgency
-  const groups = CATEGORIES
+  // Category groups
+  const categoryGroups = CATEGORIES
     .map(cat => ({
       ...cat,
       items: cards
@@ -296,6 +297,26 @@ export default function Screenings() {
         .sort((a, b) => urgencyScore(a) - urgencyScore(b)),
     }))
     .filter(g => g.items.length > 0)
+
+  // Doctor groups
+  const doctorMap = {}
+  for (const c of cards) {
+    const doc = primaryDoctor(c.doctor)
+    if (!doctorMap[doc]) doctorMap[doc] = []
+    doctorMap[doc].push(c)
+  }
+  const doctorGroups = Object.entries(doctorMap)
+    .map(([doc, items]) => ({
+      key: doc, icon: '🏥', label: doc,
+      items: items.sort((a, b) => urgencyScore(a) - urgencyScore(b)),
+    }))
+    .sort((a, b) => {
+      const uA = a.items.filter(c => c.status === 'overdue' || c.status === 'unknown').length
+      const uB = b.items.filter(c => c.status === 'overdue' || c.status === 'unknown').length
+      return uB - uA
+    })
+
+  const groups = viewMode === 'category' ? categoryGroups : doctorGroups
 
   if (selected) return <ScreeningDetail screening={selected} onBack={() => setSelected(null)} />
 
@@ -314,14 +335,30 @@ export default function Screenings() {
           </button>
         </div>
         {urgentCount > 0 ? (
-          <p className="text-sm font-bold" style={{ color: '#DC2626' }}>
+          <p className="text-sm font-bold mb-2" style={{ color: '#DC2626' }}>
             ⚠️ {urgentCount} taramanızda gecikme var
           </p>
         ) : (
-          <p className="text-sm font-semibold" style={{ color: '#0D7377' }}>
+          <p className="text-sm font-semibold mb-2" style={{ color: '#0D7377' }}>
             ✓ Tüm takipler güncel
           </p>
         )}
+
+        {/* 2-way toggle */}
+        <div className="flex rounded-2xl p-1 gap-1" style={{ background: '#F3F4F6' }}>
+          {[
+            { key: 'category', label: '📂 Kategoriye' },
+            { key: 'doctor',   label: '🏥 Doktora' },
+          ].map(v => (
+            <button key={v.key} onClick={() => setViewMode(v.key)}
+              className="flex-1 py-2 rounded-xl text-xs font-bold transition-all"
+              style={viewMode === v.key
+                ? { background: 'white', color: '#0D7377', boxShadow: '0 1px 6px rgba(0,0,0,0.08)' }
+                : { background: 'transparent', color: '#9CA3AF' }}>
+              {v.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Category groups */}
