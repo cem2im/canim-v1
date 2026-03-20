@@ -6,14 +6,49 @@ import FeedbackSection from '../components/FeedbackSection'
 import Disclaimer from '../components/Disclaimer'
 import { generateICS, buildWhatsAppReminder } from '../utils/generateICS'
 
-// ── Urgency sort: overdue/unknown first, then by daysUntil, ok last ───────────
+// ── Category map ──────────────────────────────────────────────────────────────
+const CATEGORIES = [
+  {
+    key: 'blood',
+    icon: '🩸',
+    label: 'Kan Tahlilleri',
+    ids: new Set(['kan_sayimi','biyokimya','lipid','hba1c','tsh','vitamin_d','b12','hepatit','hiv_tarama','prostat','idrar']),
+  },
+  {
+    key: 'imaging',
+    icon: '🩻',
+    label: 'Görüntüleme',
+    ids: new Set(['dexa','karin_usg','karotis_usg','fibroscan','mamografi','aort_anevrizması','akci_bt','akciger_bt','ekokardiyografi']),
+  },
+  {
+    key: 'vaccine',
+    icon: '💉',
+    label: 'Aşılar',
+    ids: new Set(['asi_grip','asi_td_tdap','asi_zona','asi_pnomoni','asi_hpv','asi_hepatit_b']),
+  },
+  {
+    key: 'checkup',
+    icon: '🩺',
+    label: 'Muayene & Tarama',
+    ids: new Set(['tansiyon_olcumu','obezite_tarama','depresyon_tarama','ekg','goz_dibi','dis_kontrol','kolonoskopi','pap_smear','sft','genetik_danisman']),
+  },
+]
+
+function getCategory(id) {
+  for (const cat of CATEGORIES) {
+    if (cat.ids.has(id)) return cat.key
+  }
+  return 'checkup'
+}
+
+// ── Urgency sort ──────────────────────────────────────────────────────────────
 function urgencyScore(card) {
   if (card.status === 'overdue' || card.status === 'unknown') return -999
   if (card.daysUntil === null) return 9999
   return card.daysUntil
 }
 
-// ── Time label & color ────────────────────────────────────────────────────────
+// ── Time helpers ──────────────────────────────────────────────────────────────
 function timeLabel(status, daysUntil) {
   if (status === 'overdue' || status === 'unknown') return 'Hemen'
   if (daysUntil === null || daysUntil <= 30) return 'Hemen'
@@ -41,12 +76,116 @@ function fmtDate(dateStr) {
   return `${d.getDate()} ${TR_MONTHS[d.getMonth()]} ${d.getFullYear()}`
 }
 
+// ── Group Row ─────────────────────────────────────────────────────────────────
+function GroupRow({ icon, label, items, onClick }) {
+  const urgentCount = items.filter(c =>
+    c.status === 'overdue' || c.status === 'unknown' ||
+    (c.daysUntil !== null && c.daysUntil <= 30)
+  ).length
+  const preview = [...items]
+    .sort((a,b) => urgencyScore(a) - urgencyScore(b))
+    .slice(0, 3).map(c => c.icon).join(' ')
+
+  return (
+    <button onClick={onClick}
+      className="w-full flex items-center gap-3 bg-white rounded-2xl px-4 py-4 text-left active:scale-98 transition-transform"
+      style={{ border: '1.5px solid #F3F4F6', boxShadow: '0 1px 8px rgba(0,0,0,0.05)' }}>
+      <span className="text-2xl shrink-0">{icon}</span>
+      <div className="flex-1 min-w-0">
+        <div className="font-bold text-gray-900 text-sm">{label}</div>
+        <div className="text-xs text-gray-400 mt-0.5">
+          {preview}{items.length > 3 ? ` +${items.length - 3}` : ''}
+        </div>
+      </div>
+      {urgentCount > 0 && (
+        <span className="text-xs font-bold px-2.5 py-1 rounded-full shrink-0"
+          style={{ background: '#FEF2F2', color: '#DC2626' }}>
+          {urgentCount} bekliyor
+        </span>
+      )}
+      <span className="text-xs font-black px-2.5 py-1 rounded-full shrink-0"
+        style={{ background: '#e8f4f5', color: '#0D7377' }}>{items.length}</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D1D5DB"
+        strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </button>
+  )
+}
+
+// ── Detail Sheet (items inside a category) ────────────────────────────────────
+function DetailSheet({ icon, label, items, onSelectItem, onClose, onMarkDone }) {
+  const sorted = [...items].sort((a, b) => urgencyScore(a) - urgencyScore(b))
+
+  return createPortal(
+    <div className="fixed inset-0 flex flex-col"
+      style={{ background: 'rgba(0,0,0,0.48)', zIndex: 9999 }}
+      onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="flex-1" onClick={onClose} />
+      <div className="bg-white rounded-t-3xl flex flex-col"
+        style={{ animation: 'slideUp 0.26s cubic-bezier(0.22,1,0.36,1)', maxHeight: '75dvh' }}
+        onClick={e => e.stopPropagation()}>
+        {/* Handle */}
+        <div className="flex justify-center pt-3 pb-1 shrink-0">
+          <div className="w-10 h-1 rounded-full bg-gray-200" />
+        </div>
+        {/* Header */}
+        <div className="flex items-center gap-3 px-5 py-3 border-b border-gray-100 shrink-0">
+          <span className="text-2xl">{icon}</span>
+          <div className="flex-1">
+            <div className="font-extrabold text-gray-900">{label}</div>
+            <div className="text-xs text-gray-400">{items.length} tarama</div>
+          </div>
+          <button onClick={onClose}
+            className="w-10 h-10 rounded-full flex items-center justify-center active:scale-90"
+            style={{ background: '#E5E7EB', fontSize: 22, fontWeight: 700, color: '#374151' }}>×</button>
+        </div>
+        {/* Items */}
+        <div className="overflow-y-auto flex-1 min-h-0 px-4 py-3 flex flex-col gap-2"
+          style={{ paddingBottom: 80 }}>
+          {sorted.map(card => {
+            const color   = timeLabelColor(card.status, card.daysUntil)
+            const label   = timeLabel(card.status, card.daysUntil)
+            const urgent  = card.status === 'overdue' || card.status === 'unknown'
+            return (
+              <div key={card.id}
+                onClick={() => { onClose(); setTimeout(() => onSelectItem(card), 280) }}
+                className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3 cursor-pointer active:scale-98 transition-transform"
+                style={{
+                  border: `1.5px solid ${urgent ? '#FEE2E2' : '#F3F4F6'}`,
+                  boxShadow: urgent ? '0 2px 8px rgba(220,38,38,0.08)' : '0 1px 4px rgba(0,0,0,0.04)',
+                }}>
+                <span className="text-xl shrink-0">{card.icon}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-gray-900 text-sm leading-tight">{card.trName}</div>
+                  <div className="text-xs text-gray-400 mt-0.5">
+                    {primaryDoctor(card.doctor)}
+                    {card.lastDoneDate && ` · Son: ${fmtDate(card.lastDoneDate)}`}
+                  </div>
+                </div>
+                <span className="text-xs font-bold px-2.5 py-1 rounded-full shrink-0 mr-1"
+                  style={{ background: `${color}18`, color }}>{label}</span>
+                <button
+                  onClick={e => { e.stopPropagation(); onMarkDone(card) }}
+                  className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 active:scale-90"
+                  style={{ background: '#F0FDF4', border: '1.5px solid #DCFCE7', color: '#16A34A', fontSize: 14, fontWeight: 700 }}>
+                  ✓
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+    </div>
+  , document.body)
+}
+
 // ── Mark-done sheet ───────────────────────────────────────────────────────────
 function MarkDoneSheet({ card, onDone, onClose }) {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10))
   return createPortal(
     <div className="fixed inset-0 flex flex-col"
-      style={{ background: 'rgba(0,0,0,0.48)', zIndex: 9999 }}
+      style={{ background: 'rgba(0,0,0,0.48)', zIndex: 10000 }}
       onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="flex-1" onClick={onClose} />
       <div className="bg-white rounded-t-3xl"
@@ -81,7 +220,6 @@ function ReminderSheet({ cards, profileName, onClose }) {
     c.status === 'overdue' || c.status === 'unknown' ||
     (c.daysUntil !== null && c.daysUntil <= 30)
   ).length
-
   return createPortal(
     <div className="fixed inset-0 flex flex-col"
       style={{ background: 'rgba(0,0,0,0.48)', zIndex: 9999 }}
@@ -106,8 +244,7 @@ function ReminderSheet({ cards, profileName, onClose }) {
             style={{ background: '#E5E7EB', fontSize: 22, fontWeight: 700, color: '#374151' }}>×</button>
         </div>
         <div className="px-5 pt-5 flex flex-col gap-3">
-          <button
-            onClick={() => { generateICS(cards); setIcsDone(true) }}
+          <button onClick={() => { generateICS(cards); setIcsDone(true) }}
             className="w-full flex items-center gap-4 px-4 py-4 rounded-2xl text-left active:scale-98"
             style={{ background: icsDone ? '#F0FDF4' : '#F9FAFB', border: `1.5px solid ${icsDone ? '#BBF7D0' : '#E5E7EB'}` }}>
             <span className="text-3xl">{icsDone ? '✅' : '📅'}</span>
@@ -132,16 +269,6 @@ function ReminderSheet({ cards, profileName, onClose }) {
   , document.body)
 }
 
-// ── Divider label between urgency groups ──────────────────────────────────────
-function GroupDivider({ label, color }) {
-  return (
-    <div className="flex items-center gap-2 mt-2 mb-1 px-1">
-      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: color }} />
-      <span className="text-xs font-bold uppercase tracking-widest" style={{ color }}>{label}</span>
-    </div>
-  )
-}
-
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function Screenings() {
   const getScreeningCards = useAppStore(s => s.getScreeningCards)
@@ -149,27 +276,28 @@ export default function Screenings() {
   const profile           = useAppStore(s => s.profile)
 
   const [selected,     setSelected]     = useState(null)
+  const [openSheet,    setOpenSheet]    = useState(null) // { icon, label, items }
   const [markCard,     setMarkCard]     = useState(null)
   const [showReminder, setShowReminder] = useState(false)
 
-  const cards  = getScreeningCards()
-  const sorted = [...cards].sort((a, b) => urgencyScore(a) - urgencyScore(b))
+  const cards = getScreeningCards()
 
   const urgentCount = cards.filter(c =>
     c.status === 'overdue' || c.status === 'unknown' ||
     (c.daysUntil !== null && c.daysUntil <= 30)
   ).length
 
-  // Group boundaries for dividers
-  const hasOverdue  = sorted.some(c => c.status === 'overdue' || c.status === 'unknown')
-  const hasUpcoming = sorted.some(c => c.daysUntil !== null && c.daysUntil > 30 && c.daysUntil <= 90)
-  const hasOk       = sorted.some(c => c.status === 'ok' && (c.daysUntil === null || c.daysUntil > 90))
+  // Build category groups, sorted internally by urgency
+  const groups = CATEGORIES
+    .map(cat => ({
+      ...cat,
+      items: cards
+        .filter(c => cat.ids.has(c.id))
+        .sort((a, b) => urgencyScore(a) - urgencyScore(b)),
+    }))
+    .filter(g => g.items.length > 0)
 
   if (selected) return <ScreeningDetail screening={selected} onBack={() => setSelected(null)} />
-
-  let shownOverdueDivider  = false
-  let shownUpcomingDivider = false
-  let shownOkDivider       = false
 
   return (
     <div style={{ height: '100dvh', display: 'flex', flexDirection: 'column', background: '#FAFAF8', overflow: 'hidden' }}
@@ -196,73 +324,35 @@ export default function Screenings() {
         )}
       </div>
 
-      {/* Scrollable list */}
-      <div style={{ flex: 1, padding: '4px 16px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
-        {sorted.map(card => {
-          const isUrgent   = card.status === 'overdue' || card.status === 'unknown'
-          const isUpcoming = !isUrgent && card.daysUntil !== null && card.daysUntil <= 90
-          const isOk       = card.status === 'ok' && !isUpcoming && !isUrgent
-          const color      = timeLabelColor(card.status, card.daysUntil)
-          const label      = timeLabel(card.status, card.daysUntil)
-
-          // Insert dividers
-          const dividers = []
-          if (isUrgent && !shownOverdueDivider) {
-            shownOverdueDivider = true
-            dividers.push(<GroupDivider key="d-overdue" label="Hemen Yapılmalı" color="#DC2626" />)
-          } else if (isUpcoming && !shownUpcomingDivider) {
-            shownUpcomingDivider = true
-            dividers.push(<GroupDivider key="d-upcoming" label="Yakında" color="#D97706" />)
-          } else if (isOk && !shownOkDivider) {
-            shownOkDivider = true
-            dividers.push(<GroupDivider key="d-ok" label="Güncel" color="#0D7377" />)
-          }
-
-          return (
-            <div key={card.id}>
-              {dividers}
-              <div
-                onClick={() => setSelected(card)}
-                className="flex items-center gap-3 bg-white rounded-2xl px-4 py-3.5 mb-2 cursor-pointer active:scale-98 transition-transform"
-                style={{
-                  border: `1.5px solid ${isUrgent ? '#FEE2E2' : isUpcoming ? '#FEF3C7' : '#F3F4F6'}`,
-                  boxShadow: isUrgent ? '0 2px 10px rgba(220,38,38,0.08)' : '0 1px 4px rgba(0,0,0,0.04)',
-                }}>
-                {/* Icon */}
-                <span className="text-2xl shrink-0">{card.icon}</span>
-
-                {/* Info */}
-                <div className="flex-1 min-w-0">
-                  <div className="font-semibold text-gray-900 text-sm leading-tight truncate">{card.trName}</div>
-                  <div className="text-xs text-gray-400 mt-0.5 truncate">
-                    {primaryDoctor(card.doctor)}
-                    {card.lastDoneDate && ` · Son: ${fmtDate(card.lastDoneDate)}`}
-                  </div>
-                </div>
-
-                {/* Time badge */}
-                <span className="text-xs font-bold px-2.5 py-1 rounded-full shrink-0 mx-1"
-                  style={{ background: `${color}18`, color }}>
-                  {label}
-                </span>
-
-                {/* Quick done button */}
-                <button
-                  onClick={e => { e.stopPropagation(); setMarkCard(card) }}
-                  className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 active:scale-90 transition-transform"
-                  style={{ background: '#F0FDF4', border: '1.5px solid #DCFCE7', color: '#16A34A', fontSize: 14, fontWeight: 700 }}>
-                  ✓
-                </button>
-              </div>
-            </div>
-          )
-        })}
+      {/* Category groups */}
+      <div style={{ flex: 1, padding: '8px 16px 24px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {groups.map(g => (
+          <GroupRow
+            key={g.key}
+            icon={g.icon}
+            label={g.label}
+            items={g.items}
+            onClick={() => setOpenSheet({ icon: g.icon, label: g.label, items: g.items })}
+          />
+        ))}
 
         <div style={{ marginTop: 'auto', paddingTop: 8 }}>
           <FeedbackSection page="screenings" />
           <Disclaimer />
         </div>
       </div>
+
+      {/* Detail sheet */}
+      {openSheet && (
+        <DetailSheet
+          icon={openSheet.icon}
+          label={openSheet.label}
+          items={openSheet.items}
+          onSelectItem={setSelected}
+          onClose={() => setOpenSheet(null)}
+          onMarkDone={card => { setOpenSheet(null); setMarkCard(card) }}
+        />
+      )}
 
       {/* Mark-done sheet */}
       {markCard && (
