@@ -70,8 +70,9 @@ export default function Profile() {
         const color = scoreColor(score)
         const label = scoreLabel(score)
         const cards = getScreeningCards()
-        const overdueCount = cards.filter(c => c.status === 'overdue').length
-        const hemenCount   = cards.filter(c => c.daysUntil !== null && c.daysUntil <= 30 && c.status !== 'overdue').length
+        // unknown = hiç yapılmamış → gecikmiş sayılır
+        const overdueCount = cards.filter(c => c.status === 'overdue' || c.status === 'unknown').length
+        const hemenCount   = cards.filter(c => c.status === 'upcoming').length
         const monthsSince  = onboardingCompletedAt
           ? Math.floor((Date.now() - new Date(onboardingCompletedAt)) / (1000*60*60*24*30))
           : 0
@@ -135,28 +136,29 @@ export default function Profile() {
         const sex   = profile?.sex
         const age   = profile?.birthYear ? new Date().getFullYear() - profile.birthYear : null
         if (!age || !sex) return null
-        // Turkey TÜİK 2023: men healthspan ~55y, women ~60y avg
-        const base  = sex === 'F' ? 60 : 55
-        const bonus = score >= 90 ? 8 : score >= 75 ? 6 : score >= 60 ? 4 : score >= 45 ? 2 : 0
-        const healthyYears = base + bonus
-        const yearsLeft    = Math.max(0, healthyYears - age)
-        const bgColor      = score >= 75 ? '#F0FDF4' : score >= 50 ? '#FFFBEB' : '#FEF2F2'
-        const txtColor     = score >= 75 ? '#15803D' : score >= 50 ? '#B45309' : '#B91C1C'
-        const borderColor  = score >= 75 ? '#BBF7D0' : score >= 50 ? '#FDE68A' : '#FECACA'
+        // Bonus yıllar: taramalar sayesinde ortalamanın üstünde sağlıklı yaşam
+        // Absolut değil, delta göster — yaştan bağımsız, her zaman pozitif
+        const maxBonus = 8
+        const bonus    = score >= 90 ? 8 : score >= 75 ? 6 : score >= 60 ? 4 : score >= 45 ? 2 : 0
+        const missed   = maxBonus - bonus // kaybedilen potansiyel yıl
+        const bgColor     = score >= 75 ? '#F0FDF4' : score >= 50 ? '#FFFBEB' : '#FEF2F2'
+        const txtColor    = score >= 75 ? '#15803D' : score >= 50 ? '#B45309' : '#B91C1C'
+        const borderColor = score >= 75 ? '#BBF7D0' : score >= 50 ? '#FDE68A' : '#FECACA'
         return (
           <div className="mb-4 rounded-2xl px-4 py-4"
             style={{ background: bgColor, border: `1.5px solid ${borderColor}` }}>
             <div className="flex items-center gap-2 mb-1">
               <span className="text-xl">⏳</span>
-              <span className="text-sm font-extrabold" style={{ color: txtColor }}>Sağlıklı Yaşam Tahmini</span>
+              <span className="text-sm font-extrabold" style={{ color: txtColor }}>Sağlıklı Yaşam Kazancı</span>
             </div>
             <div className="flex items-baseline gap-1 mb-1">
-              <span className="text-3xl font-black" style={{ color: txtColor }}>{yearsLeft}</span>
-              <span className="text-sm font-bold" style={{ color: txtColor }}>yıl daha sağlıklı yaşam</span>
+              <span className="text-3xl font-black" style={{ color: txtColor }}>+{bonus}</span>
+              <span className="text-sm font-bold" style={{ color: txtColor }}>yıl (Türkiye ortalamasına göre)</span>
             </div>
             <p className="text-xs leading-relaxed" style={{ color: txtColor, opacity: 0.8 }}>
-              Türkiye ortalaması baz alındı (TÜİK 2023). Taramalarını düzenli yaptırdıkça bu sayı artar.
-              {bonus > 0 && ` Mevcut uyum puanınız sayesinde +${bonus} yıl kazancınız var.`}
+              {bonus === maxBonus
+                ? 'Mükemmel! Düzenli tarama ile maksimum sağlıklı yaşam kazancındasınız.'
+                : `Taramalarınızı tamamlarsanız ${missed} yıl daha kazanabilirsiniz. TÜİK 2023 baz alındı.`}
             </p>
           </div>
         )
