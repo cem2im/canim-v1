@@ -344,20 +344,27 @@ export default function Screenings() {
           </p>
         )}
 
-        {/* 2-way toggle */}
-        <div className="flex rounded-2xl p-1 gap-1" style={{ background: '#F3F4F6' }}>
-          {[
-            { key: 'category', label: '📂 Kategoriye' },
-            { key: 'doctor',   label: '🏥 Doktora' },
-          ].map(v => (
-            <button key={v.key} onClick={() => setViewMode(v.key)}
-              className="flex-1 py-2 rounded-xl text-xs font-bold transition-all"
-              style={viewMode === v.key
-                ? { background: 'white', color: '#0D7377', boxShadow: '0 1px 6px rgba(0,0,0,0.08)' }
-                : { background: 'transparent', color: '#9CA3AF' }}>
-              {v.label}
-            </button>
-          ))}
+        {/* Stacked view mode selector */}
+        <div className="flex flex-col gap-1">
+          <button
+            onClick={() => setViewMode('category')}
+            className="w-full py-3 px-4 rounded-2xl text-sm font-bold transition-all text-left"
+            style={viewMode === 'category'
+              ? { background: '#0D7377', color: 'white', boxShadow: '0 2px 8px rgba(13,115,119,0.25)' }
+              : { background: '#F3F4F6', color: '#6B7280' }}>
+            🔬 Hangi testleri yaptırmalıyım?
+          </button>
+          <div className="text-center text-xs font-semibold" style={{ color: '#9CA3AF', lineHeight: '1.2', padding: '2px 0' }}>
+            veya
+          </div>
+          <button
+            onClick={() => setViewMode('doctor')}
+            className="w-full py-3 px-4 rounded-2xl text-sm font-bold transition-all text-left"
+            style={viewMode === 'doctor'
+              ? { background: '#0D7377', color: 'white', boxShadow: '0 2px 8px rgba(13,115,119,0.25)' }
+              : { background: '#F3F4F6', color: '#6B7280' }}>
+            👨‍⚕️ Hangi doktora gitmeliyim?
+          </button>
         </div>
       </div>
 
