@@ -131,9 +131,11 @@ function DetailSheet({ screening, onClose, onMarkDone }) {
 
 // ReminderSheet
 function ReminderSheet({ cards, onClose }) {
+  const [emptyMsg, setEmptyMsg] = useState(false)
   const handleICS = () => {
     const upcoming = cards.filter(c => c.status !== 'ok' && c.nextDate)
-    if (!upcoming.length) { alert('Tüm taramalar güncel!'); return }
+    if (!upcoming.length) { setEmptyMsg(true); return }
+    setEmptyMsg(false)
     const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Canım//TR']
     for (const c of upcoming) {
       const dt = (c.nextDate || new Date().toISOString().slice(0,10)).replace(/-/g,'')
@@ -167,6 +169,11 @@ function ReminderSheet({ cards, onClose }) {
       <div className="relative w-full bg-white rounded-t-3xl p-6" style={{maxWidth:480,margin:'0 auto'}}>
         <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
         <h2 className="text-xl font-bold mb-5">Hatırlatma Kur</h2>
+        {emptyMsg && (
+          <p className="text-sm text-green-700 font-semibold mb-3 px-1" role="status">
+            ✅ Tüm taramalar güncel — eklenecek randevu yok.
+          </p>
+        )}
         <div className="space-y-3">
           <button onClick={handleICS}
             className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl border border-gray-200 bg-white text-left"

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { DISEASE_LIST } from '../data/screenings'
 import useAppStoreV2 from '../store/useAppStoreV2'
 
@@ -9,10 +10,52 @@ const DISEASE_ROWS = [
   { id: 'yagli_karaciger', label: 'Yağlı Karaciğer',        icon: '🫁' },
   { id: 'kalp_damar',      label: 'Kalp / Damar Hastalığı', icon: '❤️' },
   { id: 'kemik_erimesi',   label: 'Kemik Erimesi',          icon: '🦴' },
+  { id: 'bobrek_hastaligi',label: 'Böbrek Hastalığı',       icon: '🫘' },
   { id: 'obezite',         label: 'Obezite / Fazla Kilo',   icon: '⚖️' },
 ]
 
+const CANCER_IDS = [
+  { id: 'aile_krc_yuksek',  label: '🟠 Kolorektal — 1. derece, 60 yaş altı', sexFilter: null },
+  { id: 'aile_krc_orta',    label: '🟠 Kolorektal — 1. derece, herhangi yaş', sexFilter: null },
+  { id: 'aile_meme_yuksek', label: '🩷 Meme — 1. derece, 50 yaş altı',        sexFilter: 'F' },
+  { id: 'aile_meme_orta',   label: '🩷 Meme — 1. derece, 50 yaş ve üstü',     sexFilter: 'F' },
+  { id: 'aile_prostat',     label: '🔵 Prostat — 1. derece akraba',            sexFilter: 'M' },
+  { id: 'aile_yumurtalik',  label: '🟣 Yumurtalık',                           sexFilter: 'F' },
+  { id: 'brca_lynch',       label: '🧬 BRCA/Lynch Mutasyonu',                  sexFilter: null },
+]
+
 const validDiseaseIds = new Set(DISEASE_LIST.map(d => d.id))
+
+function CancerSheet({ sex, selectedCancerIds, onToggle, onClose }) {
+  const filtered = CANCER_IDS.filter(c => {
+    if (!validDiseaseIds.has(c.id)) return false
+    if (c.sexFilter && c.sexFilter !== sex) return false
+    return true
+  })
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-end" role="dialog" aria-modal="true" aria-label="Ailede Kanser Öyküsü">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div className="relative w-full bg-white rounded-t-3xl p-6 max-h-[70dvh] overflow-y-auto" style={{maxWidth:480,margin:'0 auto'}}>
+        <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
+        <h2 className="text-xl font-bold mb-2">Ailede Kanser Öyküsü</h2>
+        <p className="text-gray-600 text-sm mb-4">Birden fazla seçebilirsiniz</p>
+        <div className="flex flex-wrap gap-2">
+          {filtered.map(c => {
+            const selected = selectedCancerIds.includes(c.id)
+            return (
+              <button key={c.id} onClick={() => onToggle(c.id)}
+                className={`px-3 py-2 rounded-2xl text-sm font-medium border transition-colors ${selected ? 'text-white border-transparent' : 'bg-gray-100 text-gray-800 border-gray-200'}`}
+                style={selected ? {background:'#0D7377',minHeight:44} : {minHeight:44}}
+                aria-pressed={selected}>{c.label}</button>
+            )
+          })}
+        </div>
+        <button onClick={onClose} className="mt-6 w-full py-3 rounded-2xl font-semibold text-white" style={{background:'#0D7377',minHeight:44}}>Tamam</button>
+      </div>
+    </div>,
+    document.body
+  )
+}
 
 export default function ProfileV2({ onNavigate }) {
   const profile = useAppStoreV2(s => s.profile)
@@ -30,6 +73,7 @@ export default function ProfileV2({ onNavigate }) {
   const [heightInput, setHeightInput] = useState(profile?.height?.toString() || '')
   const [weightInput, setWeightInput] = useState(profile?.weight?.toString() || '')
   const [showResetConfirm, setShowResetConfirm] = useState(false)
+  const [showCancerSheet, setShowCancerSheet] = useState(false)
 
   const currentYear = new Date().getFullYear()
 
@@ -62,6 +106,7 @@ export default function ProfileV2({ onNavigate }) {
   const visibleDiseaseRows = DISEASE_ROWS.filter(d => validDiseaseIds.has(d.id))
 
   return (
+    <>
     <div className="flex flex-col h-full overflow-y-auto bg-gray-50">
       {/* Header */}
       <div className="px-5 pt-12 pb-4 bg-white border-b border-gray-100">
@@ -82,14 +127,14 @@ export default function ProfileV2({ onNavigate }) {
               {!editingYear ? (
                 <button onClick={() => { setYearInput(profile?.birthYear?.toString() || ''); setEditingYear(true) }}
                   className="text-base font-semibold" style={{color:'#0D7377', minHeight:44, minWidth:44}}>
-                  {profile?.birthYear || '—'} <span className="text-xs text-gray-400">Düzenle</span>
+                  {profile?.birthYear || '—'} <span className="text-xs text-gray-600">Düzenle</span>
                 </button>
               ) : (
                 <div className="flex items-center gap-2">
                   <label htmlFor="year-edit" className="sr-only">Doğum yılı</label>
                   <input id="year-edit" type="text" inputMode="numeric"
                     value={yearInput} onChange={e => setYearInput(e.target.value.replace(/\D/g,'').slice(0,4))}
-                    className="w-24 border border-gray-300 rounded-xl px-3 py-2 text-center font-semibold focus:outline-none"
+                    className="w-24 border border-gray-300 rounded-xl px-3 py-2 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-teal-600"
                     style={{borderColor:'#0D7377'}} autoFocus />
                   <button onClick={handleSaveYear} className="px-3 py-2 rounded-xl text-white text-sm font-semibold" style={{background:'#0D7377',minHeight:44}}>✓</button>
                   <button onClick={() => setEditingYear(false)} className="px-3 py-2 rounded-xl text-gray-600 text-sm" style={{minHeight:44}}>✕</button>
@@ -136,13 +181,13 @@ export default function ProfileV2({ onNavigate }) {
                     <label htmlFor="height-edit" className="text-xs text-gray-500 mb-1 block">Boy (cm)</label>
                     <input id="height-edit" type="text" inputMode="decimal"
                       value={heightInput} onChange={e => setHeightInput(e.target.value)}
-                      placeholder="170" className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none" />
+                      placeholder="170" className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-600" />
                   </div>
                   <div className="flex-1">
                     <label htmlFor="weight-edit" className="text-xs text-gray-500 mb-1 block">Kilo (kg)</label>
                     <input id="weight-edit" type="text" inputMode="decimal"
                       value={weightInput} onChange={e => setWeightInput(e.target.value)}
-                      placeholder="70" className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none" />
+                      placeholder="70" className="w-full border border-gray-300 rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-teal-600" />
                   </div>
                 </div>
                 <div className="flex gap-2">
@@ -177,6 +222,23 @@ export default function ProfileV2({ onNavigate }) {
                 )
               })}
             </div>
+          </div>
+
+          {/* Kanser öyküsü */}
+          <div className="px-5 py-4 border-b border-gray-50">
+            {(() => {
+              const selectedCancerIds = diseases.filter(d => CANCER_IDS.some(c => c.id === d))
+              return (
+                <button onClick={() => setShowCancerSheet(true)}
+                  className="w-full flex items-center justify-between"
+                  style={{minHeight:44}}>
+                  <p className="text-sm text-gray-600">🧬 Ailede Kanser Öyküsü</p>
+                  <span className="text-sm font-semibold" style={{color:'#0D7377'}}>
+                    {selectedCancerIds.length > 0 ? `${selectedCancerIds.length} seçili ›` : 'Ekle ›'}
+                  </span>
+                </button>
+              )
+            })()}
           </div>
 
           {/* Sigara */}
@@ -236,5 +298,18 @@ export default function ProfileV2({ onNavigate }) {
         </div>
       </div>
     </div>
+
+    {showCancerSheet && (
+      <CancerSheet
+        sex={profile?.sex}
+        selectedCancerIds={diseases.filter(d => CANCER_IDS.some(c => c.id === d))}
+        onToggle={(id) => {
+          if (diseases.includes(id)) updateDiseases(diseases.filter(d => d !== id))
+          else updateDiseases([...diseases, id])
+        }}
+        onClose={() => setShowCancerSheet(false)}
+      />
+    )}
+    </>
   )
 }

@@ -102,7 +102,7 @@ function CancerSheet({ sex, selectedCancerIds, onToggle, onClose }) {
             return (
               <button key={c.id} onClick={() => onToggle(c.id)}
                 className={`px-3 py-2 rounded-2xl text-sm font-medium border transition-colors ${selected ? 'text-white border-transparent' : 'bg-gray-100 text-gray-800 border-gray-200'}`}
-                style={selected ? {background:'#0D7377'} : {}}
+                style={selected ? {background:'#0D7377', minHeight:44} : {minHeight:44}}
                 aria-pressed={selected}>{c.label}</button>
             )
           })}
@@ -185,7 +185,15 @@ export default function OnboardingV2() {
     <div className="min-h-dvh flex flex-col" style={{background:'#FAFAF8'}}>
       {/* Progress bar */}
       <div className="h-1 bg-gray-200">
-        <div className="h-1 transition-all duration-500" style={{width:`${(step/4)*100}%`, background:'#0D7377'}} />
+        <div
+          role="progressbar"
+          aria-valuenow={step}
+          aria-valuemin={1}
+          aria-valuemax={4}
+          aria-label={`Adım ${step} / 4`}
+          className="h-1 transition-all duration-500"
+          style={{width:`${(step/4)*100}%`, background:'#0D7377'}}
+        />
       </div>
 
       {/* ── STEP 1 — Doğum Yılı ── */}
@@ -203,7 +211,7 @@ export default function OnboardingV2() {
             onChange={e => setBirthYear(e.target.value.replace(/\D/g,'').slice(0,4))}
             placeholder="1985"
             maxLength={4}
-            className="text-center text-5xl font-bold w-48 border-b-4 border-gray-300 bg-transparent focus:border-teal-600 focus:outline-none py-2 transition-colors"
+            className="text-center text-5xl font-bold w-48 border-b-4 border-gray-300 bg-transparent focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 py-2 transition-colors"
             style={yearValid ? {borderColor:'#0D7377'} : {}}
             aria-describedby="year-hint"
           />
