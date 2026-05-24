@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { DISEASE_LIST } from '../data/screenings'
 import { buildScreeningList } from '../utils/engine'
@@ -29,6 +29,98 @@ const CANCER_IDS = [
 ]
 
 const validDiseaseIds = new Set(DISEASE_LIST.map(d => d.id))
+
+// ── Year Picker (drum / scroll wheel) ────────────────────────────────────
+function YearPicker({ value, onChange }) {
+  const YEARS = Array.from({ length: 2006 - 1940 + 1 }, (_, i) => 1940 + i)
+  const ITEM_H = 60
+  const VISIBLE = 5
+  const containerH = ITEM_H * VISIBLE
+  const padding = containerH / 2 - ITEM_H / 2
+
+  const scrollRef = useRef(null)
+  const debounceRef = useRef(null)
+
+  // Scroll to initial value on mount (no animation — instant)
+  useEffect(() => {
+    const idx = YEARS.indexOf(value)
+    if (idx !== -1 && scrollRef.current) {
+      scrollRef.current.scrollTop = idx * ITEM_H
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleScroll = useCallback(() => {
+    clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => {
+      if (!scrollRef.current) return
+      const idx = Math.round(scrollRef.current.scrollTop / ITEM_H)
+      const clamped = Math.max(0, Math.min(idx, YEARS.length - 1))
+      scrollRef.current.scrollTo({ top: clamped * ITEM_H, behavior: 'smooth' })
+      onChange(YEARS[clamped])
+    }, 120)
+  }, [onChange, YEARS])
+
+  const scrollTo = (y) => {
+    const idx = YEARS.indexOf(y)
+    if (idx !== -1) scrollRef.current?.scrollTo({ top: idx * ITEM_H, behavior: 'smooth' })
+    onChange(y)
+  }
+
+  return (
+    <div style={{ position: 'relative', width: 220, height: containerH }}>
+      {/* Top fade */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0,
+        height: padding + ITEM_H * 0.6,
+        background: 'linear-gradient(to bottom, #FAFAF8 40%, transparent)',
+        pointerEvents: 'none', zIndex: 2,
+      }} />
+      {/* Bottom fade */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0,
+        height: padding + ITEM_H * 0.6,
+        background: 'linear-gradient(to top, #FAFAF8 40%, transparent)',
+        pointerEvents: 'none', zIndex: 2,
+      }} />
+      {/* Selection highlight box */}
+      <div style={{
+        position: 'absolute', top: '50%', left: 20, right: 20,
+        height: ITEM_H, transform: 'translateY(-50%)',
+        border: '2.5px solid #0D7377', borderRadius: 18,
+        pointerEvents: 'none', zIndex: 2,
+      }} />
+      {/* Scrollable list */}
+      <div
+        ref={scrollRef}
+        onScroll={handleScroll}
+        className="year-picker-scroll"
+        style={{
+          height: '100%', overflowY: 'scroll', overflowX: 'hidden',
+          scrollSnapType: 'y mandatory',
+          paddingTop: padding, paddingBottom: padding,
+          WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none',
+        }}
+      >
+        {YEARS.map(y => {
+          const sel = y === value
+          return (
+            <div key={y}
+              onClick={() => scrollTo(y)}
+              style={{
+                height: ITEM_H, scrollSnapAlign: 'center',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: sel ? 44 : 24, fontWeight: sel ? 800 : 400,
+                color: sel ? '#0D7377' : '#9CA3AF',
+                transition: 'font-size 0.15s, color 0.15s, font-weight 0.15s',
+                cursor: 'pointer', userSelect: 'none',
+              }}
+            >{y}</div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 // BMI Calculator Bottom Sheet
 function BMISheet({ onClose, onApply, initialSelected }) {
@@ -119,14 +211,11 @@ export default function OnboardingV2() {
   const [step, setStep] = useState(1)
 
   // Step 1 state
-  const [birthYear, setBirthYear] = useState('')
-  const yearInputRef = useRef(null)
-  useEffect(() => { if (step === 1 && yearInputRef.current) yearInputRef.current.focus() }, [step])
-
+  const [selectedYear, setSelectedYear] = useState(1985)
   const currentYear = new Date().getFullYear()
-  const yearNum = parseInt(birthYear)
-  const yearValid = !isNaN(yearNum) && yearNum >= 1920 && yearNum <= 2010
-  const age = yearValid ? currentYear - yearNum : null
+  const yearNum = selectedYear
+  const yearValid = true  // wheel only exposes valid years
+  const age = currentYear - selectedYear
 
   // Step 2 state
   const [sex, setSex] = useState(null)
@@ -198,31 +287,15 @@ export default function OnboardingV2() {
 
       {/* ── STEP 1 — Doğum Yılı ── */}
       {step === 1 && (
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 page-enter">
-          <p className="text-gray-600 text-sm mb-2">Adım 1 / 4</p>
-          <h1 className="text-3xl font-bold text-center mb-8" style={{color:'#0D7377'}}>Doğum yılınız?</h1>
-          <label htmlFor="birth-year" className="sr-only">Doğum yılı</label>
-          <input
-            id="birth-year"
-            ref={yearInputRef}
-            type="text"
-            inputMode="numeric"
-            value={birthYear}
-            onChange={e => setBirthYear(e.target.value.replace(/\D/g,'').slice(0,4))}
-            placeholder="1985"
-            maxLength={4}
-            className="text-center text-5xl font-bold w-48 border-b-4 border-gray-300 bg-transparent focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-offset-2 py-2 transition-colors"
-            style={yearValid ? {borderColor:'#0D7377'} : {}}
-            aria-describedby="year-hint"
-          />
-          <p id="year-hint" className="mt-4 text-xl text-gray-600 min-h-[2rem]">
-            {yearValid ? `${age} yaşında` : (birthYear.length === 4 && !yearValid ? <span className="text-red-600" role="alert">Geçerli bir yıl girin (1920–2010)</span> : '')}
-          </p>
+        <div className="flex-1 flex flex-col items-center justify-center px-6 page-enter" style={{gap:0}}>
+          <p className="text-gray-500 text-sm mb-3">Adım 1 / 4</p>
+          <h1 className="text-3xl font-bold text-center mb-1" style={{color:'#0D7377'}}>Doğum yılınız?</h1>
+          <p className="text-gray-500 text-base mb-6">{age} yaşında</p>
+          <YearPicker value={selectedYear} onChange={setSelectedYear} />
           <button
             onClick={() => setStep(2)}
-            disabled={!yearValid}
-            className="mt-10 w-full max-w-xs py-4 rounded-2xl text-lg font-bold text-white transition-all"
-            style={yearValid ? {background:'#0D7377'} : {background:'#D1D5DB',color:'#9CA3AF'}}
+            className="mt-8 w-full max-w-xs py-4 rounded-2xl text-lg font-bold text-white"
+            style={{background:'#0D7377'}}
           >Devam →</button>
         </div>
       )}
