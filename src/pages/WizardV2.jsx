@@ -24,11 +24,12 @@ const DISEASE_META = {
 const CANCER_IDS  = new Set(['kolonoskopi','mamografi','pap_smear','prostat','akciger_bt','aort_anevrizması','genetik_danisman'])
 const VACCINE_IDS = new Set(['asi_grip','asi_td_tdap','asi_hpv','asi_hepatit_b','asi_pnomoni','asi_zona'])
 
+// Yeni zaman seçenekleri
 const ANSWER_OPTS = [
-  { value: 'this_month', label: 'Bu ay' },
-  { value: '6m',         label: '6 ay önce' },
-  { value: '1y',         label: '1-2 yıl' },
-  { value: 'unknown',    label: 'Hiç yapmadım' },
+  { value: '1m',     label: '1 ay' },
+  { value: '1y',     label: '1 yıl' },
+  { value: '5y',     label: '5 yıl' },
+  { value: 'unknown', label: 'Hatırlamıyorum' },
 ]
 
 // ── Grouping ─────────────────────────────────────────────────────────────────
@@ -67,6 +68,25 @@ function buildWizardGroups(diseases, cards) {
   return groups
 }
 
+// Maks 4 tarama / sayfa → pages dizisi
+function buildPages(groups) {
+  const pages = []
+  for (const g of groups) {
+    const chunks = []
+    for (let i = 0; i < g.cards.length; i += 4) chunks.push(g.cards.slice(i, i + 4))
+    chunks.forEach((chunk, idx) => pages.push({
+      key: `${g.key}-${idx}`,
+      groupKey: g.key,
+      label: g.label,
+      icon: g.icon,
+      cards: chunk,
+      pageNum: idx + 1,
+      totalChunks: chunks.length,
+    }))
+  }
+  return pages
+}
+
 // ── Score ─────────────────────────────────────────────────────────────────────
 function calcScore(cards, answers, screeningDates) {
   const total = cards.length
@@ -101,19 +121,17 @@ function ScoreRing({ score }) {
 function ScreeningRow({ card, answer, onAnswer }) {
   return (
     <div className="py-3 border-b border-gray-100 last:border-0">
-      {/* Name */}
       <div className="flex items-center gap-2 mb-2">
         <span className="text-xl shrink-0">{card.icon}</span>
         <span className="font-semibold text-gray-900 text-sm leading-snug">{card.trName}</span>
       </div>
-      {/* Single-row chips */}
       <div className="grid grid-cols-4 gap-1.5">
         {ANSWER_OPTS.map(opt => {
           const sel = answer === opt.value
           return (
             <button key={opt.value}
               onClick={() => onAnswer(card.id, opt.value)}
-              className="py-2 rounded-xl text-xs font-semibold border-2 transition-all text-center leading-tight"
+              className="py-2 rounded-xl text-xs font-semibold border-2 transition-all text-center"
               style={{
                 minHeight: 44,
                 background: sel ? '#0D7377' : '#fff',
@@ -140,22 +158,24 @@ export default function WizardV2() {
 
   const cards  = useMemo(() => getScreeningCards(), [getScreeningCards])
   const groups = useMemo(() => buildWizardGroups(diseases, cards), [diseases, cards])
+  const pages  = useMemo(() => buildPages(groups), [groups])
 
-  // -1 = intro, 0..N-1 = group screens, N = karne
+  // -1 = intro, 0..N-1 = pages, N = karne
   const [step, setStep]     = useState(-1)
   const [answers, setAnswers] = useState({})
   const [animKey, setAnimKey] = useState(0)
 
-  const totalGroups = groups.length
+  const totalPages = pages.length
   const isIntro = step === -1
-  const isKarne = step === totalGroups
-  const group   = (!isIntro && !isKarne) ? groups[step] : null
+  const isKarne = step === totalPages
+  const page    = (!isIntro && !isKarne) ? pages[step] : null
 
   const goNext = useCallback(() => {
-    if (step === totalGroups - 1) applyWizardAnswers(answers)
+    if (step === totalPages - 1) applyWizardAnswers(answers)
     setStep(s => s + 1)
     setAnimKey(k => k + 1)
-  }, [step, totalGroups, answers, applyWizardAnswers])
+    window.scrollTo?.(0, 0)
+  }, [step, totalPages, answers, applyWizardAnswers])
 
   const goPrev = useCallback(() => {
     setStep(s => Math.max(-1, s - 1))
@@ -174,10 +194,14 @@ export default function WizardV2() {
 
     return (
       <div key={`karne-${animKey}`} className="page-enter flex flex-col h-full" style={{ background: '#FAFAF8' }}>
-        <div className="px-5 pt-12 pb-4 bg-white border-b border-gray-100 shrink-0">
-          <h1 className="text-2xl font-bold" style={{ color: '#0D7377' }}>🏆 Sağlık Karnen</h1>
-          <p className="text-sm text-gray-500 mt-0.5">Tarama özeti hazır</p>
+        {/* Teal header */}
+        <div className="px-5 pt-12 pb-6 shrink-0" style={{ background: '#0D7377' }}>
+          <p className="text-white text-opacity-80 text-sm font-medium mb-1" style={{ color: 'rgba(255,255,255,0.8)' }}>
+            Tamamlandı 🎉
+          </p>
+          <h1 className="text-3xl font-extrabold text-white leading-tight">Sağlık Karnen</h1>
         </div>
+
         <div className="flex-1 overflow-y-auto px-5 py-6 flex flex-col gap-4">
           <div className="bg-white rounded-2xl p-6 border border-gray-100 flex flex-col items-center text-center">
             <ScoreRing score={score} />
@@ -185,6 +209,7 @@ export default function WizardV2() {
               <strong>{done}</strong> / {total} tarama güncel
             </p>
           </div>
+
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white rounded-2xl p-4 border border-gray-100 text-center">
               <p className="text-3xl font-extrabold" style={{ color: '#10B981' }}>{done}</p>
@@ -195,6 +220,7 @@ export default function WizardV2() {
               <p className="text-xs font-semibold text-gray-500 mt-1">⚠️ Gerekli</p>
             </div>
           </div>
+
           {score < 70 && (
             <div className="bg-amber-50 rounded-2xl p-4 border border-amber-100">
               <p className="text-sm font-semibold text-amber-700">
@@ -202,6 +228,7 @@ export default function WizardV2() {
               </p>
             </div>
           )}
+
           <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank')}
             className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-white"
             style={{ background: '#25D366', minHeight: 52 }}>
@@ -221,25 +248,31 @@ export default function WizardV2() {
   if (isIntro) {
     return (
       <div key="intro" className="page-enter flex flex-col h-full" style={{ background: '#FAFAF8' }}>
-        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-          <div className="w-20 h-20 rounded-full flex items-center justify-center text-4xl mb-6"
-            style={{ background: '#e8f4f5' }}>🏥</div>
-          <h1 className="text-2xl font-extrabold text-gray-900 mb-2">
-            Sağlık karnenizi çıkaralım
-          </h1>
-          <p className="text-gray-500 text-sm mb-6 leading-relaxed max-w-xs">
-            {totalGroups} adımda hangi taramaları yaptırdığını sor,<br />kişisel sağlık karneni hazırlayalım.
+        {/* Teal header */}
+        <div className="px-5 pt-12 pb-6 shrink-0" style={{ background: '#0D7377' }}>
+          <p className="text-sm font-medium mb-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
+            Sağlık Karnesi
           </p>
-          <div className="flex flex-wrap gap-2 justify-center mb-8">
+          <h1 className="text-3xl font-extrabold text-white leading-tight">
+            Taramalarını Kontrol Edelim
+          </h1>
+        </div>
+
+        <div className="flex-1 flex flex-col justify-center px-6 py-6">
+          <p className="text-gray-600 text-base leading-relaxed mb-6">
+            {totalPages} adımda hangi taramaları yaptırdığını sor — kişisel sağlık karnenizi hazırlayalım.
+          </p>
+          <div className="flex flex-wrap gap-2 mb-8">
             {groups.map(g => (
               <span key={g.key}
-                className="px-3 py-1.5 rounded-full text-xs font-semibold border"
+                className="px-3 py-1.5 rounded-full text-sm font-semibold border"
                 style={{ background: '#e8f4f5', borderColor: '#b2d8da', color: '#0D7377' }}>
                 {g.icon} {g.label}
               </span>
             ))}
           </div>
         </div>
+
         <div className="px-5 pb-6 shrink-0">
           <button onClick={goNext}
             className="w-full py-4 rounded-2xl font-bold text-white text-lg"
@@ -251,43 +284,50 @@ export default function WizardV2() {
     )
   }
 
-  // ── GROUP SCREEN ───────────────────────────────────────────────────────────
-  const isLast = step === totalGroups - 1
+  // ── PAGE SCREEN ────────────────────────────────────────────────────────────
+  const isLast = step === totalPages - 1
+  const subLabel = page.totalChunks > 1 ? ` (${page.pageNum}/${page.totalChunks})` : ''
 
   return (
-    <div key={`g-${animKey}`} className="page-enter flex flex-col h-full" style={{ background: '#FAFAF8' }}>
+    <div key={`p-${animKey}`} className="page-enter flex flex-col h-full" style={{ background: '#FAFAF8' }}>
 
-      {/* Progress bar */}
-      <div className="h-1 bg-gray-200 shrink-0">
-        <div className="h-1 transition-all duration-400"
-          style={{ width: `${((step + 1) / totalGroups) * 100}%`, background: '#0D7377' }} />
-      </div>
-
-      {/* Fixed header */}
-      <div className="px-5 pt-5 pb-4 bg-white border-b border-gray-100 shrink-0">
-        <div className="flex items-center justify-between mb-3">
+      {/* Teal header — büyük, göze çarpan */}
+      <div className="px-5 pt-10 pb-5 shrink-0" style={{ background: '#0D7377' }}>
+        <div className="flex items-center justify-between mb-4">
           <button onClick={goPrev}
-            className="text-sm text-gray-400 font-medium"
-            style={{ minHeight: 44, minWidth: 44 }}
+            className="text-sm font-medium flex items-center gap-1"
+            style={{ color: 'rgba(255,255,255,0.75)', minHeight: 44, minWidth: 44 }}
             aria-label="Geri">
             ← Geri
           </button>
-          <span className="text-xs text-gray-400 font-semibold">
-            {step + 1} / {totalGroups}
+          <span className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.65)' }}>
+            {step + 1} / {totalPages}
           </span>
         </div>
-        <p className="text-xs font-bold uppercase tracking-widest mb-0.5"
-          style={{ color: '#0D7377' }}>
-          {group.icon} {group.label} İçin
-        </p>
-        <h1 className="text-xl font-extrabold text-gray-900 leading-tight">
-          Taramalarını Kontrol Edelim
-        </h1>
+
+        {/* İlerleme çubuğu */}
+        <div className="w-full h-1 rounded-full mb-4" style={{ background: 'rgba(255,255,255,0.25)' }}>
+          <div className="h-1 rounded-full transition-all duration-400"
+            style={{ width: `${((step + 1) / totalPages) * 100}%`, background: 'white' }} />
+        </div>
+
+        {/* Büyük icon + hastalık adı */}
+        <div className="flex items-center gap-3">
+          <span className="text-4xl">{page.icon}</span>
+          <div>
+            <h1 className="text-2xl font-extrabold text-white leading-tight">
+              {page.label}{subLabel}
+            </h1>
+            <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>
+              taramalarını kontrol edelim
+            </p>
+          </div>
+        </div>
       </div>
 
-      {/* Scrollable screening list */}
-      <div className="flex-1 overflow-y-auto px-5 py-2">
-        {group.cards.map(card => (
+      {/* Tarama listesi */}
+      <div className="flex-1 overflow-y-auto px-5 py-3 bg-white">
+        {page.cards.map(card => (
           <ScreeningRow
             key={card.id}
             card={card}
@@ -295,10 +335,9 @@ export default function WizardV2() {
             onAnswer={handleAnswer}
           />
         ))}
-        <div className="h-4" />
       </div>
 
-      {/* Fixed footer */}
+      {/* Devam butonu */}
       <div className="px-5 py-4 bg-white border-t border-gray-100 shrink-0">
         <button onClick={goNext}
           className="w-full py-4 rounded-2xl font-bold text-white text-base"

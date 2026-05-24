@@ -66,7 +66,7 @@ const useAppStoreV2 = create(
         for (const s of list) {
           const ans = answers[s.id]
           if (!ans || ans === 'unknown') continue
-          const monthsAgo = { 'this_month': 0, '6m': 6, '1y': 12, '2y': 24 }[ans] ?? 0
+          const monthsAgo = { 'this_month': 0, '1m': 1, '6m': 6, '1y': 12, '2y': 24, '5y': 60 }[ans] ?? 0
           const lastDate = new Date(today)
           lastDate.setMonth(lastDate.getMonth() - monthsAgo)
           const lastDoneDate = lastDate.toISOString().slice(0, 10)
