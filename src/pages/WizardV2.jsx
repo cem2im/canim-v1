@@ -121,12 +121,12 @@ function ScoreRing({ score }) {
 function ScreeningRow({ card, answer, onAnswer }) {
   return (
     <div className="py-3 border-b border-gray-100 last:border-0">
-      {/* Single-line question */}
-      <p className="text-sm font-semibold text-gray-800 leading-snug mb-2">
-        <span className="mr-1">{card.icon}</span>
-        <span className="font-bold">{card.trName}</span>
-        <span className="text-gray-400 font-normal"> — ne zaman?</span>
-      </p>
+      {/* Question */}
+      <div className="flex items-center gap-1.5 mb-1">
+        <span className="text-base shrink-0">{card.icon}</span>
+        <span className="font-bold text-gray-900 text-sm leading-tight">{card.trName}</span>
+      </div>
+      <p className="text-xs text-gray-500 mb-2 pl-6">Ne zaman yaptırdınız?</p>
       {/* Answer chips — single row */}
       <div className="grid grid-cols-4 gap-1.5">
         {ANSWER_OPTS.map(opt => {
