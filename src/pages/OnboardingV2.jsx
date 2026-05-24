@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { DISEASE_LIST } from '../data/screenings'
 import { buildScreeningList } from '../utils/engine'
@@ -30,98 +30,66 @@ const CANCER_IDS = [
 
 const validDiseaseIds = new Set(DISEASE_LIST.map(d => d.id))
 
-// ── Year Picker (drum / scroll wheel) ────────────────────────────────────
-// value=null → no selection yet (wheel positioned at 1975 but nothing highlighted)
+// ── Year Input (numpad) ───────────────────────────────────────────────────
 function YearPicker({ value, onChange }) {
-  const YEARS = Array.from({ length: 2006 - 1940 + 1 }, (_, i) => 1940 + i)
-  const ITEM_H = 60
-  const VISIBLE = 5
-  const containerH = ITEM_H * VISIBLE
-  const padding = containerH / 2 - ITEM_H / 2
+  const currentYear = new Date().getFullYear()
+  const MIN_YEAR = 1930
+  const MAX_YEAR = currentYear - 10  // en az 10 yaşında
 
-  const scrollRef = useRef(null)
-  const debounceRef = useRef(null)
+  const [raw, setRaw] = useState(value ? String(value) : '')
 
-  // Scroll to value on mount; if null, start at 1975 (middle) without selecting
-  useEffect(() => {
-    const startYear = value ?? 1975
-    const idx = YEARS.indexOf(startYear)
-    if (idx !== -1 && scrollRef.current) {
-      scrollRef.current.scrollTop = idx * ITEM_H
+  const handleChange = (e) => {
+    const digits = e.target.value.replace(/\D/g, '').slice(0, 4)
+    setRaw(digits)
+    if (digits.length === 4) {
+      const y = parseInt(digits, 10)
+      if (y >= MIN_YEAR && y <= MAX_YEAR) {
+        onChange(y)
+      } else {
+        onChange(null)
+      }
+    } else {
+      onChange(null)
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const handleScroll = useCallback(() => {
-    clearTimeout(debounceRef.current)
-    debounceRef.current = setTimeout(() => {
-      if (!scrollRef.current) return
-      const idx = Math.round(scrollRef.current.scrollTop / ITEM_H)
-      const clamped = Math.max(0, Math.min(idx, YEARS.length - 1))
-      scrollRef.current.scrollTo({ top: clamped * ITEM_H, behavior: 'smooth' })
-      onChange(YEARS[clamped])
-    }, 120)
-  }, [onChange, YEARS])
-
-  const scrollTo = (y) => {
-    const idx = YEARS.indexOf(y)
-    if (idx !== -1) scrollRef.current?.scrollTo({ top: idx * ITEM_H, behavior: 'smooth' })
-    onChange(y)
   }
 
+  const year = raw.length === 4 ? parseInt(raw, 10) : null
+  const isValid = year != null && year >= MIN_YEAR && year <= MAX_YEAR
+  const isError = raw.length === 4 && !isValid
+
   return (
-    <div style={{ position: 'relative', width: 220, height: containerH }}>
-      {/* Top fade */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, right: 0,
-        height: padding + ITEM_H * 0.6,
-        background: 'linear-gradient(to bottom, #FAFAF8 40%, transparent)',
-        pointerEvents: 'none', zIndex: 2,
-      }} />
-      {/* Bottom fade */}
-      <div style={{
-        position: 'absolute', bottom: 0, left: 0, right: 0,
-        height: padding + ITEM_H * 0.6,
-        background: 'linear-gradient(to top, #FAFAF8 40%, transparent)',
-        pointerEvents: 'none', zIndex: 2,
-      }} />
-      {/* Selection highlight box — only visible after user has selected */}
-      <div style={{
-        position: 'absolute', top: '50%', left: 20, right: 20,
-        height: ITEM_H, transform: 'translateY(-50%)',
-        border: `2.5px solid ${value != null ? '#0D7377' : '#D1D5DB'}`,
-        borderRadius: 18,
-        pointerEvents: 'none', zIndex: 2,
-        transition: 'border-color 0.2s',
-      }} />
-      {/* Scrollable list */}
-      <div
-        ref={scrollRef}
-        onScroll={handleScroll}
-        className="year-picker-scroll"
+    <div style={{ width: '100%', maxWidth: 280, textAlign: 'center' }}>
+      <input
+        type="tel"
+        inputMode="numeric"
+        pattern="[0-9]{4}"
+        maxLength={4}
+        value={raw}
+        onChange={handleChange}
+        placeholder="örn. 1985"
+        autoFocus
         style={{
-          height: '100%', overflowY: 'scroll', overflowX: 'hidden',
-          scrollSnapType: 'y mandatory',
-          paddingTop: padding, paddingBottom: padding,
-          WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none',
+          width: '100%',
+          fontSize: 56,
+          fontWeight: 800,
+          textAlign: 'center',
+          color: isError ? '#EF4444' : isValid ? '#0D7377' : '#1F2937',
+          background: 'transparent',
+          border: 'none',
+          borderBottom: `3px solid ${isError ? '#EF4444' : isValid ? '#0D7377' : '#D1D5DB'}`,
+          outline: 'none',
+          letterSpacing: '0.1em',
+          padding: '8px 0',
+          transition: 'border-color 0.2s, color 0.2s',
         }}
-      >
-        {YEARS.map(y => {
-          const sel = value != null && y === value
-          return (
-            <div key={y}
-              onClick={() => scrollTo(y)}
-              style={{
-                height: ITEM_H, scrollSnapAlign: 'center',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: sel ? 44 : 24, fontWeight: sel ? 800 : 400,
-                color: sel ? '#0D7377' : '#9CA3AF',
-                transition: 'font-size 0.15s, color 0.15s, font-weight 0.15s',
-                cursor: 'pointer', userSelect: 'none',
-              }}
-            >{y}</div>
-          )
-        })}
-      </div>
+        aria-label="Doğum yılı"
+        aria-invalid={isError}
+      />
+      {isError && (
+        <p style={{ color: '#EF4444', fontSize: 14, marginTop: 8 }}>
+          {raw && parseInt(raw) > MAX_YEAR ? `En fazla ${MAX_YEAR} olabilir` : `${MIN_YEAR}–${MAX_YEAR} arası bir yıl girin`}
+        </p>
+      )}
     </div>
   )
 }
@@ -331,8 +299,8 @@ export default function OnboardingV2() {
           <h1 className="text-3xl font-bold text-center mb-1" style={{color:'#0D7377'}}>
             {giftMode ? `${giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} doğum yılı?` : 'Doğum yılınız?'}
           </h1>
-          <p className="text-base mb-6" style={{color: yearValid ? '#6B7280' : '#9CA3AF'}}>
-            {yearValid ? `${age} yaşında` : 'Kaydırarak seçin ↕'}
+          <p className="text-base mb-8" style={{color: yearValid ? '#0D7377' : '#9CA3AF', fontWeight: yearValid ? 700 : 400}}>
+            {yearValid ? `${age} yaşında` : '4 rakam girin'}
           </p>
           <YearPicker value={selectedYear} onChange={setSelectedYear} />
           <button
