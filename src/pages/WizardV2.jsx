@@ -120,17 +120,15 @@ function ScoreRing({ score }) {
 // ── Compact screening row ────────────────────────────────────────────────────
 function ScreeningRow({ card, answer, onAnswer }) {
   return (
-    <div className="py-4 border-b border-gray-100 last:border-0">
-      {/* Question */}
-      <div className="flex items-start gap-2 mb-1">
-        <span className="text-xl shrink-0 mt-0.5">{card.icon}</span>
-        <div>
-          <p className="font-bold text-gray-900 text-sm leading-snug">{card.trName}</p>
-          <p className="text-xs text-gray-500 mt-0.5">Ne zaman yaptırdınız?</p>
-        </div>
-      </div>
+    <div className="py-3 border-b border-gray-100 last:border-0">
+      {/* Single-line question */}
+      <p className="text-sm font-semibold text-gray-800 leading-snug mb-2">
+        <span className="mr-1">{card.icon}</span>
+        <span className="font-bold">{card.trName}</span>
+        <span className="text-gray-400 font-normal"> — ne zaman?</span>
+      </p>
       {/* Answer chips — single row */}
-      <div className="grid grid-cols-4 gap-1.5 mt-2 pl-8">
+      <div className="grid grid-cols-4 gap-1.5">
         {ANSWER_OPTS.map(opt => {
           const sel = answer === opt.value
           return (
@@ -138,7 +136,7 @@ function ScreeningRow({ card, answer, onAnswer }) {
               onClick={() => onAnswer(card.id, opt.value)}
               className="py-2 rounded-xl text-xs font-bold border-2 transition-all text-center"
               style={{
-                minHeight: 44,
+                minHeight: 40,
                 background: sel ? '#0D7377' : '#fff',
                 color: sel ? '#fff' : '#4B5563',
                 borderColor: sel ? '#0D7377' : '#E5E7EB',
@@ -302,8 +300,8 @@ export default function WizardV2() {
   return (
     <div key={`p-${animKey}`} className="page-enter flex flex-col h-full" style={{ background: '#FAFAF8' }}>
 
-      {/* Teal header — büyük, göze çarpan */}
-      <div className="px-5 pt-10 pb-5 shrink-0" style={{ background: '#0D7377' }}>
+      {/* Teal header */}
+      <div className="px-5 pt-8 pb-4 shrink-0" style={{ background: '#0D7377' }}>
         <div className="flex items-center justify-between mb-4">
           <button onClick={goPrev}
             className="text-sm font-medium flex items-center gap-1"
@@ -322,14 +320,14 @@ export default function WizardV2() {
             style={{ width: `${((step + 1) / totalPages) * 100}%`, background: 'white' }} />
         </div>
 
-        {/* Büyük icon + hastalık adı */}
-        <div className="flex items-center gap-3">
-          <span className="text-4xl">{page.icon}</span>
+        {/* Icon + hastalık adı */}
+        <div className="flex items-center gap-2">
+          <span className="text-2xl">{page.icon}</span>
           <div>
-            <h1 className="text-2xl font-extrabold text-white leading-tight">
+            <h1 className="text-lg font-extrabold text-white leading-tight">
               {page.label}{subLabel}
             </h1>
-            <p className="text-sm font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>
+            <p className="text-xs font-medium" style={{ color: 'rgba(255,255,255,0.75)' }}>
               taramalarını kontrol edelim
             </p>
           </div>
