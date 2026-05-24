@@ -220,6 +220,17 @@ a, button, [role="button"], input, textarea, select {
   transform: translateY(0);
 }
 
+.btn--outline-white {
+  background: transparent;
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,0.6);
+  font-weight: 600;
+}
+.btn--outline-white:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: #fff;
+}
+
 .btn--whatsapp {
   background: #25D366;
   color: #fff;

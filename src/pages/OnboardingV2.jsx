@@ -206,19 +206,37 @@ function CancerSheet({ sex, selectedCancerIds, onToggle, onClose }) {
   )
 }
 
+// Gift mode label helpers
+function getGiftLabels(forParam) {
+  const map = {
+    anne:  { isim: 'annen',   isimIn: 'annenin',   sex: 'F', year: 1960 },
+    baba:  { isim: 'baban',   isimIn: 'babanın',   sex: 'M', year: 1958 },
+    es:    { isim: 'eşin',    isimIn: 'eşinin',    sex: null, year: 1975 },
+    cocuk: { isim: 'çocuğun', isimIn: 'çocuğunun', sex: null, year: 2005 },
+  }
+  return map[forParam] || { isim: 'yakının', isimIn: 'yakınının', sex: null, year: 1970 }
+}
+
 export default function OnboardingV2() {
   const completeOnboarding = useAppStoreV2(s => s.completeOnboarding)
   const [step, setStep] = useState(1)
 
+  // Gift mode — read URL param once
+  const giftFor = new URLSearchParams(window.location.search).get('for')
+  const giftMode = !!giftFor
+  const giftLabels = giftMode ? getGiftLabels(giftFor) : null
+
   // Step 1 state
-  const [selectedYear, setSelectedYear] = useState(1985)
+  const [selectedYear, setSelectedYear] = useState(
+    giftMode ? giftLabels.year : 1985
+  )
   const currentYear = new Date().getFullYear()
   const yearNum = selectedYear
   const yearValid = true  // wheel only exposes valid years
   const age = currentYear - selectedYear
 
-  // Step 2 state
-  const [sex, setSex] = useState(null)
+  // Step 2 state — pre-select sex in gift mode if known
+  const [sex, setSex] = useState(giftMode && giftLabels.sex ? giftLabels.sex : null)
 
   // Step 3 state
   const [selectedDiseases, setSelectedDiseases] = useState([])
@@ -258,10 +276,22 @@ export default function OnboardingV2() {
     return buildScreeningList(allDiseases, profile).length
   })()
 
+  const [giftSharing, setGiftSharing] = useState(false)
+
   const handleComplete = () => {
+    if (giftMode) {
+      setGiftSharing(true)
+      return
+    }
     const profile = { birthYear: yearNum, sex }
     const allDiseases = selectedDiseases.filter(d => validDiseaseIds.has(d))
     completeOnboarding(profile, allDiseases, smokingStatus)
+  }
+
+  const handleGiftWhatsApp = () => {
+    const isim = giftLabels.isim
+    const msg = `${isim.charAt(0).toUpperCase() + isim.slice(1)} için Canım'da sağlık tarama planı oluşturdum — ${screeningCount} tarama belirlendi. Sen de 2 dakikada kendi karnenizi çıkar: https://canim.uzunyasa.com/app/`
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank')
   }
 
   // Rows to display (filter out unknown disease IDs)
@@ -289,7 +319,9 @@ export default function OnboardingV2() {
       {step === 1 && (
         <div className="flex-1 flex flex-col items-center justify-center px-6 page-enter" style={{gap:0}}>
           <p className="text-gray-500 text-sm mb-3">Adım 1 / 4</p>
-          <h1 className="text-3xl font-bold text-center mb-1" style={{color:'#0D7377'}}>Doğum yılınız?</h1>
+          <h1 className="text-3xl font-bold text-center mb-1" style={{color:'#0D7377'}}>
+            {giftMode ? `${giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} doğum yılı?` : 'Doğum yılınız?'}
+          </h1>
           <p className="text-gray-500 text-base mb-6">{age} yaşında</p>
           <YearPicker value={selectedYear} onChange={setSelectedYear} />
           <button
@@ -304,7 +336,9 @@ export default function OnboardingV2() {
       {step === 2 && (
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 page-enter">
           <p className="text-gray-600 text-sm mb-2">Adım 2 / 4</p>
-          <h1 className="text-3xl font-bold text-center mb-10" style={{color:'#0D7377'}}>Cinsiyetiniz?</h1>
+          <h1 className="text-3xl font-bold text-center mb-10" style={{color:'#0D7377'}}>
+            {giftMode ? `${giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} cinsiyeti?` : 'Cinsiyetiniz?'}
+          </h1>
           <div className="w-full max-w-xs space-y-4">
             <button onClick={() => { setSex('F'); setStep(3) }}
               className="w-full py-5 rounded-2xl text-2xl font-semibold border-2 transition-all"
@@ -324,7 +358,9 @@ export default function OnboardingV2() {
         <div className="flex-1 flex flex-col px-0 page-enter">
           <div className="px-5 pt-6 pb-2">
             <p className="text-gray-600 text-sm mb-1">Adım 3 / 4</p>
-            <h1 className="text-2xl font-bold" style={{color:'#0D7377'}}>Sağlık durumunuz?</h1>
+            <h1 className="text-2xl font-bold" style={{color:'#0D7377'}}>
+              {giftMode ? `${giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} sağlık durumu?` : 'Sağlık durumunuz?'}
+            </h1>
             <p className="text-gray-600 text-sm mt-1">Birden fazla seçebilirsiniz</p>
           </div>
 
@@ -409,20 +445,59 @@ export default function OnboardingV2() {
         </div>
       )}
 
-      {/* ── STEP 4 — Hazır ── */}
-      {step === 4 && (
+      {/* ── STEP 4 — Hazır / Gift Share ── */}
+      {step === 4 && !giftSharing && (
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 page-enter text-center">
           <div className="w-24 h-24 rounded-full flex items-center justify-center text-5xl mb-6 animate-[popIn_0.5s_ease-out]"
             style={{background:'linear-gradient(135deg,#0D7377,#14919B)'}}>
             ✓
           </div>
           <h1 className="text-4xl font-bold mb-3" style={{color:'#0D7377'}}>Hazır! 🎉</h1>
-          <p className="text-2xl font-semibold text-gray-800 mb-2">Senin için {screeningCount} tarama belirlendi</p>
+          <p className="text-2xl font-semibold text-gray-800 mb-2">
+            {giftMode
+              ? `${giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} için ${screeningCount} tarama belirlendi`
+              : `Senin için ${screeningCount} tarama belirlendi`}
+          </p>
           <p className="text-gray-600 text-base max-w-xs">Düzenli takip, hastalıkları erken yakalamanın en etkili yolu.</p>
           <button onClick={handleComplete}
             className="mt-10 w-full max-w-xs py-4 rounded-2xl text-lg font-bold text-white shadow-lg"
             style={{background:'linear-gradient(135deg,#0D7377,#14919B)'}}>
-            Listemi Gör →
+            {giftMode ? `${giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} karnesini gönder →` : 'Listemi Gör →'}
+          </button>
+        </div>
+      )}
+
+      {/* ── GIFT SHARE SCREEN ── */}
+      {giftSharing && (
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 page-enter text-center">
+          <div className="text-6xl mb-6">💚</div>
+          <h1 className="text-3xl font-bold mb-2" style={{color:'#0D7377'}}>
+            {giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} karnesi hazır!
+          </h1>
+          <p className="text-xl font-semibold text-gray-800 mb-1">{screeningCount} tarama belirlendi</p>
+          <p className="text-gray-500 text-sm mb-8 max-w-xs">
+            Şimdi {giftLabels.isim}e gönder — 2 dakikada kendi karnesini çıkarsın.
+          </p>
+
+          {/* WhatsApp share */}
+          <button onClick={handleGiftWhatsApp}
+            className="w-full max-w-xs py-4 rounded-2xl text-lg font-bold text-white flex items-center justify-center gap-3 mb-4 shadow-lg"
+            style={{background:'#25D366'}}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+            </svg>
+            WhatsApp'ta Gönder
+          </button>
+
+          <button
+            onClick={() => {
+              const profile = { birthYear: yearNum, sex }
+              const allDiseases = selectedDiseases.filter(d => validDiseaseIds.has(d))
+              completeOnboarding(profile, allDiseases, smokingStatus)
+            }}
+            className="w-full max-w-xs py-3 rounded-2xl text-base font-semibold border-2"
+            style={{borderColor:'#0D7377', color:'#0D7377', background:'white'}}>
+            Benim karnem için de oluştur →
           </button>
         </div>
       )}
