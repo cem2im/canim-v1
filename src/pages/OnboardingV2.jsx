@@ -243,32 +243,37 @@ export default function OnboardingV2() {
   const [sex, setSex] = useState(giftMode && giftLabels.sex ? giftLabels.sex : null)
 
   // Step 3 state
-  const [selectedDiseases, setSelectedDiseases] = useState([])
+  // diseaseAnswers: { [diseaseRowId]: 'var' | 'yok' } — explicit answer per disease row
+  const [diseaseAnswers, setDiseaseAnswers] = useState({})
+  const [cancerIds, setCancerIds] = useState([])   // multi-select from CancerSheet
   const [smokingStatus, setSmokingStatus] = useState(null)
   const [showBMISheet, setShowBMISheet] = useState(false)
   const [showCancerSheet, setShowCancerSheet] = useState(false)
-  const [smokingError, setSmokingError] = useState(false)
 
-  const toggleDisease = (id) => {
-    setSelectedDiseases(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    )
-  }
+  const setDiseaseAnswer = (id, val) =>
+    setDiseaseAnswers(prev => ({ ...prev, [id]: val }))
 
-  const selectedCancerIds = selectedDiseases.filter(d =>
-    CANCER_IDS.some(c => c.id === d)
-  )
-  const cancerCount = selectedCancerIds.length
+  const handleCancerToggle = (id) =>
+    setCancerIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id])
 
-  const handleCancerToggle = (id) => {
-    setSelectedDiseases(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    )
-  }
+  const cancerCount = cancerIds.length
+
+  // Derived: all disease IDs that are 'var' + selected cancer IDs
+  const selectedDiseases = [
+    ...Object.entries(diseaseAnswers).filter(([, v]) => v === 'var').map(([k]) => k),
+    ...cancerIds,
+  ]
+
+  const visibleDiseaseRows_count = DISEASE_ROWS.filter(d =>
+    d.id === 'obezite' || validDiseaseIds.has(d.id)
+  ).length
+  const allDiseaseAnswered = visibleDiseaseRows_count > 0 &&
+    DISEASE_ROWS.filter(d => d.id === 'obezite' || validDiseaseIds.has(d.id))
+      .every(d => diseaseAnswers[d.id] != null)
+  const step3Valid = allDiseaseAnswered && !!smokingStatus
 
   const handleListemiGoster = () => {
-    if (!smokingStatus) { setSmokingError(true); return }
-    setSmokingError(false)
+    if (!step3Valid) return
     setStep(4)
   }
 
@@ -368,84 +373,107 @@ export default function OnboardingV2() {
             <h1 className="text-2xl font-bold" style={{color:'#0D7377'}}>
               {giftMode ? `${giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} sağlık durumu?` : 'Sağlık durumunuz?'}
             </h1>
-            <p className="text-gray-600 text-sm mt-1">Birden fazla seçebilirsiniz</p>
+            <p className="text-gray-500 text-sm mt-1">Her satır için cevap verin</p>
           </div>
 
           <div className="flex-1 overflow-y-auto px-5 pb-4">
-            <div className="space-y-2 mt-2">
+            <div className="space-y-3 mt-2">
               {visibleDiseaseRows.map(d => {
-                const selected = selectedDiseases.includes(d.id)
+                const ans = diseaseAnswers[d.id]
                 const isObezite = d.id === 'obezite'
                 return (
-                  <div key={d.id}
-                    className="flex items-center rounded-2xl border transition-all"
-                    style={selected ? {background:'#0D7377',borderColor:'#0D7377',color:'white'} : {background:'white',borderColor:'#E5E7EB',color:'#1F2937'}}>
-                    <button
-                      className="flex-1 flex items-center gap-3 px-4 py-4 text-left"
-                      style={{minHeight:44}}
-                      onClick={() => toggleDisease(d.id)}
-                      aria-pressed={selected}>
-                      <span className="text-2xl">{d.icon}</span>
-                      <span className="font-medium text-base">{d.label}</span>
-                    </button>
-                    {isObezite && (
-                      <button onClick={() => setShowBMISheet(true)}
-                        className="px-4 py-4 text-sm font-bold rounded-r-2xl"
-                        style={{color: selected ? 'white' : '#0D7377', minWidth:44, minHeight:44}}
-                        aria-label="BMI hesaplayıcıyı aç">?</button>
-                    )}
+                  <div key={d.id} className="bg-white rounded-2xl border px-4 py-3"
+                    style={{borderColor: ans ? '#0D7377' : '#E5E7EB'}}>
+                    {/* Disease label row */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">{d.icon}</span>
+                      <span className="font-semibold text-gray-900 text-base flex-1">{d.label}</span>
+                      {isObezite && (
+                        <button onClick={() => setShowBMISheet(true)}
+                          className="text-xs font-bold px-2 py-1 rounded-lg"
+                          style={{color:'#0D7377', background:'#e8f4f5', minHeight:32}}
+                          aria-label="BMI hesapla">BMI?</button>
+                      )}
+                    </div>
+                    {/* Var / Yok chips */}
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        onClick={() => setDiseaseAnswer(d.id, 'var')}
+                        className="py-2 rounded-xl text-sm font-bold border-2 transition-all"
+                        style={{
+                          minHeight: 44,
+                          background: ans === 'var' ? '#0D7377' : '#fff',
+                          color: ans === 'var' ? '#fff' : '#374151',
+                          borderColor: ans === 'var' ? '#0D7377' : '#E5E7EB',
+                        }}
+                        aria-pressed={ans === 'var'}>✓ Var</button>
+                      <button
+                        onClick={() => setDiseaseAnswer(d.id, 'yok')}
+                        className="py-2 rounded-xl text-sm font-bold border-2 transition-all"
+                        style={{
+                          minHeight: 44,
+                          background: ans === 'yok' ? '#6B7280' : '#fff',
+                          color: ans === 'yok' ? '#fff' : '#374151',
+                          borderColor: ans === 'yok' ? '#6B7280' : '#E5E7EB',
+                        }}
+                        aria-pressed={ans === 'yok'}>Yok / Bilmiyorum</button>
+                    </div>
                   </div>
                 )
               })}
 
-              {/* Cancer history row */}
-              <div
-                className="flex items-center rounded-2xl border bg-white transition-all"
-                style={{borderColor:'#E5E7EB'}}>
-                <button
-                  className="flex-1 flex items-center gap-3 px-4 py-4 text-left"
-                  style={{minHeight:44}}
-                  onClick={() => setShowCancerSheet(true)}>
-                  <span className="text-2xl">🧬</span>
-                  <div>
-                    <span className="font-medium text-base">Ailede Kanser Öyküsü</span>
-                    {cancerCount > 0 && (
-                      <p className="text-sm mt-0.5" style={{color:'#0D7377'}}>{cancerCount} seçenek işaretlendi ✓</p>
-                    )}
-                  </div>
+              {/* Cancer history row — optional, opens sheet */}
+              <div className="bg-white rounded-2xl border px-4 py-3" style={{borderColor:'#E5E7EB'}}>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xl">🧬</span>
+                  <span className="font-semibold text-gray-900 text-base flex-1">Ailede Kanser Öyküsü</span>
+                  <span className="text-xs text-gray-400">isteğe bağlı</span>
+                </div>
+                <button onClick={() => setShowCancerSheet(true)}
+                  className="w-full py-2 rounded-xl text-sm font-semibold border-2 transition-all text-left px-3"
+                  style={{
+                    minHeight: 44,
+                    background: cancerCount > 0 ? '#e8f4f5' : '#fff',
+                    color: cancerCount > 0 ? '#0D7377' : '#6B7280',
+                    borderColor: cancerCount > 0 ? '#0D7377' : '#E5E7EB',
+                  }}>
+                  {cancerCount > 0 ? `✓ ${cancerCount} kanser türü seçildi — değiştir ›` : 'Var ise seçmek için dokunun ›'}
                 </button>
-                <span className="px-4 text-gray-600 text-lg">›</span>
               </div>
             </div>
 
             {/* Smoking */}
-            <div className="mt-6">
-              <p className="font-semibold text-gray-800 mb-3">Sigara kullanıyor musunuz?</p>
-              <div className="flex gap-2">
+            <div className="mt-5 bg-white rounded-2xl border px-4 py-3" style={{borderColor: smokingStatus ? '#0D7377' : '#E5E7EB'}}>
+              <p className="font-semibold text-gray-900 mb-2">Sigara kullanıyor musunuz?</p>
+              <div className="grid grid-cols-3 gap-2">
                 {[
                   { id: 'yes', label: '🚬 Evet' },
                   { id: 'no',  label: '✓ Hayır' },
                   { id: 'quit',label: '⏳ Bıraktım' },
                 ].map(opt => (
                   <button key={opt.id}
-                    onClick={() => { setSmokingStatus(opt.id); setSmokingError(false) }}
-                    className="flex-1 py-3 rounded-2xl text-sm font-semibold border transition-all"
-                    style={smokingStatus === opt.id
-                      ? {background:'#0D7377',color:'white',borderColor:'#0D7377'}
-                      : {background:'white',color:'#374151',borderColor:'#D1D5DB'}}
+                    onClick={() => setSmokingStatus(opt.id)}
+                    className="py-2 rounded-xl text-sm font-bold border-2 transition-all"
+                    style={{
+                      minHeight: 44,
+                      background: smokingStatus === opt.id ? '#0D7377' : '#fff',
+                      color: smokingStatus === opt.id ? '#fff' : '#374151',
+                      borderColor: smokingStatus === opt.id ? '#0D7377' : '#E5E7EB',
+                    }}
                     aria-pressed={smokingStatus === opt.id}>{opt.label}</button>
                 ))}
               </div>
-              {smokingError && (
-                <p className="text-red-600 text-sm mt-2" role="alert">Sigara sorusunu yanıtlayın</p>
-              )}
             </div>
           </div>
 
           <div className="px-5 pb-6 pt-2 border-t border-gray-100 bg-white/80 backdrop-blur">
+            {!step3Valid && (
+              <p className="text-center text-sm text-gray-400 mb-2">Tüm soruları yanıtlayın</p>
+            )}
             <button onClick={handleListemiGoster}
-              className="w-full py-4 rounded-2xl text-lg font-bold text-white"
-              style={{background:'#0D7377'}}>
+              disabled={!step3Valid}
+              className="w-full py-4 rounded-2xl text-lg font-bold text-white transition-opacity"
+              style={{background:'#0D7377', opacity: step3Valid ? 1 : 0.35, cursor: step3Valid ? 'pointer' : 'not-allowed'}}>
               Listemi Göster →
             </button>
           </div>
@@ -514,17 +542,15 @@ export default function OnboardingV2() {
         <BMISheet
           onClose={() => setShowBMISheet(false)}
           onApply={(shouldSelect) => {
-            if (shouldSelect && !selectedDiseases.includes('obezite')) {
-              setSelectedDiseases(prev => [...prev, 'obezite'])
-            }
+            setDiseaseAnswer('obezite', shouldSelect ? 'var' : 'yok')
           }}
-          initialSelected={selectedDiseases.includes('obezite')}
+          initialSelected={diseaseAnswers['obezite'] === 'var'}
         />
       )}
       {showCancerSheet && (
         <CancerSheet
           sex={sex}
-          selectedCancerIds={selectedCancerIds}
+          selectedCancerIds={cancerIds}
           onToggle={handleCancerToggle}
           onClose={() => setShowCancerSheet(false)}
         />
