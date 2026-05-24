@@ -336,94 +336,79 @@ export default function OnboardingV2() {
       {/* ── STEP 3 — Sağlık Durumu ── */}
       {step === 3 && (
         <div className="flex-1 flex flex-col px-0 page-enter">
-          <div className="px-5 pt-6 pb-2">
-            <p className="text-gray-600 text-sm mb-1">Adım 3 / 4</p>
-            <h1 className="text-2xl font-bold" style={{color:'#0D7377'}}>
+          <div className="px-5 pt-4 pb-2">
+            <p className="text-gray-500 text-xs mb-0.5">Adım 3 / 4</p>
+            <h1 className="text-xl font-bold" style={{color:'#0D7377'}}>
               {giftMode ? `${giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} sağlık durumu?` : 'Sağlık durumunuz?'}
             </h1>
-            <p className="text-gray-500 text-sm mt-1">Her satır için cevap verin</p>
+            <p className="text-gray-400 text-xs mt-0.5">Her satır için cevap verin</p>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-5 pb-4">
-            <div className="space-y-3 mt-2">
-              {visibleDiseaseRows.map(d => {
-                const ans = diseaseAnswers[d.id]
-                const isObezite = d.id === 'obezite'
-                return (
-                  <div key={d.id} className="bg-white rounded-2xl border px-4 py-3"
-                    style={{borderColor: ans ? '#0D7377' : '#E5E7EB'}}>
-                    {/* Disease label row */}
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xl">{d.icon}</span>
-                      <span className="font-semibold text-gray-900 text-base flex-1">{d.label}</span>
-                      {isObezite && (
-                        <button onClick={() => setShowBMISheet(true)}
-                          className="text-xs font-bold px-2 py-1 rounded-lg"
-                          style={{color:'#0D7377', background:'#e8f4f5', minHeight:32}}
-                          aria-label="BMI hesapla">BMI?</button>
-                      )}
-                    </div>
-                    {/* Var / Yok chips */}
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={() => setDiseaseAnswer(d.id, 'var')}
-                        className="py-2 rounded-xl text-sm font-bold border-2 transition-all"
-                        style={{
-                          minHeight: 44,
-                          background: ans === 'var' ? '#0D7377' : '#fff',
-                          color: ans === 'var' ? '#fff' : '#374151',
-                          borderColor: ans === 'var' ? '#0D7377' : '#E5E7EB',
-                        }}
-                        aria-pressed={ans === 'var'}>✓ Var</button>
-                      <button
-                        onClick={() => setDiseaseAnswer(d.id, 'yok')}
-                        className="py-2 rounded-xl text-sm font-bold border-2 transition-all"
-                        style={{
-                          minHeight: 44,
-                          background: ans === 'yok' ? '#6B7280' : '#fff',
-                          color: ans === 'yok' ? '#fff' : '#374151',
-                          borderColor: ans === 'yok' ? '#6B7280' : '#E5E7EB',
-                        }}
-                        aria-pressed={ans === 'yok'}>Yok / Bilmiyorum</button>
-                    </div>
+          <div className="flex-1 px-4 pb-2 flex flex-col gap-1 overflow-hidden">
+            {visibleDiseaseRows.map(d => {
+              const ans = diseaseAnswers[d.id]
+              const isObezite = d.id === 'obezite'
+              return (
+                <div key={d.id} className="flex items-center gap-2 bg-white rounded-2xl px-3"
+                  style={{minHeight: 46, border: `2px solid ${ans ? '#0D7377' : '#E5E7EB'}`}}>
+                  <span className="text-lg shrink-0">{d.icon}</span>
+                  <span className="font-semibold text-gray-900 text-sm flex-1 leading-tight">{d.label}</span>
+                  {isObezite && (
+                    <button onClick={() => setShowBMISheet(true)}
+                      className="text-xs font-bold px-1.5 py-1 rounded-lg shrink-0"
+                      style={{color:'#0D7377', background:'#e8f4f5'}}
+                      aria-label="BMI hesapla">?</button>
+                  )}
+                  <div className="flex gap-1.5 shrink-0">
+                    <button onClick={() => setDiseaseAnswer(d.id, 'var')}
+                      className="rounded-xl text-xs font-bold border-2 transition-all px-3"
+                      style={{
+                        height: 36, minWidth: 44,
+                        background: ans === 'var' ? '#0D7377' : '#fff',
+                        color: ans === 'var' ? '#fff' : '#374151',
+                        borderColor: ans === 'var' ? '#0D7377' : '#E5E7EB',
+                      }}
+                      aria-pressed={ans === 'var'}>Var</button>
+                    <button onClick={() => setDiseaseAnswer(d.id, 'yok')}
+                      className="rounded-xl text-xs font-bold border-2 transition-all px-2"
+                      style={{
+                        height: 36, minWidth: 44,
+                        background: ans === 'yok' ? '#6B7280' : '#fff',
+                        color: ans === 'yok' ? '#fff' : '#374151',
+                        borderColor: ans === 'yok' ? '#6B7280' : '#E5E7EB',
+                      }}
+                      aria-pressed={ans === 'yok'}>Yok</button>
                   </div>
-                )
-              })}
-
-              {/* Cancer history row — optional, opens sheet */}
-              <div className="bg-white rounded-2xl border px-4 py-3" style={{borderColor:'#E5E7EB'}}>
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-xl">🧬</span>
-                  <span className="font-semibold text-gray-900 text-base flex-1">Ailede Kanser Öyküsü</span>
-                  <span className="text-xs text-gray-400">isteğe bağlı</span>
                 </div>
-                <button onClick={() => setShowCancerSheet(true)}
-                  className="w-full py-2 rounded-xl text-sm font-semibold border-2 transition-all text-left px-3"
-                  style={{
-                    minHeight: 44,
-                    background: cancerCount > 0 ? '#e8f4f5' : '#fff',
-                    color: cancerCount > 0 ? '#0D7377' : '#6B7280',
-                    borderColor: cancerCount > 0 ? '#0D7377' : '#E5E7EB',
-                  }}>
-                  {cancerCount > 0 ? `✓ ${cancerCount} kanser türü seçildi — değiştir ›` : 'Var ise seçmek için dokunun ›'}
-                </button>
-              </div>
-            </div>
+              )
+            })}
 
-            {/* Smoking */}
-            <div className="mt-5 bg-white rounded-2xl border px-4 py-3" style={{borderColor: smokingStatus ? '#0D7377' : '#E5E7EB'}}>
-              <p className="font-semibold text-gray-900 mb-2">Sigara kullanıyor musunuz?</p>
-              <div className="grid grid-cols-3 gap-2">
+            {/* Cancer — compact single row */}
+            <button onClick={() => setShowCancerSheet(true)}
+              className="flex items-center gap-2 bg-white rounded-2xl px-3 w-full text-left"
+              style={{minHeight: 46, border: `2px solid ${cancerCount > 0 ? '#0D7377' : '#E5E7EB'}`}}>
+              <span className="text-lg shrink-0">🧬</span>
+              <span className="font-semibold text-gray-900 text-sm flex-1 leading-tight">Ailede Kanser Öyküsü</span>
+              <span className="text-xs font-bold shrink-0" style={{color: cancerCount > 0 ? '#0D7377' : '#9CA3AF'}}>
+                {cancerCount > 0 ? `✓ ${cancerCount} seçili` : 'isteğe bağlı ›'}
+              </span>
+            </button>
+
+            {/* Smoking — compact */}
+            <div className="bg-white rounded-2xl px-3 py-2"
+              style={{border: `2px solid ${smokingStatus ? '#0D7377' : '#E5E7EB'}`}}>
+              <p className="text-xs font-semibold text-gray-500 mb-1.5">Sigara kullanıyor musunuz?</p>
+              <div className="grid grid-cols-3 gap-1.5">
                 {[
-                  { id: 'yes', label: '🚬 Evet' },
-                  { id: 'no',  label: '✓ Hayır' },
-                  { id: 'quit',label: '⏳ Bıraktım' },
+                  { id: 'yes',  label: '🚬 Evet' },
+                  { id: 'no',   label: '✓ Hayır' },
+                  { id: 'quit', label: '⏳ Bıraktım' },
                 ].map(opt => (
                   <button key={opt.id}
                     onClick={() => setSmokingStatus(opt.id)}
-                    className="py-2 rounded-xl text-sm font-bold border-2 transition-all"
+                    className="rounded-xl text-xs font-bold border-2 transition-all py-2"
                     style={{
-                      minHeight: 44,
+                      minHeight: 40,
                       background: smokingStatus === opt.id ? '#0D7377' : '#fff',
                       color: smokingStatus === opt.id ? '#fff' : '#374151',
                       borderColor: smokingStatus === opt.id ? '#0D7377' : '#E5E7EB',
@@ -434,13 +419,13 @@ export default function OnboardingV2() {
             </div>
           </div>
 
-          <div className="px-5 pb-6 pt-2 border-t border-gray-100 bg-white/80 backdrop-blur">
+          <div className="px-4 pb-4 pt-2 border-t border-gray-100 bg-white/80 backdrop-blur shrink-0">
             {!step3Valid && (
-              <p className="text-center text-sm text-gray-400 mb-2">Tüm soruları yanıtlayın</p>
+              <p className="text-center text-xs text-gray-400 mb-1.5">Tüm soruları yanıtlayın</p>
             )}
             <button onClick={handleListemiGoster}
               disabled={!step3Valid}
-              className="w-full py-4 rounded-2xl text-lg font-bold text-white transition-opacity"
+              className="w-full py-3.5 rounded-2xl text-base font-bold text-white transition-opacity"
               style={{background:'#0D7377', opacity: step3Valid ? 1 : 0.35, cursor: step3Valid ? 'pointer' : 'not-allowed'}}>
               Listemi Göster →
             </button>
