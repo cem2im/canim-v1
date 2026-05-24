@@ -31,6 +31,7 @@ const CANCER_IDS = [
 const validDiseaseIds = new Set(DISEASE_LIST.map(d => d.id))
 
 // ── Year Picker (drum / scroll wheel) ────────────────────────────────────
+// value=null → no selection yet (wheel positioned at 1975 but nothing highlighted)
 function YearPicker({ value, onChange }) {
   const YEARS = Array.from({ length: 2006 - 1940 + 1 }, (_, i) => 1940 + i)
   const ITEM_H = 60
@@ -41,9 +42,10 @@ function YearPicker({ value, onChange }) {
   const scrollRef = useRef(null)
   const debounceRef = useRef(null)
 
-  // Scroll to initial value on mount (no animation — instant)
+  // Scroll to value on mount; if null, start at 1975 (middle) without selecting
   useEffect(() => {
-    const idx = YEARS.indexOf(value)
+    const startYear = value ?? 1975
+    const idx = YEARS.indexOf(startYear)
     if (idx !== -1 && scrollRef.current) {
       scrollRef.current.scrollTop = idx * ITEM_H
     }
@@ -82,12 +84,14 @@ function YearPicker({ value, onChange }) {
         background: 'linear-gradient(to top, #FAFAF8 40%, transparent)',
         pointerEvents: 'none', zIndex: 2,
       }} />
-      {/* Selection highlight box */}
+      {/* Selection highlight box — only visible after user has selected */}
       <div style={{
         position: 'absolute', top: '50%', left: 20, right: 20,
         height: ITEM_H, transform: 'translateY(-50%)',
-        border: '2.5px solid #0D7377', borderRadius: 18,
+        border: `2.5px solid ${value != null ? '#0D7377' : '#D1D5DB'}`,
+        borderRadius: 18,
         pointerEvents: 'none', zIndex: 2,
+        transition: 'border-color 0.2s',
       }} />
       {/* Scrollable list */}
       <div
@@ -102,7 +106,7 @@ function YearPicker({ value, onChange }) {
         }}
       >
         {YEARS.map(y => {
-          const sel = y === value
+          const sel = value != null && y === value
           return (
             <div key={y}
               onClick={() => scrollTo(y)}
@@ -226,14 +230,14 @@ export default function OnboardingV2() {
   const giftMode = !!giftFor
   const giftLabels = giftMode ? getGiftLabels(giftFor) : null
 
-  // Step 1 state
+  // Step 1 state — null until user explicitly scrolls/selects
   const [selectedYear, setSelectedYear] = useState(
-    giftMode ? giftLabels.year : 1985
+    giftMode ? giftLabels.year : null
   )
   const currentYear = new Date().getFullYear()
   const yearNum = selectedYear
-  const yearValid = true  // wheel only exposes valid years
-  const age = currentYear - selectedYear
+  const yearValid = selectedYear != null
+  const age = selectedYear ? currentYear - selectedYear : null
 
   // Step 2 state — pre-select sex in gift mode if known
   const [sex, setSex] = useState(giftMode && giftLabels.sex ? giftLabels.sex : null)
@@ -322,12 +326,15 @@ export default function OnboardingV2() {
           <h1 className="text-3xl font-bold text-center mb-1" style={{color:'#0D7377'}}>
             {giftMode ? `${giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} doğum yılı?` : 'Doğum yılınız?'}
           </h1>
-          <p className="text-gray-500 text-base mb-6">{age} yaşında</p>
+          <p className="text-base mb-6" style={{color: yearValid ? '#6B7280' : '#9CA3AF'}}>
+            {yearValid ? `${age} yaşında` : 'Kaydırarak seçin ↕'}
+          </p>
           <YearPicker value={selectedYear} onChange={setSelectedYear} />
           <button
             onClick={() => setStep(2)}
-            className="mt-8 w-full max-w-xs py-4 rounded-2xl text-lg font-bold text-white"
-            style={{background:'#0D7377'}}
+            disabled={!yearValid}
+            className="mt-8 w-full max-w-xs py-4 rounded-2xl text-lg font-bold text-white transition-opacity"
+            style={{background:'#0D7377', opacity: yearValid ? 1 : 0.35, cursor: yearValid ? 'pointer' : 'not-allowed'}}
           >Devam →</button>
         </div>
       )}
