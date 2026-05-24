@@ -256,32 +256,39 @@ export default function WizardV2() {
         {/* Teal header */}
         <div className="px-5 pt-12 pb-6 shrink-0" style={{ background: '#0D7377' }}>
           <p className="text-sm font-medium mb-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
-            Sağlık Karnesi
+            Kişisel Sağlık Karnesi
           </p>
           <h1 className="text-3xl font-extrabold text-white leading-tight">
-            Taramalarını Kontrol Edelim
+            Hangi taramaları yaptırman gerekiyor?
           </h1>
+          <p className="text-sm mt-2" style={{ color: 'rgba(255,255,255,0.75)' }}>
+            ~2 dakika · {totalPages} adım
+          </p>
         </div>
 
         <div className="flex-1 flex flex-col justify-center px-6 py-6">
-          <p className="text-gray-700 text-lg leading-relaxed mb-6">
-            {totalPages} kısa soru — sadece 2 dakika.
-          </p>
-          <ul className="space-y-3">
-            {groups.map(g => (
-              <li key={g.key} className="flex items-center gap-3 text-gray-600 text-base">
-                <span className="text-2xl">{g.icon}</span>
-                <span>{g.label}</span>
+          <p className="text-gray-500 text-sm font-semibold uppercase tracking-wide mb-5">Nasıl çalışır?</p>
+          <ol className="space-y-5">
+            {[
+              { n: '1', icon: '👤', text: 'Yaşını ve sağlık durumunu gir' },
+              { n: '2', icon: '📋', text: 'Hangi sağlık kontrollerini yaptırdığını belirt' },
+              { n: '3', icon: '📊', text: 'Kişisel sağlık karnen hazırlanır — eksik taramalar listelenir' },
+              { n: '4', icon: '📅', text: 'Her tarama için ne zaman tekrar yapılması gerektiğini gör' },
+            ].map(item => (
+              <li key={item.n} className="flex items-start gap-4">
+                <span className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 mt-0.5"
+                  style={{ background: '#0D7377' }}>{item.n}</span>
+                <p className="text-gray-700 text-base leading-snug pt-1">{item.text}</p>
               </li>
             ))}
-          </ul>
+          </ol>
         </div>
 
         <div className="px-5 pb-6 shrink-0">
           <button onClick={goNext}
             className="w-full py-4 rounded-2xl font-bold text-white text-lg"
             style={{ background: '#0D7377', minHeight: 52 }}>
-            Hadi Başlayalım →
+            Karnemizi Oluştur →
           </button>
         </div>
       </div>
