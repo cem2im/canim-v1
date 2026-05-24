@@ -297,6 +297,7 @@ export default function WizardV2() {
   // ── PAGE SCREEN ────────────────────────────────────────────────────────────
   const isLast = step === totalPages - 1
   const subLabel = page.totalChunks > 1 ? ` (${page.pageNum}/${page.totalChunks})` : ''
+  const pageComplete = page ? page.cards.every(c => answers[c.id] != null) : false
 
   return (
     <div key={`p-${animKey}`} className="page-enter flex flex-col h-full" style={{ background: '#FAFAF8' }}>
@@ -349,9 +350,15 @@ export default function WizardV2() {
 
       {/* Devam butonu */}
       <div className="px-5 py-4 bg-white border-t border-gray-100 shrink-0">
-        <button onClick={goNext}
-          className="w-full py-4 rounded-2xl font-bold text-white text-base"
-          style={{ background: '#0D7377', minHeight: 52 }}>
+        {!pageComplete && (
+          <p className="text-center text-sm text-gray-400 mb-2">
+            Tüm soruları yanıtlayın
+          </p>
+        )}
+        <button onClick={pageComplete ? goNext : undefined}
+          disabled={!pageComplete}
+          className="w-full py-4 rounded-2xl font-bold text-white text-base transition-opacity"
+          style={{ background: '#0D7377', minHeight: 52, opacity: pageComplete ? 1 : 0.35, cursor: pageComplete ? 'pointer' : 'not-allowed' }}>
           {isLast ? 'Karnemi Gör 🏆' : 'Devam →'}
         </button>
       </div>
