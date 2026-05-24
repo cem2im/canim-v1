@@ -24,12 +24,12 @@ const DISEASE_META = {
 const CANCER_IDS  = new Set(['kolonoskopi','mamografi','pap_smear','prostat','akciger_bt','aort_anevrizması','genetik_danisman'])
 const VACCINE_IDS = new Set(['asi_grip','asi_td_tdap','asi_hpv','asi_hepatit_b','asi_pnomoni','asi_zona'])
 
-// Yeni zaman seçenekleri
+// Zaman seçenekleri — açıklayıcı
 const ANSWER_OPTS = [
-  { value: '1m',     label: '1 ay' },
-  { value: '1y',     label: '1 yıl' },
-  { value: '5y',     label: '5 yıl' },
-  { value: 'unknown', label: 'Hatırlamıyorum' },
+  { value: '1m',      label: 'Bu ay' },
+  { value: '6m',      label: '6 ay içinde' },
+  { value: '1y',      label: '1–2 yıl önce' },
+  { value: 'unknown', label: 'Hiç / Bilmiyorum' },
 ]
 
 // ── Grouping ─────────────────────────────────────────────────────────────────
@@ -120,18 +120,23 @@ function ScoreRing({ score }) {
 // ── Compact screening row ────────────────────────────────────────────────────
 function ScreeningRow({ card, answer, onAnswer }) {
   return (
-    <div className="py-3 border-b border-gray-100 last:border-0">
-      <div className="flex items-center gap-2 mb-2">
-        <span className="text-xl shrink-0">{card.icon}</span>
-        <span className="font-semibold text-gray-900 text-sm leading-snug">{card.trName}</span>
+    <div className="py-4 border-b border-gray-100 last:border-0">
+      {/* Question */}
+      <div className="flex items-start gap-2 mb-1">
+        <span className="text-xl shrink-0 mt-0.5">{card.icon}</span>
+        <div>
+          <p className="font-bold text-gray-900 text-sm leading-snug">{card.trName}</p>
+          <p className="text-xs text-gray-500 mt-0.5">Ne zaman yaptırdınız?</p>
+        </div>
       </div>
-      <div className="grid grid-cols-4 gap-1.5">
+      {/* Answer chips */}
+      <div className="grid grid-cols-2 gap-1.5 mt-2 pl-8">
         {ANSWER_OPTS.map(opt => {
           const sel = answer === opt.value
           return (
             <button key={opt.value}
               onClick={() => onAnswer(card.id, opt.value)}
-              className="py-2 rounded-xl text-xs font-semibold border-2 transition-all text-center"
+              className="py-2 px-3 rounded-xl text-xs font-semibold border-2 transition-all text-center"
               style={{
                 minHeight: 44,
                 background: sel ? '#0D7377' : '#fff',
