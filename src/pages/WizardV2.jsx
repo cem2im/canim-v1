@@ -259,18 +259,17 @@ export default function WizardV2() {
         </div>
 
         <div className="flex-1 flex flex-col justify-center px-6 py-6">
-          <p className="text-gray-600 text-base leading-relaxed mb-6">
-            {totalPages} adımda hangi taramaları yaptırdığını sor — kişisel sağlık karnenizi hazırlayalım.
+          <p className="text-gray-700 text-lg leading-relaxed mb-6">
+            {totalPages} kısa soru — sadece 2 dakika.
           </p>
-          <div className="flex flex-wrap gap-2 mb-8">
+          <ul className="space-y-3">
             {groups.map(g => (
-              <span key={g.key}
-                className="px-3 py-1.5 rounded-full text-sm font-semibold border"
-                style={{ background: '#e8f4f5', borderColor: '#b2d8da', color: '#0D7377' }}>
-                {g.icon} {g.label}
-              </span>
+              <li key={g.key} className="flex items-center gap-3 text-gray-600 text-base">
+                <span className="text-2xl">{g.icon}</span>
+                <span>{g.label}</span>
+              </li>
             ))}
-          </div>
+          </ul>
         </div>
 
         <div className="px-5 pb-6 shrink-0">
