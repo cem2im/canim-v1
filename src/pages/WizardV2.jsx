@@ -267,18 +267,17 @@ export default function WizardV2() {
         </div>
 
         <div className="flex-1 flex flex-col justify-center px-6 py-6">
-          <p className="text-gray-500 text-sm font-semibold uppercase tracking-wide mb-5">Nasıl çalışır?</p>
-          <ol className="space-y-5">
+          <ol className="space-y-4">
             {[
-              { n: '1', icon: '👤', text: 'Yaşını ve sağlık durumunu gir' },
-              { n: '2', icon: '📋', text: 'Hangi sağlık kontrollerini yaptırdığını belirt' },
-              { n: '3', icon: '📊', text: 'Kişisel sağlık karnen hazırlanır — eksik taramalar listelenir' },
-              { n: '4', icon: '📅', text: 'Her tarama için ne zaman tekrar yapılması gerektiğini gör' },
+              { n: '1', text: 'Yaşını ve durumunu gir' },
+              { n: '2', text: 'Son kontrol tarihlerini söyle' },
+              { n: '3', text: 'Kişisel karnen hazırlanır' },
+              { n: '4', text: 'Eksik taramaları gör' },
             ].map(item => (
-              <li key={item.n} className="flex items-start gap-4">
-                <span className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 mt-0.5"
+              <li key={item.n} className="flex items-center gap-4">
+                <span className="w-10 h-10 rounded-full flex items-center justify-center text-base font-extrabold text-white shrink-0"
                   style={{ background: '#0D7377' }}>{item.n}</span>
-                <p className="text-gray-700 text-base leading-snug pt-1">{item.text}</p>
+                <p className="text-gray-800 text-xl font-bold leading-tight">{item.text}</p>
               </li>
             ))}
           </ol>
