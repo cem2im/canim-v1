@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import useAppStoreV2 from '../store/useAppStoreV2'
+import WizardV2 from './WizardV2'
 
 const FREQ_LABELS = {
   1: 'Ayda bir', 3: '3 ayda bir', 6: '6 ayda bir', 12: 'Yılda bir',
@@ -211,9 +212,9 @@ function GroupHeader({ label }) {
 }
 
 export default function ScreeningsV2() {
+  const wizardDone = useAppStoreV2(s => s.wizardDone)
   const markDone = useAppStoreV2(s => s.markDone)
   const getScreeningCards = useAppStoreV2(s => s.getScreeningCards)
-  const cards = getScreeningCards()
 
   const [toast, setToast] = useState(null)
   const [markDoneCard, setMarkDoneCard] = useState(null)
@@ -229,6 +230,10 @@ export default function ScreeningsV2() {
     markDone(id, date)
     showToast('✅ Kaydedildi')
   }, [markDone, showToast])
+
+  if (!wizardDone) return <WizardV2 />
+
+  const cards = getScreeningCards()
 
   // Group cards
   const unknown  = cards.filter(c => c.status === 'unknown')

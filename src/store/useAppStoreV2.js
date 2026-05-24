@@ -14,6 +14,9 @@ const useAppStoreV2 = create(
       // Onboarding
       onboardingDone: false,
 
+      // Wizard
+      wizardDone: false,
+
       // Profile
       profile: null, // { birthYear, sex, height?, weight? }
       diseases: [],  // string[]
@@ -52,8 +55,31 @@ const useAppStoreV2 = create(
 
       updateSmokingStatus: (status) => set({ smokingStatus: status }),
 
+      setWizardDone: () => set({ wizardDone: true }),
+
+      applyWizardAnswers: (answers) => {
+        // answers = { screeningId: 'this_month' | '6m' | '1y' | '2y' | 'unknown' }
+        const { diseases, profile } = get()
+        const list = buildScreeningList(diseases, profile)
+        const today = new Date()
+        const newDates = {}
+        for (const s of list) {
+          const ans = answers[s.id]
+          if (!ans || ans === 'unknown') continue
+          const monthsAgo = { 'this_month': 0, '6m': 6, '1y': 12, '2y': 24 }[ans] ?? 0
+          const lastDate = new Date(today)
+          lastDate.setMonth(lastDate.getMonth() - monthsAgo)
+          const lastDoneDate = lastDate.toISOString().slice(0, 10)
+          const nextDate = new Date(lastDate)
+          nextDate.setMonth(nextDate.getMonth() + s.frequencyMonths)
+          newDates[s.id] = { lastDoneDate, nextDate: nextDate.toISOString().slice(0, 10) }
+        }
+        set(state => ({ screeningDates: { ...state.screeningDates, ...newDates } }))
+      },
+
       resetAll: () => set({
         onboardingDone: false,
+        wizardDone: false,
         profile: null,
         diseases: [],
         smokingStatus: null,
