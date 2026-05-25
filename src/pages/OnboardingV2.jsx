@@ -457,7 +457,7 @@ export default function OnboardingV2() {
               disabled={!step3Valid}
               className="w-full py-3.5 rounded-2xl text-base font-bold text-white transition-opacity"
               style={{background:'#0D7377', opacity: step3Valid ? 1 : 0.35, cursor: step3Valid ? 'pointer' : 'not-allowed'}}>
-              Listemi Göster →
+              Karnemi Çıkar →
             </button>
           </div>
         </div>
@@ -480,7 +480,7 @@ export default function OnboardingV2() {
           <button onClick={handleComplete}
             className="mt-10 w-full max-w-xs py-4 rounded-2xl text-lg font-bold text-white shadow-lg"
             style={{background:'linear-gradient(135deg,#0D7377,#14919B)'}}>
-            {giftMode ? `${giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} karnesini gönder →` : 'Listemi Gör →'}
+            {giftMode ? `${giftLabels.isimIn.charAt(0).toUpperCase() + giftLabels.isimIn.slice(1)} karnesini gönder →` : 'Karnemi Çıkar →'}
           </button>
         </div>
       )}

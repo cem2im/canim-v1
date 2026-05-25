@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { createPortal } from 'react-dom'
 import { DISEASE_LIST } from '../data/screenings'
 import useAppStoreV2 from '../store/useAppStoreV2'
