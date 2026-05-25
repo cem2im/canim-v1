@@ -300,7 +300,7 @@ export default function WizardV2() {
           {/* TERTIARY: PDF */}
           <button onClick={() => {
             const profile = useAppStoreV2.getState().profile
-            generateScreeningsPdf({ profile, screeningCards: cards })
+            generateScreeningsPdf({ profile, screeningCards: cards, axes: radarAxes })
           }}
             className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-semibold border-2"
             style={{ color: '#6B7280', borderColor: '#E5E7EB', background: 'white', minHeight: 44 }}>

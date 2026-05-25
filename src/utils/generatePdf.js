@@ -1,4 +1,5 @@
 import { jsPDF } from 'jspdf'
+import { renderRadarDataUrl } from './karneShare'
 
 // Turkish → ASCII safe mapping for PDF fonts that don't support full Unicode
 function tr(str) {
@@ -346,27 +347,23 @@ const STATUS_COLOR = {
   unknown:  [107, 114, 128],
 }
 
-export function generateScreeningsPdf({ profile, screeningCards }) {
+export async function generateScreeningsPdf({ profile, screeningCards, axes }) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
-  const W = 210, M = 16
+  const W = 210, M = 14
   const CW = W - M * 2
   let y = 0
   const now = new Date()
   const reportDate = `${now.getDate()} ${MONTHS_TR[now.getMonth()]} ${now.getFullYear()}`
   const age = profile?.birthYear ? now.getFullYear() - profile.birthYear : '?'
+  const sexLabel = profile?.sex === 'F' ? 'Kadin' : profile?.sex === 'M' ? 'Erkek' : ''
 
-  const newPage = () => {
-    doc.addPage(); y = 20
-    drawHeader(); drawFooter()
-  }
-  const checkY = (n = 14) => { if (y + n > 275) newPage() }
-
-  function drawHeader() {
+  // ── Helpers ──────────────────────────────────────────────────────────────
+  const drawPageHeader = () => {
     doc.setFillColor(13, 115, 119)
     doc.rect(0, 0, W, 7, 'F')
   }
-  function drawFooter() {
-    doc.setFontSize(7.5); doc.setTextColor(160)
+  const drawPageFooter = () => {
+    doc.setFontSize(7); doc.setTextColor(160)
     doc.setFont('helvetica', 'normal')
     doc.text('Canim · Dr. Cem Simsek · canim.uzunyasa.com', M, 288)
     doc.text(reportDate, W - M, 288, { align: 'right' })
@@ -374,116 +371,200 @@ export function generateScreeningsPdf({ profile, screeningCards }) {
     doc.setFillColor(13, 115, 119)
     doc.rect(0, 292, W, 5, 'F')
   }
+  const newPage = () => {
+    doc.addPage(); y = 18
+    drawPageHeader(); drawPageFooter()
+  }
+  const checkY = (needed = 14) => { if (y + needed > 275) newPage() }
 
-  drawHeader(); drawFooter(); y = 16
+  // ── PAGE 1: Özet ─────────────────────────────────────────────────────────
+  drawPageHeader(); drawPageFooter(); y = 14
 
-  // ── Title block ─────────────────────────────────────────────────────────
+  // Title block
   doc.setFillColor(13, 115, 119)
-  doc.roundedRect(M, y, CW, 34, 3, 3, 'F')
+  doc.roundedRect(M, y, CW, 28, 3, 3, 'F')
   doc.setTextColor(255, 255, 255)
   doc.setFont('helvetica', 'bold'); doc.setFontSize(18)
-  doc.text('Tarama Listesi', M + 7, y + 13)
-  doc.setFont('helvetica', 'normal'); doc.setFontSize(9)
-  doc.setTextColor(200, 240, 240)
-  const who = profile?.name ? `${tr(profile.name)}  |  ${age} yas  |  ${profile.sex === 'F' ? 'Kadin' : 'Erkek'}` : ''
-  doc.text(who, M + 7, y + 22)
-  doc.text(reportDate, W - M - 7, y + 22, { align: 'right' })
-  y += 42
+  doc.text('CANIM', M + 7, y + 11)
+  doc.setFontSize(10); doc.setFont('helvetica', 'normal')
+  doc.text('Kisisel Saglik Tarama Raporu', M + 7, y + 19)
+  doc.setFontSize(8.5); doc.setTextColor(200, 240, 240)
+  const patientInfo = [age + ' yas', sexLabel].filter(Boolean).join(' · ')
+  doc.text(patientInfo, M + 7, y + 26)
+  doc.text(reportDate, W - M - 7, y + 26, { align: 'right' })
+  y += 34
 
-  // ── Urgent block (overdue + upcoming) ───────────────────────────────────
-  const urgent = screeningCards.filter(c => c.status === 'overdue' || c.status === 'upcoming')
+  // ── Radar chart görsel ──────────────────────────────────────────────────
+  if (axes && axes.length) {
+    try {
+      const overallScore = Math.round(
+        axes.filter(a => a.score > 0).reduce((s, a) => s + a.score, 0) /
+        Math.max(axes.filter(a => a.score > 0).length, 1)
+      )
+      const grade = overallScore >= 85 ? 'A' : overallScore >= 70 ? 'B'
+        : overallScore >= 55 ? 'C' : overallScore >= 40 ? 'D' : 'F'
+      const dataUrl = await renderRadarDataUrl({ axes, grade, overallScore })
+
+      // Radar image (kare, ortada)
+      const imgSize = 72
+      const imgX = (W - imgSize) / 2
+      doc.addImage(dataUrl, 'PNG', imgX, y, imgSize, imgSize)
+
+      // Grade badge (sağa)
+      const gc = overallScore >= 70 ? [5,150,105] : overallScore >= 55 ? [217,119,6] : [220,38,38]
+      doc.setFillColor(...gc)
+      doc.roundedRect(W - M - 24, y + 4, 22, 22, 3, 3, 'F')
+      doc.setTextColor(255, 255, 255)
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(20)
+      doc.text(grade, W - M - 13, y + 20, { align: 'center' })
+      doc.setFontSize(7); doc.setFont('helvetica', 'normal')
+      doc.text(overallScore + '/100', W - M - 13, y + 27, { align: 'center' })
+
+      y += imgSize + 4
+
+      // Score bar summary (horizontal)
+      const barW = CW / axes.length - 3
+      axes.forEach((a, i) => {
+        const bx = M + i * (barW + 3)
+        const bc = a.score >= 70 ? [5,150,105] : a.score >= 40 ? [217,119,6] : [220,38,38]
+        // background
+        doc.setFillColor(240, 240, 240)
+        doc.roundedRect(bx, y, barW, 5, 1, 1, 'F')
+        // fill
+        doc.setFillColor(...bc)
+        doc.roundedRect(bx, y, barW * (a.score / 100), 5, 1, 1, 'F')
+        // label
+        doc.setFontSize(6.5); doc.setTextColor(80); doc.setFont('helvetica', 'normal')
+        doc.text(a.icon + ' ' + tr(a.label), bx + barW / 2, y + 9.5, { align: 'center' })
+        doc.setFontSize(7); doc.setTextColor(...bc); doc.setFont('helvetica', 'bold')
+        doc.text(String(a.score), bx + barW / 2, y + 14, { align: 'center' })
+      })
+      y += 18
+    } catch (e) {
+      console.warn('PDF radar render failed', e)
+    }
+  }
+
+  // ── Urgency summary ──────────────────────────────────────────────────────
+  const urgent  = screeningCards.filter(c => c.status === 'overdue' || c.status === 'upcoming' || c.status === 'unknown')
+  const ok      = screeningCards.filter(c => c.status === 'ok' || c.status === 'soon')
+  y += 4
+  checkY(12)
+  doc.setFillColor(240, 253, 244)
+  doc.roundedRect(M, y, CW / 2 - 3, 10, 2, 2, 'F')
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(9); doc.setTextColor(5, 150, 105)
+  doc.text(`✓ ${ok.length} Tarama Guncel`, M + 5, y + 6.5)
   if (urgent.length > 0) {
-    checkY(16)
     doc.setFillColor(254, 242, 242)
-    doc.roundedRect(M, y, CW, 10, 2, 2, 'F')
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5)
+    doc.roundedRect(M + CW / 2 + 3, y, CW / 2 - 3, 10, 2, 2, 'F')
     doc.setTextColor(185, 28, 28)
-    doc.text(`YAPILMASI GEREKEN TARAMALAR (${urgent.length})`, M + 5, y + 6.5)
-    y += 13
+    doc.text(`⚠ ${urgent.length} Tarama Bekliyor`, M + CW / 2 + 8, y + 6.5)
+  }
+  y += 16
 
-    for (const c of urgent) {
-      checkY(12)
-      const isOver = c.status === 'overdue'
-      doc.setFillColor(isOver ? 254 : 240, isOver ? 242 : 253, isOver ? 242 : 250)
-      doc.roundedRect(M, y, CW, 10, 2, 2, 'F')
+  // ── PAGE 2+: Her test detayı ──────────────────────────────────────────────
+  const STATUS_LABEL = { overdue:'GECIKTI', upcoming:'BU AY', soon:'YAKINDA', ok:'TAMAM', unknown:'BILINMIYOR' }
+  const STATUS_RGB   = { overdue:[220,38,38], upcoming:[217,119,6], soon:[245,158,11], ok:[5,150,105], unknown:[107,114,128] }
 
-      // Status pill
-      const sc = STATUS_COLOR[c.status] || [100,100,100]
-      doc.setFillColor(...sc)
-      doc.roundedRect(M + CW - 30, y + 2.5, 28, 5.5, 1.5, 1.5, 'F')
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(7)
-      doc.setTextColor(255, 255, 255)
-      doc.text(isOver ? 'GECIKTI' : 'BU AY', M + CW - 16, y + 6.2, { align: 'center' })
+  // Önce acil, sonra yakında, sonra güncel sırala
+  const ordered = [...screeningCards].sort((a, b) => {
+    const o = { overdue:0, upcoming:1, unknown:2, soon:3, ok:4 }
+    return (o[a.status]??5) - (o[b.status]??5)
+  })
 
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(9)
-      doc.setTextColor(30)
-      doc.text(tr(c.trName), M + 5, y + 6.5)
+  // Sayfa başlığı ile yeni sayfaya geç
+  newPage()
+  doc.setFillColor(232, 244, 245)
+  doc.roundedRect(M, y, CW, 8, 2, 2, 'F')
+  doc.setFont('helvetica', 'bold'); doc.setFontSize(9.5); doc.setTextColor(13, 115, 119)
+  doc.text('TARAMA DETAYLARI', M + 5, y + 5.5)
+  doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(100)
+  doc.text(`${screeningCards.length} tarama`, W - M - 5, y + 5.5, { align: 'right' })
+  y += 13
 
-      if (c.nextDate) {
-        doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5)
-        doc.setTextColor(120)
-        doc.text(formatDate(c.nextDate), M + CW - 32, y + 6.5, { align: 'right' })
-      }
-      y += 12
+  for (const c of ordered) {
+    // Kart yüksekliğini tahmin et — why + guideline + doctor varsa daha uzun
+    const whyText   = tr(c.why || '')
+    const guideText = tr(c.guideline || (c.recommendation ? c.recommendation.split('.')[0] : '') || '')
+    const docText   = tr(c.doctor || '')
+    const guideShort = guideText.length > 120 ? guideText.slice(0, 117) + '...' : guideText
+
+    const whyLines   = whyText   ? doc.splitTextToSize(whyText, CW - 14).length : 0
+    const guideLines = guideShort ? doc.splitTextToSize(guideShort, CW - 14).length : 0
+    const docLines   = docText   ? 1 : 0
+
+    const cardH = 12 + (whyLines * 4.2) + (guideShort ? 4 + guideLines * 4.2 : 0) + (docText ? 4 + 4 : 0) + 8
+    checkY(cardH + 4)
+
+    // Card background
+    const sc = STATUS_RGB[c.status] || [150,150,150]
+    doc.setFillColor(252, 252, 253)
+    doc.roundedRect(M, y, CW, cardH, 2.5, 2.5, 'F')
+    // Left accent bar
+    doc.setFillColor(...sc)
+    doc.roundedRect(M, y, 3.5, cardH, 1.5, 1.5, 'F')
+
+    let cy2 = y + 7.5
+
+    // Test adı
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(10); doc.setTextColor(20)
+    doc.text(tr(c.trName), M + 8, cy2)
+
+    // Sıklık
+    doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(130)
+    doc.text(freqLabel(c.frequencyMonths), M + 8, cy2 + 5.5)
+
+    // Status pill (sağ üst)
+    doc.setFillColor(...sc)
+    doc.roundedRect(M + CW - 32, y + 3, 30, 6, 2, 2, 'F')
+    doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5); doc.setTextColor(255, 255, 255)
+    doc.text(STATUS_LABEL[c.status] || '-', M + CW - 17, y + 7, { align: 'center' })
+
+    // Son yapılma / Sonraki
+    const dateInfo = []
+    if (c.lastDoneDate) dateInfo.push('Son: ' + formatDate(c.lastDoneDate))
+    if (c.nextDate)     dateInfo.push('Sonraki: ' + formatDate(c.nextDate))
+    if (dateInfo.length) {
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7); doc.setTextColor(110)
+      doc.text(dateInfo.join('   '), M + CW - 32, cy2 + 5.5, { align: 'right' })
     }
-    y += 4
+
+    cy2 += 11.5
+
+    // Neden?
+    if (whyText) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(13, 115, 119)
+      doc.text('Neden?', M + 8, cy2)
+      cy2 += 4.5
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(50)
+      const wrapped = doc.splitTextToSize(whyText, CW - 14)
+      doc.text(wrapped, M + 8, cy2)
+      cy2 += wrapped.length * 4.2 + 2
+    }
+
+    // Kılavuz
+    if (guideShort) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(13, 115, 119)
+      doc.text('Kilavuz:', M + 8, cy2)
+      cy2 += 4.5
+      doc.setFont('helvetica', 'italic'); doc.setFontSize(7); doc.setTextColor(80)
+      const gl = doc.splitTextToSize(guideShort, CW - 14)
+      doc.text(gl, M + 8, cy2)
+      cy2 += gl.length * 4.2 + 2
+    }
+
+    // Nereye?
+    if (docText) {
+      doc.setFont('helvetica', 'bold'); doc.setFontSize(7.5); doc.setTextColor(13, 115, 119)
+      doc.text('Nereye?', M + 8, cy2)
+      cy2 += 4.5
+      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5); doc.setTextColor(80)
+      doc.text(docText.split(' · ').join(' · '), M + 8, cy2)
+    }
+
+    y += cardH + 4
   }
 
-  // ── Category sections ───────────────────────────────────────────────────
-  for (const cat of PDF_CATEGORIES) {
-    const items = screeningCards.filter(c => (SCREENING_TYPE[c.id] || 'other') === cat.key)
-    if (items.length === 0) continue
-    const order = { overdue:0, upcoming:1, soon:2, unknown:3, ok:4 }
-    items.sort((a,b) => order[a.status] - order[b.status])
-
-    checkY(18)
-    // Section header
-    doc.setFillColor(232, 244, 245)
-    doc.roundedRect(M, y, CW, 8, 2, 2, 'F')
-    doc.setFont('helvetica', 'bold'); doc.setFontSize(9)
-    doc.setTextColor(13, 115, 119)
-    doc.text(tr(cat.label).toUpperCase(), M + 5, y + 5.5)
-    doc.setFont('helvetica', 'normal'); doc.setFontSize(8)
-    doc.setTextColor(100)
-    doc.text(`${items.length} tarama`, W - M - 5, y + 5.5, { align: 'right' })
-    y += 11
-
-    for (const c of items) {
-      checkY(11)
-      // Row bg alternating
-      doc.setFillColor(252, 252, 252)
-      doc.roundedRect(M, y, CW, 9.5, 1.5, 1.5, 'F')
-      doc.setDrawColor(240); doc.setLineWidth(0.2)
-      doc.roundedRect(M, y, CW, 9.5, 1.5, 1.5, 'S')
-
-      // Name
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(8.5)
-      doc.setTextColor(30)
-      doc.text(tr(c.trName), M + 4, y + 6)
-
-      // Frequency
-      doc.setFont('helvetica', 'normal'); doc.setFontSize(7.5)
-      doc.setTextColor(130)
-      doc.text(freqLabel(c.frequencyMonths), M + 78, y + 6)
-
-      // Next date
-      doc.setTextColor(100)
-      const dateStr = c.nextDate ? formatDate(c.nextDate) : '-'
-      doc.text(dateStr, M + 114, y + 6)
-
-      // Status pill
-      const sc = STATUS_COLOR[c.status] || [150,150,150]
-      doc.setFillColor(...sc)
-      doc.roundedRect(M + CW - 27, y + 2, 25, 5.5, 1.5, 1.5, 'F')
-      doc.setFont('helvetica', 'bold'); doc.setFontSize(6.5)
-      doc.setTextColor(255, 255, 255)
-      const stLabel = { overdue:'GECIKTI', upcoming:'BU AY', soon:'YAKINDA', ok:'TAMAM', unknown:'BILINMIYOR' }
-      doc.text(stLabel[c.status] || '-', M + CW - 14.5, y + 6, { align: 'center' })
-      y += 11
-    }
-    y += 4
-  }
-
-  const filename = `Canim-Taramalarim-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.pdf`
+  const filename = `Canim-${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}.pdf`
   doc.save(filename)
 }

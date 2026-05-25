@@ -283,7 +283,7 @@ function KarneSheet({ cards, lifestyleAnswers, profile, onClose }) {
   }
 
   const handlePdf = () => {
-    generateScreeningsPdf({ profile, screeningCards: cards })
+    generateScreeningsPdf({ profile, screeningCards: cards, axes })
   }
 
   return createPortal(

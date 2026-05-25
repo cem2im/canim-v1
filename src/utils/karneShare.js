@@ -138,6 +138,19 @@ function roundRect(ctx, x, y, w, h, r) {
 }
 
 /**
+ * PDF için data URL döner (async)
+ */
+export async function renderRadarDataUrl({ axes, grade, overallScore }) {
+  const blob = await renderKarneCanvas({ axes, grade, overallScore })
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onloadend = () => resolve(reader.result)
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
+}
+
+/**
  * Paylaş: navigator.share (mobile) → download fallback
  */
 export async function shareKarneImage({ axes, grade, overallScore, waMsg }) {
