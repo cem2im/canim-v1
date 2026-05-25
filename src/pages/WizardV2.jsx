@@ -416,12 +416,39 @@ export default function WizardV2() {
       <div className="flex-1 flex flex-col items-center justify-center px-6">
         <div className="w-full max-w-sm">
           <div className="text-center mb-2">
-            <span className="text-5xl">{card.icon}</span>
+            <span className="text-4xl">{card.icon}</span>
           </div>
-          <h2 className="text-2xl font-extrabold text-gray-900 text-center leading-tight mb-1">
+          <h2 className="text-xl font-extrabold text-gray-900 text-center leading-tight mb-3">
             {card.trName}
           </h2>
-          <p className="text-gray-500 text-base text-center mb-8">Ne zaman yaptırdınız?</p>
+
+          {/* Context block — neden / kılavuz */}
+          <div className="mb-4 rounded-2xl px-4 py-3" style={{background:'#F0FDFA', border:'1px solid #CCFBF1'}}>
+            {/* Neden gerekli */}
+            {card.why && (
+              <p className="text-xs text-gray-700 leading-relaxed mb-2" style={{
+                display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden'
+              }}>
+                <span className="font-bold text-teal-700">Neden? </span>{card.why}
+              </p>
+            )}
+            <div className="flex flex-wrap gap-1.5">
+              {/* Hangi hastalık / kategori */}
+              <span className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                style={{background:'#CCFBF1', color:'#0D7377'}}>
+                {groupLabel}
+              </span>
+              {/* Kim öneriyor */}
+              {card.guideline && (
+                <span className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                  style={{background:'#0D7377', color:'white'}}>
+                  {card.guideline.split('(')[0].trim().split(':')[0].trim()}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <p className="text-gray-500 text-sm text-center mb-4">Ne zaman yaptırdınız?</p>
           <div className="grid grid-cols-4 gap-2">
             {ANSWER_OPTS.map(opt => {
               const isSel = selectedAnswer === opt.value
