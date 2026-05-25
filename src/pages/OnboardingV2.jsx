@@ -390,7 +390,7 @@ export default function OnboardingV2() {
               <span className="text-lg shrink-0">🧬</span>
               <span className="font-semibold text-gray-900 text-sm flex-1 leading-tight">Ailede Kanser Öyküsü</span>
               <span className="text-xs font-bold shrink-0" style={{color: cancerCount > 0 ? '#0D7377' : '#9CA3AF'}}>
-                {cancerCount > 0 ? `✓ ${cancerCount} seçili` : 'isteğe bağlı ›'}
+                {cancerCount > 0 ? `✓ ${cancerCount} seçili` : 'Planınızı önemli ölçüde değiştirebilir →'}
               </span>
             </button>
 

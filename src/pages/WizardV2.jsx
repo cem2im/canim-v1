@@ -27,8 +27,8 @@ const VACCINE_IDS = new Set(['asi_grip','asi_td_tdap','asi_hpv','asi_hepatit_b',
 const ANSWER_OPTS = [
   { value: '1m',      label: 'Bu ay' },
   { value: '6m',      label: '6 ay önce' },
-  { value: '1y',      label: '1-2 yıl' },
-  { value: 'unknown', label: 'Hiç' },
+  { value: '1y',      label: '12-24 ay' },   // motor ay bazlı — kullanıcı aynı birimi görür
+  { value: 'unknown', label: 'Hiç / Bilmiyorum' },
 ]
 
 // ── Yaşam Tarzı soruları (UzunYaşa 5 sütun) ──────────────────────────────────
@@ -424,6 +424,10 @@ export default function WizardV2() {
                 )
               })}
             </div>
+            <button onClick={() => handleLifestyleAnswer(q.id, q.opts[0].value)}
+              className="mt-3 text-xs text-gray-400 underline underline-offset-2 text-center w-full">
+              Cevaplamak istemiyorum →
+            </button>
           </div>
         </div>
       </div>
@@ -488,6 +492,10 @@ export default function WizardV2() {
               )
             })}
           </div>
+          <button onClick={() => handleScreeningAnswer(card.id, 'unknown')}
+            className="mt-3 text-xs text-gray-400 underline underline-offset-2 text-center w-full">
+            Cevaplamak istemiyorum →
+          </button>
         </div>
       </div>
     </div>

@@ -229,6 +229,13 @@ export default function ScreeningsV2() {
   const [markDoneCard, setMarkDoneCard] = useState(null)
   const [detailCard, setDetailCard] = useState(null)
   const [showReminder, setShowReminder] = useState(false)
+  const [legendDismissed, setLegendDismissed] = useState(
+    () => localStorage.getItem('canim-legend-seen') === '1'
+  )
+  const dismissLegend = () => {
+    localStorage.setItem('canim-legend-seen', '1')
+    setLegendDismissed(true)
+  }
 
   const showToast = useCallback((msg) => {
     setToast(msg)
@@ -295,6 +302,29 @@ export default function ScreeningsV2() {
         </div>
         {statusLine}
       </div>
+
+      {/* Renk legend — ilk ziyarette bir kez */}
+      {!legendDismissed && (
+        <div className="mx-4 mt-3 mb-1 bg-white rounded-2xl border border-gray-100 px-4 py-3">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-xs font-bold text-gray-600">Renk sistemi</p>
+            <button onClick={dismissLegend} className="text-xs text-gray-400 underline" style={{minHeight:32,minWidth:32}}>Anladım ✓</button>
+          </div>
+          <div className="grid grid-cols-2 gap-1.5 text-xs">
+            {[
+              { color:'#DC2626', label:'Hemen Yapılmalı' },
+              { color:'#D97706', label:'Yakında' },
+              { color:'#059669', label:'Güncel' },
+              { color:'#6B7280', label:'Bilgi Yok' },
+            ].map(({color,label}) => (
+              <div key={label} className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full shrink-0" style={{background:color}} />
+                <span className="text-gray-600 font-medium">{label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* List */}
       <div className="flex-1 overflow-y-auto bg-gray-50">
