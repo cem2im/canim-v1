@@ -21,6 +21,7 @@ const useAppStoreV2 = create(
       profile: null, // { birthYear, sex, height?, weight? }
       diseases: [],  // string[]
       smokingStatus: null, // 'yes' | 'no' | 'quit'
+      packYears: null, // number — paket-yıl (günde paket × yıl sayısı)
 
       // Screening dates
       screeningDates: {}, // { screeningId: { lastDoneDate, nextDate } }
@@ -34,8 +35,8 @@ const useAppStoreV2 = create(
       }),
 
       markDone: (screeningId, lastDoneDate) => {
-        const { diseases, profile } = get()
-        const list = buildScreeningList(diseases, profile)
+        const { diseases, profile, smokingStatus, packYears } = get()
+        const list = buildScreeningList(diseases, { ...profile, smokingStatus, packYears })
         const item = list.find(s => s.id === screeningId)
         const freq = item ? item.frequencyMonths : 12
         const nextDate = addMonths(lastDoneDate, freq)
@@ -55,12 +56,14 @@ const useAppStoreV2 = create(
 
       updateSmokingStatus: (status) => set({ smokingStatus: status }),
 
+      updatePackYears: (py) => set({ packYears: py }),
+
       setWizardDone: () => set({ wizardDone: true }),
 
       applyWizardAnswers: (answers) => {
         // answers = { screeningId: 'this_month' | '6m' | '1y' | '2y' | 'unknown' }
-        const { diseases, profile } = get()
-        const list = buildScreeningList(diseases, profile)
+        const { diseases, profile, smokingStatus, packYears } = get()
+        const list = buildScreeningList(diseases, { ...profile, smokingStatus, packYears })
         const today = new Date()
         const newDates = {}
         for (const s of list) {
@@ -83,14 +86,16 @@ const useAppStoreV2 = create(
         profile: null,
         diseases: [],
         smokingStatus: null,
+        packYears: null,
         screeningDates: {},
       }),
 
       // Computed
       getScreeningCards: () => {
-        const { diseases, profile, screeningDates } = get()
+        const { diseases, profile, screeningDates, smokingStatus, packYears } = get()
         if (!profile) return []
-        const list = buildScreeningList(diseases, profile)
+        const enriched = { ...profile, smokingStatus, packYears }
+        const list = buildScreeningList(diseases, enriched)
         const today = new Date()
         return list.map(s => {
           const dates = screeningDates[s.id] || {}

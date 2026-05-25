@@ -81,7 +81,7 @@ export default function LandingPage({ onStart }) {
           onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.97)' }}
           onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)' }}
         >
-          Başla →
+          Karnemi Çıkar →
         </button>
 
         {/* Features — 2x2 grid, icon + short label only */}

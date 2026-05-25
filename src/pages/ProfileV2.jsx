@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { DISEASE_LIST } from '../data/screenings'
 import useAppStoreV2 from '../store/useAppStoreV2'
@@ -27,6 +27,7 @@ const CANCER_IDS = [
 const validDiseaseIds = new Set(DISEASE_LIST.map(d => d.id))
 
 function CancerSheet({ sex, selectedCancerIds, onToggle, onClose }) {
+  const [showInfo, setShowInfo] = useState(false)
   const filtered = CANCER_IDS.filter(c => {
     if (!validDiseaseIds.has(c.id)) return false
     if (c.sexFilter && c.sexFilter !== sex) return false
@@ -35,9 +36,26 @@ function CancerSheet({ sex, selectedCancerIds, onToggle, onClose }) {
   return createPortal(
     <div className="fixed inset-0 z-50 flex items-end" role="dialog" aria-modal="true" aria-label="Ailede Kanser Öyküsü">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="relative w-full bg-white rounded-t-3xl p-6 max-h-[70dvh] overflow-y-auto" style={{maxWidth:480,margin:'0 auto'}}>
+      <div className="relative w-full bg-white rounded-t-3xl p-6 max-h-[75dvh] overflow-y-auto" style={{maxWidth:480,margin:'0 auto'}}>
         <div className="w-10 h-1 bg-gray-300 rounded-full mx-auto mb-4" />
         <h2 className="text-xl font-bold mb-2">Ailede Kanser Öyküsü</h2>
+        {/* Birinci derece akraba açıklaması */}
+        <button
+          onClick={() => setShowInfo(v => !v)}
+          className="flex items-center gap-1.5 text-sm mb-3 font-medium"
+          style={{color:'#0D7377', minHeight:36}}>
+          <span className="w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs font-bold shrink-0"
+            style={{borderColor:'#0D7377', color:'#0D7377'}}>ℹ</span>
+          "Birinci derece akraba" kimdir?
+        </button>
+        {showInfo && (
+          <div className="mb-4 p-3 rounded-2xl text-sm leading-relaxed"
+            style={{background:'#F0FDFA', color:'#134E4A', border:'1px solid #99F6E4'}}>
+            <p className="font-bold mb-1">Birinci derece akraba:</p>
+            <p>Anne, baba, kardeş veya çocuğunuzu kapsar. Büyükanne/büyükbaba, amca/teyze gibi uzak akrabalar bu kategoriye <strong>girmez</strong>.</p>
+            <p className="mt-2">Akrabada kanser varsa; kaç yaşında teşhis konduğu tarama başlangıç yaşını ve sıklığını değiştirir.</p>
+          </div>
+        )}
         <p className="text-gray-600 text-sm mb-4">Birden fazla seçebilirsiniz</p>
         <div className="flex flex-wrap gap-2">
           {filtered.map(c => {
@@ -61,9 +79,11 @@ export default function ProfileV2({ onNavigate }) {
   const profile = useAppStoreV2(s => s.profile)
   const diseases = useAppStoreV2(s => s.diseases)
   const smokingStatus = useAppStoreV2(s => s.smokingStatus)
+  const packYears = useAppStoreV2(s => s.packYears)
   const updateProfile = useAppStoreV2(s => s.updateProfile)
   const updateDiseases = useAppStoreV2(s => s.updateDiseases)
   const updateSmokingStatus = useAppStoreV2(s => s.updateSmokingStatus)
+  const updatePackYears = useAppStoreV2(s => s.updatePackYears)
   const resetAll = useAppStoreV2(s => s.resetAll)
 
   // Inline edit states
@@ -74,6 +94,26 @@ export default function ProfileV2({ onNavigate }) {
   const [weightInput, setWeightInput] = useState(profile?.weight?.toString() || '')
   const [showResetConfirm, setShowResetConfirm] = useState(false)
   const [showCancerSheet, setShowCancerSheet] = useState(false)
+
+  // Pack-year calculation helpers
+  // packYears stored as single number; we derive packsPerDay/smokingYears from it only if not yet split
+  // For simplicity: store as flat number in store; UI shows two inputs, multiplies on save
+  const [editingPackYears, setEditingPackYears] = useState(false)
+  const [packsInput, setPacksInput] = useState('')
+  const [yearsInput, setYearsInput] = useState('')
+  const startPackYearEdit = () => {
+    setPacksInput('')
+    setYearsInput('')
+    setEditingPackYears(true)
+  }
+  const savePackYears = () => {
+    const p = parseFloat(packsInput)
+    const y = parseFloat(yearsInput)
+    if (!isNaN(p) && !isNaN(y) && p > 0 && y > 0) {
+      updatePackYears(Math.round(p * y))
+    }
+    setEditingPackYears(false)
+  }
 
   const currentYear = new Date().getFullYear()
 
@@ -242,11 +282,11 @@ export default function ProfileV2({ onNavigate }) {
           </div>
 
           {/* Sigara */}
-          <div className="px-5 py-4">
+          <div className={`px-5 py-4 ${(smokingStatus === 'yes' || smokingStatus === 'quit') ? 'border-b border-gray-50' : ''}`}>
             <p className="text-sm text-gray-600 mb-3">Sigara</p>
             <div className="flex gap-2">
               {[{id:'yes',label:'🚬 Evet'},{id:'no',label:'✓ Hayır'},{id:'quit',label:'⏳ Bıraktım'}].map(opt => (
-                <button key={opt.id} onClick={() => updateSmokingStatus(opt.id)}
+                <button key={opt.id} onClick={() => { updateSmokingStatus(opt.id); if (opt.id === 'no') updatePackYears(null) }}
                   className="flex-1 py-3 rounded-2xl text-xs font-semibold border transition-all"
                   style={smokingStatus === opt.id
                     ? {background:'#0D7377',color:'white',borderColor:'#0D7377'}
@@ -255,6 +295,64 @@ export default function ProfileV2({ onNavigate }) {
               ))}
             </div>
           </div>
+
+          {/* Paket-Yıl — yalnızca sigara içen/bırakanlar için */}
+          {(smokingStatus === 'yes' || smokingStatus === 'quit') && (
+            <div className="px-5 py-4">
+              <div className="flex items-start justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Paket-Yıl</p>
+                  <p className="text-xs text-gray-400 mt-0.5">Günde kaç paket × kaç yıl</p>
+                </div>
+                {!editingPackYears ? (
+                  <button onClick={startPackYearEdit}
+                    className="text-base font-semibold text-right"
+                    style={{color:'#0D7377', minHeight:44}}>
+                    {packYears ? `${packYears} paket-yıl ✎` : 'Ekle →'}
+                  </button>
+                ) : (
+                  <div className="flex flex-col gap-2 items-end">
+                    <div className="flex gap-2">
+                      <div>
+                        <label className="text-xs text-gray-500 block mb-1">Günde paket</label>
+                        <input type="text" inputMode="decimal" placeholder="1"
+                          value={packsInput} onChange={e => setPacksInput(e.target.value.replace(/[^\d.]/g,''))}
+                          className="w-20 border border-gray-300 rounded-xl px-2 py-2 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-teal-600 text-sm"
+                          autoFocus />
+                      </div>
+                      <div>
+                        <label className="text-xs text-gray-500 block mb-1">Kaç yıl</label>
+                        <input type="text" inputMode="numeric" placeholder="10"
+                          value={yearsInput} onChange={e => setYearsInput(e.target.value.replace(/\D/g,''))}
+                          className="w-20 border border-gray-300 rounded-xl px-2 py-2 text-center font-semibold focus:outline-none focus:ring-2 focus:ring-teal-600 text-sm" />
+                      </div>
+                    </div>
+                    {packsInput && yearsInput && (
+                      <p className="text-xs text-teal-700 font-semibold">
+                        = {Math.round(parseFloat(packsInput||0) * parseFloat(yearsInput||0))} paket-yıl
+                        {parseFloat(packsInput||0) * parseFloat(yearsInput||0) >= 20 && (
+                          <span className="ml-1 text-red-600">⚠️ Akciğer BT önerilir</span>
+                        )}
+                      </p>
+                    )}
+                    <div className="flex gap-2">
+                      <button onClick={savePackYears}
+                        className="px-4 py-2 rounded-xl text-white text-sm font-semibold"
+                        style={{background:'#0D7377', minHeight:36}}>Kaydet</button>
+                      <button onClick={() => setEditingPackYears(false)}
+                        className="px-3 py-2 rounded-xl text-gray-600 text-sm border border-gray-300"
+                        style={{minHeight:36}}>✕</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              {packYears && packYears >= 20 && !editingPackYears && (
+                <p className="text-xs mt-2 font-semibold" style={{color:'#DC2626'}}>
+                  ⚠️ ≥20 paket-yıl → Yıllık Akciğer BT önerilir (USPSTF)
+                </p>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Section 3 — Uygulama */}
@@ -286,7 +384,7 @@ export default function ProfileV2({ onNavigate }) {
           )}
 
           <div className="px-5 py-4 text-center">
-            <p className="text-sm text-gray-600 font-medium">Canım v2.0 · Prof. Dr. Cem Şimşek</p>
+            <p className="text-sm text-gray-600 font-medium">Canım v3.0 · Prof. Dr. Cem Şimşek</p>
             <div className="flex justify-center gap-3 mt-2 flex-wrap">
               <button onClick={() => onNavigate('gizlilik')} className="text-xs underline" style={{color:'#0D7377',minHeight:44}}>Gizlilik Politikası</button>
               <span className="text-gray-300">|</span>

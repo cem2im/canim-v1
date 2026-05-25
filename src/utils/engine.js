@@ -47,6 +47,18 @@ export function buildScreeningList(diseases, profile) {
   if (age >= 50 && !map['asi_zona'])   map['asi_zona']   = 999  // ACIP Grade A ≥50
   if (age >= 65 && !map['asi_pnomoni']) map['asi_pnomoni'] = 999 // ACIP 2022 ≥65
 
+  // Smoking-based lung CT (USPSTF Grade B: 50-80 yaş, ≥20 paket-yıl, aktif veya ≤15y önce bırakmış)
+  const smokingStatus = profile.smokingStatus
+  const packYears = Number(profile.packYears) || 0
+  if (
+    age >= 50 && age <= 80 &&
+    packYears >= 20 &&
+    (smokingStatus === 'yes' || smokingStatus === 'quit') &&
+    !map['akciger_bt']
+  ) {
+    map['akciger_bt'] = 12
+  }
+
   // Build final list
   return Object.entries(map).map(([id, months]) => ({
     ...SCREENINGS[id],
