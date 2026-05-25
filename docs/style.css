@@ -444,11 +444,32 @@ a, button, [role="button"], input, textarea, select {
   line-height: 1.7;
   max-width: 480px;
 }
+.hero__doctor {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  max-width: 480px;
+  padding: 10px 14px;
+  background: rgba(13,115,119,0.06);
+  border-left: 3px solid var(--color-primary);
+  border-radius: 0 8px 8px 0;
+  margin-top: 4px;
+}
 .hero__actions {
   display: flex;
   gap: var(--space-4);
   flex-wrap: wrap;
 }
+.btn--ghost {
+  background: transparent;
+  color: var(--color-primary);
+  border: none;
+  padding-left: 0;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.btn--ghost:hover { color: var(--color-primary-dark); text-decoration: underline; }
 
 /* Phone Mockup — 3D Tilt + Glow */
 .hero__phone {

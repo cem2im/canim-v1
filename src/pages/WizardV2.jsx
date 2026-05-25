@@ -201,17 +201,17 @@ export default function WizardV2() {
   const SCREEN_COUNT   = allSteps.length + LIFESTYLE_QUESTIONS.length
   const LIFESTYLE_START = allSteps.length
 
-  // step: -1=intro, 0..allSteps-1=taramalar, allSteps..allSteps+3=lifestyle, allSteps+4=karne
-  const [step, setStep]             = useState(-1)
+  // step: 0..allSteps-1=taramalar, allSteps..allSteps+3=lifestyle, allSteps+4=karne
+  // Intro kaldırıldı — kullanıcı onboarding'den geliyor
+  const [step, setStep]             = useState(0)
   const [answers, setAnswers]       = useState({})    // tarama cevapları
   const [lifestyle, setLifestyle]   = useState({})    // yaşam tarzı cevapları
   const [animKey, setAnimKey]       = useState(0)
   const advancing                   = useRef(false)
 
-  const isIntro     = step === -1
   const isLifestyle = step >= LIFESTYLE_START && step < LIFESTYLE_START + LIFESTYLE_QUESTIONS.length
   const isKarne     = step >= LIFESTYLE_START + LIFESTYLE_QUESTIONS.length
-  const isScreening = !isIntro && !isLifestyle && !isKarne
+  const isScreening = !isLifestyle && !isKarne
 
   const currentScreening  = isScreening ? allSteps[step] : null
   const currentLifestyleQ = isLifestyle ? LIFESTYLE_QUESTIONS[step - LIFESTYLE_START] : null
@@ -224,8 +224,11 @@ export default function WizardV2() {
     advancing.current = false
   }, [step, LIFESTYLE_START, answers, applyWizardAnswers])
 
+  // Intro ekranını atla — kullanıcı onboarding'den geliyor, zaten biliyor
+  // step=-1 yerine direkt 0'dan başla
+
   const goPrev = useCallback(() => {
-    if (step <= 0) { setStep(-1); return }
+    if (step <= 0) return  // ilk soruda geri yok
     setStep(s => s - 1)
     setAnimKey(k => k + 1)
   }, [step])
@@ -246,8 +249,9 @@ export default function WizardV2() {
 
   // ── Radar veri hesaplama ───────────────────────────────────────────────────
   const radarAxes = useMemo(() => {
+    // Kart status'unu kullan — liste ile aynı mantık, çelişki olmaz
     const taramalarScore = cards.length > 0
-      ? Math.round((cards.filter(c => answers[c.id] && answers[c.id] !== 'unknown').length / cards.length) * 100)
+      ? Math.round((cards.filter(c => c.status === 'ok' || c.status === 'soon').length / cards.length) * 100)
       : 0
 
     const lifeAxes = LIFESTYLE_QUESTIONS.map(q => {
@@ -330,46 +334,7 @@ export default function WizardV2() {
     )
   }
 
-  // ── INTRO ─────────────────────────────────────────────────────────────────
-  if (isIntro) {
-    return (
-      <div className="page-enter flex flex-col h-full" style={{ background: '#FAFAF8' }}>
-        <div className="px-5 pt-12 pb-6 shrink-0" style={{ background: '#0D7377' }}>
-          <p className="text-sm font-medium mb-1" style={{ color: 'rgba(255,255,255,0.75)' }}>Kişisel Sağlık Karnesi</p>
-          <h1 className="text-3xl font-extrabold text-white leading-tight">
-            Hangi taramaları yaptırman gerekiyor?
-          </h1>
-          <p className="text-sm mt-2" style={{ color: 'rgba(255,255,255,0.75)' }}>
-            ~3 dakika · {SCREEN_COUNT} soru
-          </p>
-        </div>
-        <div className="flex-1 flex flex-col justify-center px-6 py-6">
-          <p className="text-gray-500 text-sm font-semibold uppercase tracking-wide mb-5">Nasıl çalışır?</p>
-          <ol className="space-y-4">
-            {[
-              { n: '1', text: 'Yaşını ve durumunu gir' },
-              { n: '2', text: 'Son kontrol tarihlerini söyle' },
-              { n: '3', text: 'Yaşam tarzını değerlendir' },
-              { n: '4', text: 'Kişisel sağlık karnen çıkar' },
-            ].map(item => (
-              <li key={item.n} className="flex items-center gap-4">
-                <span className="w-10 h-10 rounded-full flex items-center justify-center text-base font-extrabold text-white shrink-0"
-                  style={{ background: '#0D7377' }}>{item.n}</span>
-                <p className="text-gray-800 text-xl font-bold leading-tight">{item.text}</p>
-              </li>
-            ))}
-          </ol>
-        </div>
-        <div className="px-5 pb-6 shrink-0">
-          <button onClick={goNext}
-            className="w-full py-4 rounded-2xl font-bold text-white text-lg"
-            style={{ background: '#0D7377', minHeight: 52 }}>
-            Karnemizi Oluştur →
-          </button>
-        </div>
-      </div>
-    )
-  }
+  // Intro kaldırıldı — direkt tarama sorularına başla
 
   // ── YAŞAM TARZI SORUSU ────────────────────────────────────────────────────
   if (isLifestyle) {

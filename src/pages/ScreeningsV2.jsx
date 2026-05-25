@@ -22,10 +22,15 @@ function timeLabel(card) {
     if (months <= 3) return { text: `${months} ay sonra`, color: '#F59E0B' }
     return { text: '3-6 ay', color: '#10B981' }
   }
-  // ok
+  // ok — gerçek lastDoneDate'den hesapla (daysUntil değil!)
   if (card.lastDoneDate) {
-    const months = Math.abs(Math.round(card.daysUntil / 30))
-    return { text: `${months} ay önce`, color: '#10B981' }
+    const daysSince = Math.round((new Date() - new Date(card.lastDoneDate)) / 86400000)
+    const months = Math.round(daysSince / 30)
+    if (months <= 0) return { text: 'Bu ay yapıldı', color: '#10B981' }
+    if (months === 1) return { text: '1 ay önce', color: '#10B981' }
+    if (months < 12) return { text: `${months} ay önce`, color: '#10B981' }
+    const years = Math.round(months / 12)
+    return { text: `${years} yıl önce`, color: '#10B981' }
   }
   return { text: 'Güncel', color: '#10B981' }
 }
