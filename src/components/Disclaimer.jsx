@@ -12,7 +12,7 @@ export default function Disclaimer() {
         </p>
       </div>
       <p className="text-xs text-center mt-3" style={{ color: '#94a3b8' }}>
-        Prof. Dr. Cem Şimşek • Hacettepe Üniversitesi
+        Dr. Cem Şimşek • Hacettepe Üniversitesi
       </p>
     </div>
   )

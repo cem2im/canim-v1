@@ -70,7 +70,7 @@ function YearPicker({ value, onChange }) {
         autoFocus
         style={{
           width: '100%',
-          fontSize: 56,
+          fontSize: 40,
           fontWeight: 800,
           textAlign: 'center',
           color: isError ? '#EF4444' : isValid ? '#0D7377' : '#1F2937',

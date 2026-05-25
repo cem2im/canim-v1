@@ -166,7 +166,7 @@ export default function ShareCardModal({ onClose, score, label, name, cards }) {
 
     ctx.fillStyle = 'rgba(255,255,255,0.45)'
     ctx.font = '500 12px Inter, Arial, sans-serif'
-    ctx.fillText('Prof. Dr. Cem Simsek · Hacettepe Universitesi', 40, H - 28)
+    ctx.fillText('Dr. Cem Simsek · Hacettepe Universitesi', 40, H - 28)
     ctx.textAlign = 'right'
     ctx.fillText('canim.uzunyasa.com', W - 40, H - 28)
 

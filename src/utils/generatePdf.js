@@ -68,7 +68,7 @@ export function generateHealthReport({ profile, diseases, screeningCards, doctor
     doc.setFontSize(8)
     doc.setTextColor(150)
     doc.setFont('helvetica', 'normal')
-    doc.text('Prof. Dr. Cem Simsek · Hacettepe Universitesi · Canim v3.0', M, 290)
+    doc.text('Dr. Cem Simsek · Hacettepe Universitesi · Canim v3.0', M, 290)
     doc.text(`Sayfa ${pg}`, W - M, 290, { align: 'right' })
     doc.text('Bu rapor bilgilendirme amaclidir, tibbi tavsiye niteliginde degildir.', M, 286)
     // Bottom teal bar
@@ -368,7 +368,7 @@ export function generateScreeningsPdf({ profile, screeningCards }) {
   function drawFooter() {
     doc.setFontSize(7.5); doc.setTextColor(160)
     doc.setFont('helvetica', 'normal')
-    doc.text('Canim · Prof. Dr. Cem Simsek · canim.uzunyasa.com', M, 288)
+    doc.text('Canim · Dr. Cem Simsek · canim.uzunyasa.com', M, 288)
     doc.text(reportDate, W - M, 288, { align: 'right' })
     doc.text('Bu cikti bilgilendirme amaclidir, tibbi tavsiye niteliginde degildir.', M, 284)
     doc.setFillColor(13, 115, 119)

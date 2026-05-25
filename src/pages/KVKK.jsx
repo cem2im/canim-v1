@@ -14,7 +14,7 @@ export default function KVKKPage({ page, onBack }) {
       title: 'KVKK Aydınlatma Metni',
       content: [
         '6698 sayılı Kişisel Verilerin Korunması Kanunu kapsamında aydınlatma metnidir.',
-        'Veri Sorumlusu: Prof. Dr. Cem Şimşek',
+        'Veri Sorumlusu: Dr. Cem Şimşek',
         'İşlenen Kişisel Veriler: Bu uygulama kişisel veri işlememektedir. Girdiğiniz tüm bilgiler (doğum yılı, sağlık durumu, tarama tarihleri) yalnızca cihazınızın yerel depolama alanında tutulur.',
         'Veri Aktarımı: Herhangi bir sunucuya ya da üçüncü tarafa veri aktarımı yapılmamaktadır.',
         'Haklarınız: KVKK kapsamındaki haklarınızı kullanmak için cem@uzunyasa.com adresine başvurabilirsiniz.',
@@ -33,7 +33,7 @@ export default function KVKKPage({ page, onBack }) {
     iletisim: {
       title: 'İletişim',
       content: [
-        'Prof. Dr. Cem Şimşek',
+        'Dr. Cem Şimşek',
         'E-posta: cem@uzunyasa.com',
         'Web: uzunyasa.com',
         'Her türlü görüş, öneri ve geri bildiriminiz için iletişime geçebilirsiniz.',

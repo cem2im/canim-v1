@@ -106,7 +106,7 @@ export default function LandingPage({ onStart }) {
           </span>
         </div>
         <p style={{ textAlign: 'center', fontSize: 10, color: '#D1D5DB', marginTop: 6, marginBottom: 16 }}>
-          Tıbbi tavsiye değildir · Prof. Dr. Cem Şimşek
+          Tıbbi tavsiye değildir · Dr. Cem Şimşek
         </p>
       </div>
     </div>

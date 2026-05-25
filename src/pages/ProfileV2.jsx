@@ -384,7 +384,7 @@ export default function ProfileV2({ onNavigate }) {
           )}
 
           <div className="px-5 py-4 text-center">
-            <p className="text-sm text-gray-600 font-medium">Canım v3.0 · Prof. Dr. Cem Şimşek</p>
+            <p className="text-sm text-gray-600 font-medium">Canım v3.0 · Dr. Cem Şimşek</p>
             <div className="flex justify-center gap-3 mt-2 flex-wrap">
               <button onClick={() => onNavigate('gizlilik')} className="text-xs underline" style={{color:'#0D7377',minHeight:44}}>Gizlilik Politikası</button>
               <span className="text-gray-300">|</span>
