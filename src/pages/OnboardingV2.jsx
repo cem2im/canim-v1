@@ -191,6 +191,7 @@ function getGiftLabels(forParam) {
 
 export default function OnboardingV2() {
   const completeOnboarding = useAppStoreV2(s => s.completeOnboarding)
+  const updatePackYears = useAppStoreV2(s => s.updatePackYears)
   const [step, setStep] = useState(1)
 
   // Gift mode — read URL param once
@@ -215,6 +216,7 @@ export default function OnboardingV2() {
   const [diseaseAnswers, setDiseaseAnswers] = useState({})
   const [cancerIds, setCancerIds] = useState([])   // multi-select from CancerSheet
   const [smokingStatus, setSmokingStatus] = useState(null)
+  const [packYearsInput, setPackYearsInput] = useState('')  // raw numeric string
   const [showBMISheet, setShowBMISheet] = useState(false)
   const [showCancerSheet, setShowCancerSheet] = useState(false)
 
@@ -248,7 +250,8 @@ export default function OnboardingV2() {
   // Step 4
   const screeningCount = (() => {
     if (!yearValid || !sex) return 0
-    const profile = { birthYear: yearNum, sex }
+    const py = parseFloat(packYearsInput)
+    const profile = { birthYear: yearNum, sex, smokingStatus, packYears: isNaN(py) ? null : Math.round(py) }
     const allDiseases = selectedDiseases.filter(d => validDiseaseIds.has(d))
     return buildScreeningList(allDiseases, profile).length
   })()
@@ -263,6 +266,8 @@ export default function OnboardingV2() {
     const profile = { birthYear: yearNum, sex }
     const allDiseases = selectedDiseases.filter(d => validDiseaseIds.has(d))
     completeOnboarding(profile, allDiseases, smokingStatus)
+    const py = parseFloat(packYearsInput)
+    if (!isNaN(py) && py > 0) updatePackYears(Math.round(py))
   }
 
   const handleGiftWhatsApp = () => {
@@ -405,7 +410,7 @@ export default function OnboardingV2() {
                   { id: 'quit', label: '⏳ Bıraktım' },
                 ].map(opt => (
                   <button key={opt.id}
-                    onClick={() => setSmokingStatus(opt.id)}
+                    onClick={() => { setSmokingStatus(opt.id); if (opt.id === 'no') setPackYearsInput('') }}
                     className="rounded-xl text-xs font-bold border-2 transition-all py-2"
                     style={{
                       minHeight: 40,
@@ -416,6 +421,31 @@ export default function OnboardingV2() {
                     aria-pressed={smokingStatus === opt.id}>{opt.label}</button>
                 ))}
               </div>
+
+              {/* Pack-year — yalnızca içen/bırakanlara, yaş 45+ ise daha vurgulu */}
+              {(smokingStatus === 'yes' || smokingStatus === 'quit') && (
+                <div className="mt-2 pt-2 border-t border-gray-100">
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs text-gray-500 flex-1">
+                      Paket-yıl <span className="text-gray-400">(günde paket × yıl)</span>
+                    </p>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      placeholder="örn. 20"
+                      value={packYearsInput}
+                      onChange={e => setPackYearsInput(e.target.value.replace(/\D/g,''))}
+                      className="w-20 border rounded-xl px-2 py-1.5 text-center text-xs font-bold focus:outline-none focus:ring-2 focus:ring-teal-600"
+                      style={{borderColor: packYearsInput ? '#0D7377' : '#E5E7EB'}}
+                    />
+                  </div>
+                  {packYearsInput && parseInt(packYearsInput) >= 20 && (age || 0) >= 45 && (
+                    <p className="text-xs mt-1.5 font-semibold" style={{color:'#DC2626'}}>
+                      ⚠️ ≥20 paket-yıl → Akciğer BT eklenecek
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
@@ -482,6 +512,8 @@ export default function OnboardingV2() {
               const profile = { birthYear: yearNum, sex }
               const allDiseases = selectedDiseases.filter(d => validDiseaseIds.has(d))
               completeOnboarding(profile, allDiseases, smokingStatus)
+              const py = parseFloat(packYearsInput)
+              if (!isNaN(py) && py > 0) updatePackYears(Math.round(py))
             }}
             className="w-full max-w-xs py-3 rounded-2xl text-base font-semibold border-2"
             style={{borderColor:'#0D7377', color:'#0D7377', background:'white'}}>
