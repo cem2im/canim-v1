@@ -274,60 +274,87 @@ export default function WizardV2() {
 
   // ── KARNE ─────────────────────────────────────────────────────────────────
   if (isKarne) {
-    const taramaDone  = cards.filter(c => answers[c.id] && answers[c.id] !== 'unknown').length
+    const taramaDone  = cards.filter(c => c.status === 'ok' || c.status === 'soon').length
     const taramaTotal = cards.length
-    const msg = `Canım'da sağlık skorumu çıkardım: ${overallScore}/100 🎯\nTaramalar: ${taramaDone}/${taramaTotal} güncel. Sen de karnenizi çıkar: https://canim.uzunyasa.com/app/`
+    const taramaEksik = taramaTotal - taramaDone
+
+    // Harf notu
+    const grade = overallScore >= 85 ? 'A'
+      : overallScore >= 70 ? 'B'
+      : overallScore >= 55 ? 'C'
+      : overallScore >= 40 ? 'D' : 'F'
+    const gradeColor = overallScore >= 70 ? '#059669'
+      : overallScore >= 55 ? '#D97706' : '#DC2626'
+    const gradeMsg = overallScore >= 85
+      ? 'Harika — taramalarını takip ediyorsun!'
+      : overallScore >= 70
+      ? 'İyi gidiyorsun, birkaç tarama eksik.'
+      : overallScore >= 55
+      ? 'Birkaç önemli tarama gecikmiş.'
+      : 'Dikkat — bazı kritik taramalar yapılmamış.'
+
+    // WhatsApp kancası — merak uyandırsın
+    const waMsg = `Sağlık karnemdeki notuma baktım… ${grade} aldım 😬 Senin notun ne acaba? Canım ile 2 dakikada öğren: https://canim.uzunyasa.com/app/`
 
     return (
       <div className="page-enter flex flex-col h-full" style={{ background: '#FAFAF8' }}>
+        {/* Header — not büyük ve çarpıcı */}
         <div className="px-5 pt-10 pb-5 shrink-0" style={{ background: '#0D7377' }}>
-          <p className="text-sm font-medium mb-1" style={{ color: 'rgba(255,255,255,0.8)' }}>Tamamlandı 🎉</p>
-          <div className="flex items-end justify-between">
-            <h1 className="text-3xl font-extrabold text-white">Sağlık Karnen</h1>
-            <span className="text-4xl font-black text-white">{overallScore}<span className="text-lg font-semibold opacity-75">/100</span></span>
+          <p className="text-sm font-medium mb-2" style={{ color: 'rgba(255,255,255,0.8)' }}>Sağlık Karnen 🎉</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-extrabold text-white leading-tight">{gradeMsg}</h1>
+              <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.75)' }}>
+                {taramaEksik > 0 ? `${taramaEksik} tarama eksik` : 'Tüm taramalar güncel'}
+              </p>
+            </div>
+            {/* Büyük harf notu */}
+            <div className="w-20 h-20 rounded-2xl flex flex-col items-center justify-center shrink-0 ml-4"
+              style={{ background: 'white' }}>
+              <span className="text-4xl font-black leading-none" style={{ color: gradeColor }}>{grade}</span>
+              <span className="text-xs font-bold" style={{ color: gradeColor }}>{overallScore}/100</span>
+            </div>
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-4">
+        <div className="flex-1 overflow-y-auto px-5 py-4 flex flex-col gap-3">
           {/* Radar */}
-          <div className="bg-white rounded-2xl p-4 border border-gray-100 flex flex-col items-center">
+          <div className="bg-white rounded-2xl p-3 border border-gray-100 flex flex-col items-center">
             <RadarChart axes={radarAxes} />
-            <p className="text-xs text-gray-500 mt-1">{taramaDone}/{taramaTotal} tarama güncel</p>
           </div>
 
           {/* Skor çubukları */}
           <div className="bg-white rounded-2xl p-4 border border-gray-100">
-            <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Detay</p>
-            <div className="space-y-2.5">
-              {radarAxes.map(a => (
-                <div key={a.label}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-semibold text-gray-700">{a.icon} {a.label}</span>
-                    <span className="text-sm font-bold" style={{ color: a.score >= 70 ? '#10B981' : a.score >= 40 ? '#F59E0B' : '#EF4444' }}>
-                      {a.score}/100
-                    </span>
+            <div className="space-y-2">
+              {radarAxes.map(a => {
+                const barColor = a.score >= 70 ? '#059669' : a.score >= 40 ? '#D97706' : '#DC2626'
+                return (
+                  <div key={a.label}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-semibold text-gray-700">{a.icon} {a.label}</span>
+                      <span className="text-xs font-bold" style={{ color: barColor }}>{a.score}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-gray-100">
+                      <div className="h-1.5 rounded-full" style={{ width: `${a.score}%`, background: barColor }} />
+                    </div>
                   </div>
-                  <div className="h-2 rounded-full bg-gray-100">
-                    <div className="h-2 rounded-full transition-all"
-                      style={{
-                        width: `${a.score}%`,
-                        background: a.score >= 70 ? '#10B981' : a.score >= 40 ? '#F59E0B' : '#EF4444'
-                      }} />
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
 
-          <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, '_blank')}
-            className="w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-white"
-            style={{ background: '#25D366', minHeight: 52 }}>
-            💚 Karneyi Paylaş
-          </button>
+          {/* PRIMARY: Listemi Gör */}
           <button onClick={() => setWizardDone()}
-            className="w-full py-4 rounded-2xl font-bold text-white"
+            className="w-full py-4 rounded-2xl font-bold text-white text-base"
             style={{ background: '#0D7377', minHeight: 52 }}>
             Tarama Listemi Gör →
+          </button>
+
+          {/* SECONDARY: Paylaş */}
+          <button onClick={() => window.open(`https://wa.me/?text=${encodeURIComponent(waMsg)}`, '_blank')}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-semibold border-2"
+            style={{ color: '#25D366', borderColor: '#25D366', background: 'white', minHeight: 48 }}>
+            💚 "Notum ne çıktı?" — Arkadaşına Sor
           </button>
         </div>
       </div>

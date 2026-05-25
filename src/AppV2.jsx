@@ -28,6 +28,11 @@ function UserIcon() {
 function MainAppV2() {
   const [activeTab, setActiveTab] = useState('screenings')
   const [currentPage, setCurrentPage] = useState(null) // null | 'gizlilik' | 'kvkk' | 'kullanim' | 'iletisim'
+  const getScreeningCards = useAppStoreV2(s => s.getScreeningCards)
+  const wizardDone = useAppStoreV2(s => s.wizardDone)
+  const urgentCount = wizardDone
+    ? getScreeningCards().filter(c => c.status === 'unknown' || c.status === 'overdue').length
+    : 0
 
   if (currentPage) {
     return (
@@ -64,8 +69,16 @@ function MainAppV2() {
             onClick={() => setActiveTab('screenings')}
             className="flex-1 flex flex-col items-center justify-center py-3 gap-0.5 transition-colors"
             style={{color: activeTab === 'screenings' ? '#0D7377' : '#6B7280', minHeight:56}}>
-            <CalIcon />
-            <span className="text-xs font-semibold mt-0.5">Taramalarım</span>
+            <div className="relative">
+              <CalIcon />
+              {urgentCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full text-white flex items-center justify-center font-bold"
+                  style={{ background: '#DC2626', fontSize: 9 }}>{urgentCount}</span>
+              )}
+            </div>
+            <span className="text-xs font-semibold mt-0.5">
+              Taramalarım{urgentCount > 0 ? ` · ${urgentCount}` : ''}
+            </span>
           </button>
           <button
             id="tab-profile"

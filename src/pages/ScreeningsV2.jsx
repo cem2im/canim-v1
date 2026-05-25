@@ -208,10 +208,14 @@ function ReminderSheet({ cards, onClose }) {
 }
 
 // Group header
-function GroupHeader({ label }) {
+function GroupHeader({ label, color = '#6B7280', bg = '#F9FAFB', count }) {
   return (
-    <div className="px-5 py-2 mt-4 first:mt-0">
-      <p className="text-xs font-bold text-gray-500 uppercase tracking-widest">{label}</p>
+    <div className="px-5 py-2 mt-3 first:mt-0 flex items-center justify-between"
+      style={{ background: bg, borderLeft: `4px solid ${color}` }}>
+      <p className="text-xs font-extrabold uppercase tracking-widest" style={{ color }}>{label}</p>
+      {count != null && (
+        <span className="text-xs font-bold px-2 py-0.5 rounded-full text-white" style={{ background: color }}>{count}</span>
+      )}
     </div>
   )
 }
@@ -302,28 +306,33 @@ export default function ScreeningsV2() {
           </div>
         ) : (
           <div className="pb-6">
-            {unknown.length > 0 && (
+            {/* Hemen — en büyük görsel ağırlık */}
+            {(unknown.length + overdue.length) > 0 && (
               <>
-                <GroupHeader label="📋 Yapılmadı" />
-                <div className="bg-white border-y border-gray-100">{unknown.map(renderCard)}</div>
+                <GroupHeader label="⚠️ Hemen Yapılmalı"
+                  color="#DC2626" bg="#FEF2F2"
+                  count={unknown.length + overdue.length} />
+                <div className="bg-white border-y border-red-100">
+                  {[...overdue, ...unknown].map(renderCard)}
+                </div>
               </>
             )}
-            {overdue.length > 0 && (
-              <>
-                <GroupHeader label="🔴 Hemen Yapılmalı" />
-                <div className="bg-white border-y border-gray-100">{overdue.map(renderCard)}</div>
-              </>
-            )}
+            {/* Yakında — orta ağırlık */}
             {yakinda.length > 0 && (
               <>
-                <GroupHeader label="🟡 Yakında" />
-                <div className="bg-white border-y border-gray-100">{yakinda.map(renderCard)}</div>
+                <GroupHeader label="📅 Yakında"
+                  color="#D97706" bg="#FFFBEB"
+                  count={yakinda.length} />
+                <div className="bg-white border-y border-amber-100">{yakinda.map(renderCard)}</div>
               </>
             )}
+            {/* Güncel — en sönük */}
             {ok.length > 0 && (
               <>
-                <GroupHeader label="✅ Güncel" />
-                <div className="bg-white border-y border-gray-100">{ok.map(renderCard)}</div>
+                <GroupHeader label="✅ Güncel"
+                  color="#059669" bg="#F0FDF4"
+                  count={ok.length} />
+                <div className="bg-white border-y border-green-100 opacity-80">{ok.map(renderCard)}</div>
               </>
             )}
           </div>
