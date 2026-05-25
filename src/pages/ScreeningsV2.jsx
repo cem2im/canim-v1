@@ -1,7 +1,10 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import useAppStoreV2 from '../store/useAppStoreV2'
 import WizardV2 from './WizardV2'
+import { shareKarneImage } from '../utils/karneShare'
+import { generateScreeningsPdf } from '../utils/generatePdf'
+import { computeRadarAxes, computeGrade, gradeColor as getGradeColor } from '../data/lifestyle'
 
 const FREQ_LABELS = {
   1: 'Ayda bir', 3: '3 ayda bir', 6: '6 ayda bir', 12: 'Yılda bir',
@@ -220,15 +223,153 @@ function GroupHeader({ label, color = '#6B7280', bg = '#F9FAFB', count }) {
   )
 }
 
+// ── Mini Radar (karne sheet için) ─────────────────────────────────────────
+function RadarMini({ axes }) {
+  const N = axes.length
+  const cx = 130, cy = 125, R = 80
+  const angle = (i) => (Math.PI * 2 * i / N) - Math.PI / 2
+  const pt = (i, r) => [cx + r * Math.cos(angle(i)), cy + r * Math.sin(angle(i))]
+  const dataPoints = axes.map((a, i) => pt(i, R * (a.score / 100)))
+  const dataPoly = dataPoints.map(p => p.join(',')).join(' ')
+  return (
+    <svg width={260} height={250} viewBox="0 0 260 250" aria-hidden="true">
+      <defs>
+        <linearGradient id="rf2" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#0D7377" stopOpacity="0.4"/>
+          <stop offset="100%" stopColor="#14919B" stopOpacity="0.15"/>
+        </linearGradient>
+      </defs>
+      {[0.33,0.66,1].map((r,ri) => {
+        const pts = Array.from({length:N},(_,i)=>pt(i,R*r)).map(p=>p.join(',')).join(' ')
+        return <polygon key={ri} points={pts} fill="none" stroke="#E5E7EB" strokeWidth={1}/>
+      })}
+      {axes.map((_,i)=>{const[x,y]=pt(i,R);return<line key={i} x1={cx} y1={cy} x2={x} y2={y} stroke="#E5E7EB" strokeWidth={1}/>})}
+      <polygon points={dataPoly} fill="url(#rf2)" stroke="#0D7377" strokeWidth={2.5} strokeLinejoin="round"/>
+      {dataPoints.map(([x,y],i)=><circle key={i} cx={x} cy={y} r={5} fill="#0D7377" stroke="white" strokeWidth={2}/>)}
+      {axes.map((a,i)=>{const[x,y]=pt(i,R+20);return(
+        <g key={i}>
+          <text x={x} y={y-8} textAnchor="middle" fontSize={16}>{a.icon}</text>
+          <text x={x} y={y+6} textAnchor="middle" fontSize={9} fontWeight={700} fill="#374151" fontFamily="Inter,sans-serif">{a.label}</text>
+          <text x={x} y={y+17} textAnchor="middle" fontSize={9} fill="#0D7377" fontFamily="Inter,sans-serif" fontWeight={800}>{a.score}</text>
+        </g>
+      )})}
+    </svg>
+  )
+}
+
+// ── KarneSheet ────────────────────────────────────────────────────────────
+function KarneSheet({ cards, lifestyleAnswers, profile, onClose }) {
+  const [sharing, setSharing] = useState(false)
+  const axes = useMemo(() => computeRadarAxes(cards, lifestyleAnswers), [cards, lifestyleAnswers])
+  const overallScore = useMemo(() => {
+    const filled = axes.filter(a => a.score > 0)
+    return filled.length ? Math.round(filled.reduce((s,a) => s + a.score, 0) / filled.length) : 0
+  }, [axes])
+  const grade = computeGrade(overallScore)
+  const gColor = getGradeColor(overallScore)
+  const gradeMsg = overallScore >= 85 ? 'Harika — taramalarını takip ediyorsun!'
+    : overallScore >= 70 ? 'İyi gidiyorsun, birkaç tarama eksik.'
+    : overallScore >= 55 ? 'Birkaç önemli tarama gecikmiş.'
+    : 'Dikkat — bazı kritik taramalar yapılmamış.'
+
+  const waMsg = `Sağlık karnemdeki notuma baktım… ${grade} aldım 😬 Senin notun ne acaba? Canım ile 2 dakikada öğren: https://canim.uzunyasa.com/app/`
+
+  const handleShare = async () => {
+    setSharing(true)
+    try { await shareKarneImage({ axes, grade, overallScore, waMsg }) }
+    finally { setSharing(false) }
+  }
+
+  const handlePdf = () => {
+    generateScreeningsPdf({ profile, screeningCards: cards })
+  }
+
+  return createPortal(
+    <div className="fixed inset-0 z-50 flex items-end" role="dialog" aria-modal="true" aria-label="Sağlık Karnem">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose}/>
+      <div className="relative w-full bg-white rounded-t-3xl max-h-[90dvh] overflow-y-auto" style={{maxWidth:480,margin:'0 auto'}}>
+        {/* Header */}
+        <div className="px-5 pt-5 pb-4 shrink-0" style={{background:'#0D7377',borderRadius:'24px 24px 0 0'}}>
+          <div className="w-10 h-1 bg-white/40 rounded-full mx-auto mb-4"/>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-white/80">Sağlık Karnen</p>
+              <h2 className="text-xl font-extrabold text-white leading-tight">{gradeMsg}</h2>
+            </div>
+            <div className="w-16 h-16 rounded-2xl bg-white flex flex-col items-center justify-center shrink-0 ml-3">
+              <span className="text-3xl font-black leading-none" style={{color:gColor}}>{grade}</span>
+              <span className="text-xs font-bold" style={{color:gColor}}>{overallScore}/100</span>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-5 py-4 flex flex-col gap-3">
+          {/* Radar */}
+          <div className="bg-gray-50 rounded-2xl flex justify-center py-2 border border-gray-100">
+            <RadarMini axes={axes}/>
+          </div>
+
+          {/* Bar scores */}
+          <div className="bg-white rounded-2xl p-4 border border-gray-100">
+            <div className="space-y-2">
+              {axes.map(a => {
+                const bc = a.score >= 70 ? '#059669' : a.score >= 40 ? '#D97706' : '#DC2626'
+                return (
+                  <div key={a.label}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-semibold text-gray-700">{a.icon} {a.label}</span>
+                      <span className="text-xs font-bold" style={{color:bc}}>{a.score}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-gray-100">
+                      <div className="h-1.5 rounded-full transition-all" style={{width:`${a.score}%`,background:bc}}/>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+
+          {/* Paylaş (WhatsApp + görsel) */}
+          <button onClick={handleShare} disabled={sharing}
+            className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl font-bold border-2 text-sm"
+            style={{color:'#25D366',borderColor:'#25D366',background:'white',minHeight:48,opacity:sharing?0.6:1}}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+            </svg>
+            {sharing ? 'Hazırlanıyor…' : 'Karneyi Paylaş (WhatsApp / Görsel)'}
+          </button>
+
+          {/* PDF */}
+          <button onClick={handlePdf}
+            className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-semibold border border-gray-200 text-gray-600 text-sm"
+            style={{minHeight:44}}>
+            📄 PDF İndir
+          </button>
+
+          <button onClick={onClose}
+            className="w-full py-3 rounded-2xl border border-gray-200 text-gray-500 text-sm font-medium"
+            style={{minHeight:44}}>
+            Kapat
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  )
+}
+
 export default function ScreeningsV2() {
   const wizardDone = useAppStoreV2(s => s.wizardDone)
   const markDone = useAppStoreV2(s => s.markDone)
   const getScreeningCards = useAppStoreV2(s => s.getScreeningCards)
+  const profile = useAppStoreV2(s => s.profile)
+  const lifestyleAnswers = useAppStoreV2(s => s.lifestyleAnswers)
 
   const [toast, setToast] = useState(null)
   const [markDoneCard, setMarkDoneCard] = useState(null)
   const [detailCard, setDetailCard] = useState(null)
   const [showReminder, setShowReminder] = useState(false)
+  const [showKarne, setShowKarne] = useState(false)
   const [legendDismissed, setLegendDismissed] = useState(
     () => localStorage.getItem('canim-legend-seen') === '1'
   )
@@ -296,9 +437,14 @@ export default function ScreeningsV2() {
       <div className="px-5 pt-12 pb-4 bg-white border-b border-gray-100">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold" style={{color:'#0D7377'}}>Taramalarım</h1>
-          <button onClick={() => setShowReminder(true)}
-            className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 text-xl"
-            style={{minWidth:44,minHeight:44}} aria-label="Hatırlatma kur">🔔</button>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowKarne(true)}
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 text-lg"
+              style={{minWidth:44,minHeight:44}} aria-label="Karneyi gör">📊</button>
+            <button onClick={() => setShowReminder(true)}
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100 text-xl"
+              style={{minWidth:44,minHeight:44}} aria-label="Hatırlatma kur">🔔</button>
+          </div>
         </div>
         {statusLine}
       </div>
@@ -386,6 +532,14 @@ export default function ScreeningsV2() {
       )}
       {showReminder && (
         <ReminderSheet cards={cards} onClose={() => setShowReminder(false)} />
+      )}
+      {showKarne && (
+        <KarneSheet
+          cards={cards}
+          lifestyleAnswers={lifestyleAnswers}
+          profile={profile}
+          onClose={() => setShowKarne(false)}
+        />
       )}
       {toast && <Toast message={toast} />}
     </div>

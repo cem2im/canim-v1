@@ -22,6 +22,7 @@ const useAppStoreV2 = create(
       diseases: [],  // string[]
       smokingStatus: null, // 'yes' | 'no' | 'quit'
       packYears: null, // number — paket-yıl (günde paket × yıl sayısı)
+      lifestyleAnswers: {}, // { hareket, uyku, beslenme, zihin } — wizard'dan gelir
 
       // Screening dates
       screeningDates: {}, // { screeningId: { lastDoneDate, nextDate } }
@@ -58,6 +59,8 @@ const useAppStoreV2 = create(
 
       updatePackYears: (py) => set({ packYears: py }),
 
+      setLifestyleAnswers: (answers) => set({ lifestyleAnswers: answers }),
+
       setWizardDone: () => set({ wizardDone: true }),
 
       applyWizardAnswers: (answers) => {
@@ -87,6 +90,7 @@ const useAppStoreV2 = create(
         diseases: [],
         smokingStatus: null,
         packYears: null,
+        lifestyleAnswers: {},
         screeningDates: {},
       }),
 
