@@ -260,6 +260,8 @@ function RadarMini({ axes }) {
 // ── KarneSheet ────────────────────────────────────────────────────────────
 function KarneSheet({ cards, lifestyleAnswers, profile, onClose }) {
   const [sharing, setSharing] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
+  const resetAll = useAppStoreV2(s => s.resetAll)
   const axes = useMemo(() => computeRadarAxes(cards, lifestyleAnswers), [cards, lifestyleAnswers])
   const overallScore = useMemo(() => {
     const filled = axes.filter(a => a.score > 0)
@@ -351,6 +353,33 @@ function KarneSheet({ cards, lifestyleAnswers, profile, onClose }) {
             style={{minHeight:44}}>
             Kapat
           </button>
+
+          {/* Sıfırla */}
+          {!confirmReset ? (
+            <button onClick={() => setConfirmReset(true)}
+              className="w-full py-2 text-xs text-red-400 font-medium"
+              style={{minHeight:36}}>
+              🔄 Baştan Başla
+            </button>
+          ) : (
+            <div className="bg-red-50 rounded-2xl p-4 border border-red-100">
+              <p className="text-sm text-red-700 font-semibold mb-3 text-center">
+                Tüm tarama verileri silinecek. Emin misin?
+              </p>
+              <div className="flex gap-2">
+                <button onClick={() => { resetAll(); onClose() }}
+                  className="flex-1 py-3 rounded-2xl text-white font-bold text-sm"
+                  style={{background:'#EF4444', minHeight:44}}>
+                  Evet, Sıfırla
+                </button>
+                <button onClick={() => setConfirmReset(false)}
+                  className="flex-1 py-3 rounded-2xl border border-gray-300 text-gray-600 font-semibold text-sm"
+                  style={{minHeight:44}}>
+                  İptal
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>,
