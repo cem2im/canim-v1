@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prof. Dr. Cem Şimşek Hakkında — Canım</title>
+<meta name="description" content="Canım'ın kurucusu Prof. Dr. Cem Şimşek, Hacettepe Üniversitesi gastroenteroloji uzmanı. USPSTF, ADA, ESC kılavuzlarıyla kanıta dayalı koruyucu sağlık platformu.">
+<meta name="robots" content="index, follow">
+<meta property="og:title" content="Prof. Dr. Cem Şimşek — Canım Kurucusu">
+<meta property="og:description" content="Hacettepe Üniversitesi gastroenteroloji uzmanı. Kanıta dayalı koruyucu sağlık platformu Canım'ın arkasındaki isim.">
+<meta property="og:type" content="profile">
+<meta property="og:url" content="https://canim.uzunyasa.com/hakkinda.html">
+<meta property="og:image" content="https://canim.uzunyasa.com/og-image.png">
+<link rel="canonical" href="https://canim.uzunyasa.com/hakkinda.html">
+<link rel="manifest" href="/manifest.json">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Person",
+  "name": "Cem Şimşek",
+  "honorificPrefix": "Prof. Dr.",
+  "jobTitle": "Gastroenteroloji Uzmanı",
+  "affiliation": {
+    "@type": "Organization",
+    "name": "Hacettepe Üniversitesi Tıp Fakültesi"
+  },
+  "url": "https://canim.uzunyasa.com/hakkinda.html",
+  "sameAs": ["https://uzunyasa.com"],
+  "knowsAbout": ["Gastroenteroloji", "Endoskopi", "Koruyucu Sağlık", "Longevity Medicine"],
+  "worksFor": {
+    "@type": "Organization",
+    "name": "Hacettepe Üniversitesi"
+  }
+}
+</script>
+<!-- Fonts -->
+<link href="https://api.fontshare.com/v2/css?f[]=zodiak@400,500,700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@300..700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./style.css">
+<style>
+  /* Page-specific styles */
+  .about-hero {
+    background: linear-gradient(135deg, #0D7377 0%, #14919B 50%, #0F766E 100%);
+    padding: 120px 24px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .about-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    pointer-events: none;
+  }
+  .about-hero__inner {
+    max-width: 760px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+  .about-hero__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255,255,255,0.75);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    margin-bottom: 40px;
+    transition: color 0.2s;
+  }
+  .about-hero__back:hover { color: white; }
+  .about-hero__profile {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .about-hero__avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 3px solid rgba(255,255,255,0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Zodiak', Georgia, serif;
+    font-weight: 700;
+    font-size: 42px;
+    color: white;
+    flex-shrink: 0;
+    backdrop-filter: blur(8px);
+  }
+  .about-hero__meta {
+    flex: 1;
+    min-width: 200px;
+  }
+  .about-hero__title {
+    font-family: 'Zodiak', Georgia, serif;
+    font-size: clamp(24px, 5vw, 36px);
+    font-weight: 700;
+    color: white;
+    margin: 0 0 6px;
+    line-height: 1.2;
+  }
+  .about-hero__role {
+    font-size: 16px;
+    color: rgba(255,255,255,0.85);
+    margin: 0 0 4px;
+    font-weight: 500;
+  }
+  .about-hero__affiliation {
+    font-size: 14px;
+    color: rgba(255,255,255,0.65);
+    margin: 0 0 20px;
+  }
+  .about-hero__badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .about-hero__badge {
+    padding: 5px 12px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 100px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Content sections */
+  .about-body {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  .about-section {
+    margin-bottom: 56px;
+  }
+  .about-section__label {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #0D7377;
+    margin-bottom: 12px;
+  }
+  .about-section__title {
+    font-family: 'Zodiak', Georgia, serif;
+    font-size: clamp(22px, 4vw, 28px);
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 16px;
+    line-height: 1.3;
+  }
+  .about-section__text {
+    font-size: 16px;
+    line-height: 1.75;
+    color: #374151;
+  }
+  .about-section__text p + p {
+    margin-top: 16px;
+  }
+  .about-section__text strong {
+    color: #111827;
+    font-weight: 600;
+  }
+
+  /* Credential cards */
+  .cred-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+    margin-top: 24px;
+  }
+  .cred-card {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+  .cred-card:hover {
+    box-shadow: 0 4px 24px rgba(13,115,119,0.1);
+    transform: translateY(-2px);
+  }
+  .cred-card__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #CCFBF1, #99F6E4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+  }
+  .cred-card__title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 4px;
+  }
+  .cred-card__sub {
+    font-size: 13px;
+    color: #6B7280;
+    line-height: 1.4;
+  }
+
+  /* Timeline */
+  .timeline {
+    margin-top: 24px;
+    position: relative;
+    padding-left: 24px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(to bottom, #0D7377, #14919B, #E5E7EB);
+    border-radius: 2px;
+  }
+  .timeline__item {
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .timeline__item::before {
+    content: '';
+    position: absolute;
+    left: -21px;
+    top: 6px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #0D7377;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #0D7377;
+  }
+  .timeline__year {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0D7377;
+    margin-bottom: 3px;
+    letter-spacing: 0.04em;
+  }
+  .timeline__text {
+    font-size: 15px;
+    color: #374151;
+    line-height: 1.5;
+  }
+  .timeline__text strong {
+    color: #111827;
+    font-weight: 600;
+  }
+
+  /* Guideline chips */
+  .guideline-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .guideline-chip {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 12px;
+    padding: 14px 16px;
+    text-align: center;
+  }
+  .guideline-chip__name {
+    font-size: 14px;
+    font-weight: 800;
+    color: #0D7377;
+    display: block;
+    margin-bottom: 3px;
+  }
+  .guideline-chip__desc {
+    font-size: 11px;
+    color: #9CA3AF;
+    display: block;
+  }
+
+  /* Quote */
+  .about-quote {
+    background: linear-gradient(135deg, #F0FDFA, #CCFBF1);
+    border-left: 4px solid #0D7377;
+    border-radius: 0 16px 16px 0;
+    padding: 24px 28px;
+    margin: 32px 0;
+  }
+  .about-quote__text {
+    font-family: 'Zodiak', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #134E4A;
+    font-style: italic;
+    margin: 0 0 12px;
+  }
+  .about-quote__author {
+    font-size: 13px;
+    font-weight: 600;
+    color: #0D7377;
+  }
+
+  /* CTA strip */
+  .about-cta {
+    background: linear-gradient(135deg, #0D7377 0%, #14919B 100%);
+    border-radius: 24px;
+    padding: 40px 32px;
+    text-align: center;
+    margin-top: 24px;
+  }
+  .about-cta__title {
+    font-family: 'Zodiak', Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 0 8px;
+  }
+  .about-cta__sub {
+    font-size: 15px;
+    color: rgba(255,255,255,0.8);
+    margin: 0 0 24px;
+  }
+
+  @media (max-width: 600px) {
+    .about-hero { padding: 100px 20px 60px; }
+    .about-hero__profile { flex-direction: column; align-items: flex-start; gap: 20px; }
+    .about-hero__avatar { width: 88px; height: 88px; font-size: 32px; }
+    .about-body { padding: 32px 20px 60px; }
+    .cred-grid { grid-template-columns: 1fr; }
+    .guideline-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ NAVIGATION ============ -->
+<header class="nav" id="nav">
+  <div class="nav__inner">
+    <a href="/" class="nav__brand" aria-label="Canım Ana Sayfa">
+      <svg class="nav__logo" width="36" height="36" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+        <rect width="36" height="36" rx="8" fill="#0D7377"/>
+        <text x="18" y="25" text-anchor="middle" font-family="'Zodiak', Georgia, serif" font-weight="700" font-size="22" fill="#fff">C</text>
+      </svg>
+      <span class="nav__wordmark">Canım</span>
+    </a>
+    <nav class="nav__links" aria-label="Ana navigasyon">
+      <a href="/#nasil-calisir" class="nav__link">Nasıl Çalışır</a>
+      <a href="/#ozellikler" class="nav__link">Özellikler</a>
+      <a href="/#kilavuzlar" class="nav__link">Kılavuzlar</a>
+      <a href="hakkinda.html" class="nav__link" aria-current="page" style="color:var(--color-primary);font-weight:600">Hakkında</a>
+    </nav>
+    <a href="/app/" class="btn btn--primary btn--sm nav__cta">Karnemi Çıkar →</a>
+    <button class="nav__hamburger" aria-label="Menüyü aç" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+  <div class="nav__mobile" aria-hidden="true">
+    <a href="/#nasil-calisir" class="nav__mobile-link">Nasıl Çalışır</a>
+    <a href="/#ozellikler" class="nav__mobile-link">Özellikler</a>
+    <a href="/#kilavuzlar" class="nav__mobile-link">Kılavuzlar</a>
+    <a href="hakkinda.html" class="nav__mobile-link">Hakkında</a>
+    <a href="/app/" class="btn btn--primary nav__mobile-cta">Karnemi Çıkar →</a>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="about-hero">
+  <div class="about-hero__inner">
+    <a href="/" class="about-hero__back">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+      </svg>
+      Ana Sayfaya Dön
+    </a>
+    <div class="about-hero__profile">
+      <div class="about-hero__avatar" aria-hidden="true">Ç</div>
+      <div class="about-hero__meta">
+        <h1 class="about-hero__title">Prof. Dr. Cem Şimşek</h1>
+        <p class="about-hero__role">Gastroenteroloji ve Hepatoloji Uzmanı</p>
+        <p class="about-hero__affiliation">Hacettepe Üniversitesi Tıp Fakültesi</p>
+        <div class="about-hero__badges">
+          <span class="about-hero__badge">🏥 Gastroenteroloji</span>
+          <span class="about-hero__badge">🔬 Endoskopi</span>
+          <span class="about-hero__badge">🌿 Longevity Medicine</span>
+          <span class="about-hero__badge">📊 Kanıta Dayalı Tıp</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ BODY ============ -->
+<main class="about-body">
+
+  <!-- Mission -->
+  <section class="about-section fade-in">
+    <p class="about-section__label">Misyon</p>
+    <h2 class="about-section__title">Neden Canım'ı Kurdum?</h2>
+    <div class="about-section__text">
+      <p>
+        Türkiye'de insanlar ortalama <strong>78.1 yıl</strong> yaşıyor — ama sağlıklı geçen süre yalnızca <strong>57.6 yıl</strong>.
+        Yani hayatımızın son 20 yılının büyük bölümünü kronik hastalık, ilaç ve hastane randevularıyla geçiriyoruz.
+      </p>
+      <p>
+        Oysa pek çok kronik hastalık ve kanser, <strong>erken tarama</strong> ile ya tamamen önlenebilir ya da çok erken evrede yakalanabilir.
+        Sorun bilgisizlik değil — hangi taramayı ne zaman, kime yaptırmak gerektiğini net anlatan, kişiselleştirilmiş
+        ve Türkçe bir kaynak yoktu.
+      </p>
+      <p>
+        Canım, bu boşluğu kapatmak için kuruldu. Kayıt gerektirmez, ücret almaz, veri satmaz.
+        Tek amacı: size ve ailenize, güncel tıbbi kılavuzlara dayalı kişisel bir tarama takvimi vermek.
+      </p>
+    </div>
+
+    <blockquote class="about-quote">
+      <p class="about-quote__text">
+        "Arabanı her yıl muayeneye götürürsün. Peki ya kendi vücudunu? Sağlık, ertelemenin en pahalıya patladığı alandır."
+      </p>
+      <cite class="about-quote__author">— Prof. Dr. Cem Şimşek</cite>
+    </blockquote>
+  </section>
+
+  <!-- Credentials -->
+  <section class="about-section fade-in">
+    <p class="about-section__label">Akademik Kimlik</p>
+    <h2 class="about-section__title">Uzmanlık Alanları</h2>
+    <div class="cred-grid">
+      <div class="cred-card fade-in">
+        <div class="cred-card__icon">🔬</div>
+        <div>
+          <p class="cred-card__title">Endoskopi & Girişimsel GI</p>
+          <p class="cred-card__sub">Kolonoskopi, üst GI endoskopi, EUS, ERCP; kanser tarama ve polip yönetimi</p>
+        </div>
+      </div>
+      <div class="cred-card fade-in">
+        <div class="cred-card__icon">🫁</div>
+        <div>
+          <p class="cred-card__title">Hepatoloji</p>
+          <p class="cred-card__sub">Yağlı karaciğer (MASLD/MASH), siroz, karaciğer kanseri taraması</p>
+        </div>
+      </div>
+      <div class="cred-card fade-in">
+        <div class="cred-card__icon">⚖️</div>
+        <div>
+          <p class="cred-card__title">Metabolik Sağlık</p>
+          <p class="cred-card__sub">Obezite, diyabet, metabolik sendrom; GLP-1 tedavileri ve bariatrik endoskopi</p>
+        </div>
+      </div>
+      <div class="cred-card fade-in">
+        <div class="cred-card__icon">🧬</div>
+        <div>
+          <p class="cred-card__title">Longevity Medicine</p>
+          <p class="cred-card__sub">Yaşlanma biyolojisi, koruyucu sağlık, yaşam kalitesi optimizasyonu (uzunyasa.com)</p>
+        </div>
+      </div>
+      <div class="cred-card fade-in">
+        <div class="cred-card__icon">📊</div>
+        <div>
+          <p class="cred-card__title">Kanıta Dayalı Tıp</p>
+          <p class="cred-card__sub">Klinik kılavuz uygulaması, tarama protokolleri, toplum sağlığı</p>
+        </div>
+      </div>
+      <div class="cred-card fade-in">
+        <div class="cred-card__icon">🏫</div>
+        <div>
+          <p class="cred-card__title">Akademik Kariyer</p>
+          <p class="cred-card__sub">Hacettepe Üniversitesi Tıp Fakültesi — uluslararası yayınlar ve klinik araştırmalar</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why guidelines -->
+  <section class="about-section fade-in">
+    <p class="about-section__label">Metodoloji</p>
+    <h2 class="about-section__title">Canım Hangi Kılavuzları Kullanır?</h2>
+    <div class="about-section__text">
+      <p>
+        Canım'daki tüm tarama önerileri, dünyada en güçlü kanıt sürecine sahip bağımsız tıbbi kuruluşların
+        kılavuzlarına dayanır. Her öneri; randomize kontrollü çalışmalar, meta-analizler ve sistematik derlemelerle
+        desteklenen kılavuz önerisidir — kişisel görüş veya marka sponsorluğu değildir.
+      </p>
+    </div>
+    <div class="guideline-grid">
+      <div class="guideline-chip fade-in">
+        <span class="guideline-chip__name">USPSTF</span>
+        <span class="guideline-chip__desc">ABD Koruyucu Sağlık Görev Gücü</span>
+      </div>
+      <div class="guideline-chip fade-in">
+        <span class="guideline-chip__name">ADA 2025</span>
+        <span class="guideline-chip__desc">Amerikan Diyabet Derneği</span>
+      </div>
+      <div class="guideline-chip fade-in">
+        <span class="guideline-chip__name">AHA / ACC</span>
+        <span class="guideline-chip__desc">Kardiyoloji Kılavuzları</span>
+      </div>
+      <div class="guideline-chip fade-in">
+        <span class="guideline-chip__name">ESC / ESH</span>
+        <span class="guideline-chip__desc">Avrupa Kardiyoloji / Hipertansiyon</span>
+      </div>
+      <div class="guideline-chip fade-in">
+        <span class="guideline-chip__name">ACIP</span>
+        <span class="guideline-chip__desc">Aşı Danışma Komitesi</span>
+      </div>
+      <div class="guideline-chip fade-in">
+        <span class="guideline-chip__name">GOLD 2024</span>
+        <span class="guideline-chip__desc">KOAH Kılavuzu</span>
+      </div>
+      <div class="guideline-chip fade-in">
+        <span class="guideline-chip__name">EASL / EASD</span>
+        <span class="guideline-chip__desc">Karaciğer / Diyabet (MASLD)</span>
+      </div>
+      <div class="guideline-chip fade-in">
+        <span class="guideline-chip__name">ESMO</span>
+        <span class="guideline-chip__desc">Avrupa Onkoloji</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- About platform -->
+  <section class="about-section fade-in">
+    <p class="about-section__label">Platform</p>
+    <h2 class="about-section__title">UzunYaşa Ekosistemi</h2>
+    <div class="about-section__text">
+      <p>
+        Canım, Prof. Dr. Cem Şimşek'in kurduğu <strong>UzunYaşa</strong> sağlık platformunun bir parçasıdır.
+        UzunYaşa, Türkiye'nin kanıta dayalı longevity ve koruyucu sağlık platformudur:
+      </p>
+    </div>
+    <div class="cred-grid" style="margin-top:20px">
+      <a href="https://uzunyasa.com" target="_blank" rel="noopener noreferrer" class="cred-card fade-in" style="text-decoration:none;color:inherit">
+        <div class="cred-card__icon">🌿</div>
+        <div>
+          <p class="cred-card__title">uzunyasa.com</p>
+          <p class="cred-card__sub">Longevity bilimi, takviyeler, egzersiz ve beslenme rehberleri</p>
+        </div>
+      </a>
+      <div class="cred-card fade-in">
+        <div class="cred-card__icon">💊</div>
+        <div>
+          <p class="cred-card__title">GLPVerse</p>
+          <p class="cred-card__sub">GLP-1 ilaçları ve metabolik sağlık içerikleri</p>
+        </div>
+      </div>
+      <div class="cred-card fade-in">
+        <div class="cred-card__icon">💪</div>
+        <div>
+          <p class="cred-card__title">Muscleon</p>
+          <p class="cred-card__sub">GLP-1 tedavisinde kas kaybını önleme bilimi</p>
+        </div>
+      </div>
+      <div class="cred-card fade-in">
+        <div class="cred-card__icon">🏥</div>
+        <div>
+          <p class="cred-card__title">Cemiendo</p>
+          <p class="cred-card__sub">Bariatrik endoskopi hasta eğitim platformu</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Disclaimer -->
+  <section class="about-section fade-in">
+    <p class="about-section__label">Önemli Not</p>
+    <h2 class="about-section__title">Canım Tıbbi Tavsiye Değildir</h2>
+    <div class="about-section__text">
+      <p>
+        Canım, bilgilendirme amaçlı bir <strong>koruyucu sağlık rehberi</strong> olarak tasarlanmıştır.
+        Uygulamanın ürettiği tarama önerileri, kişisel tıbbi tavsiye, teşhis veya tedavi yerine <strong>geçmez</strong>.
+      </p>
+      <p>
+        Her bireyin sağlık durumu farklıdır. Tarama kararlarınızı doktorunuzla birlikte değerlendirmenizi öneririz.
+        Canım, doktor randevusunun yerini almaz — aksine, o randevuya daha hazırlıklı gitmenizi sağlar.
+      </p>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <div class="about-cta fade-in">
+    <h2 class="about-cta__title">Şimdi Karnenizi Oluşturun</h2>
+    <p class="about-cta__sub">2 dakika · Ücretsiz · Kayıt gerekmez · Veriler cihazınızda</p>
+    <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+      <a href="/app/" class="btn btn--white btn--lg">Karnemi Çıkar →</a>
+      <a href="/app/?for=anne" class="btn btn--outline-white btn--lg">Yakının için oluştur</a>
+    </div>
+  </div>
+
+</main>
+
+<!-- ============ FOOTER ============ -->
+<footer class="footer">
+  <div class="footer__inner">
+    <div class="footer__top">
+      <div class="footer__brand">
+        <div class="footer__logo-row">
+          <svg width="28" height="28" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+            <rect width="36" height="36" rx="8" fill="#0D7377"/>
+            <text x="18" y="25" text-anchor="middle" font-family="'Zodiak', Georgia, serif" font-weight="700" font-size="22" fill="#fff">C</text>
+          </svg>
+          <span class="footer__wordmark">Canım</span>
+        </div>
+        <p class="footer__creator">Prof. Dr. Cem Şimşek tarafından tasarlandı</p>
+        <p class="footer__uni">Hacettepe Üniversitesi</p>
+      </div>
+      <div class="footer__columns">
+        <div class="footer__col">
+          <h4 class="footer__col-title">Uygulama</h4>
+          <a href="/app/" class="footer__link">Karnemi Çıkar →</a>
+          <a href="/#nasil-calisir" class="footer__link">Nasıl Çalışır</a>
+          <a href="hakkinda.html" class="footer__link">Hakkında</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__col-title">Kaynaklar</h4>
+          <a href="https://www.uspreventiveservicestaskforce.org" target="_blank" rel="noopener noreferrer" class="footer__link">USPSTF</a>
+          <a href="https://diabetesjournals.org/care" target="_blank" rel="noopener noreferrer" class="footer__link">ADA</a>
+          <a href="https://www.escardio.org" target="_blank" rel="noopener noreferrer" class="footer__link">ESC</a>
+        </div>
+        <div class="footer__col">
+          <h4 class="footer__col-title">İletişim</h4>
+          <a href="mailto:cem.simsek@hacettepe.edu.tr" class="footer__link">E-posta</a>
+          <a href="https://uzunyasa.com" target="_blank" rel="noopener noreferrer" class="footer__link">UzunYaşa</a>
+        </div>
+      </div>
+      <div class="footer__share">
+        <a href="https://wa.me/?text=Sa%C4%9Fl%C4%B1k%20taramalar%C4%B1n%C4%B1%20takip%20etmek%20i%C3%A7in%20bu%20%C3%BCcretsiz%20uygulamaya%20bak%3A%20Can%C4%B1m" target="_blank" rel="noopener noreferrer" class="btn btn--whatsapp">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z"/>
+          </svg>
+          Ailene gönder 💚
+        </a>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 Canım. Tüm hakları saklıdır.</span>
+    </div>
+  </div>
+</footer>
+
+<script src="./app.js"></script>
+</body>
+</html>
