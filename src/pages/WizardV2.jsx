@@ -375,7 +375,7 @@ export default function WizardV2() {
               })}
             </div>
             <button onClick={() => handleLifestyleAnswer(q.id, q.opts[0].value)}
-              className="mt-3 text-xs text-gray-400 underline underline-offset-2 text-center w-full">
+              className="mt-4 text-sm text-gray-500 underline underline-offset-2 text-center w-full py-1">
               Cevaplamak istemiyorum →
             </button>
           </div>
@@ -470,7 +470,7 @@ export default function WizardV2() {
             })}
           </div>
           <button onClick={() => handleScreeningAnswer(card.id, 'unknown')}
-            className="mt-3 text-xs text-gray-400 underline underline-offset-2 text-center w-full">
+            className="mt-4 text-sm text-gray-500 underline underline-offset-2 text-center w-full py-1">
             Cevaplamak istemiyorum →
           </button>
         </div>
