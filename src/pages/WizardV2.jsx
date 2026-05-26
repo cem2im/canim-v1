@@ -3,7 +3,7 @@ import useAppStoreV2 from '../store/useAppStoreV2'
 import { DISEASE_SCREENINGS } from '../data/screenings'
 import { shareKarneImage } from '../utils/karneShare'
 import { generateScreeningsPdf } from '../utils/generatePdf'
-import { LIFESTYLE_QUESTIONS, computeRadarAxes, computeGrade, gradeColor as getGradeColor } from '../data/lifestyle'
+import { LIFESTYLE_QUESTIONS, computeRadarAxes, computeOverallScore, computeGrade, gradeColor as getGradeColor } from '../data/lifestyle'
 
 // ── Disease metadata ──────────────────────────────────────────────────────────
 const DISEASE_META = {
@@ -207,11 +207,7 @@ export default function WizardV2() {
   // ── Radar veri hesaplama (shared utility) ────────────────────────────────
   const radarAxes = useMemo(() => computeRadarAxes(cards, lifestyle), [cards, lifestyle])
 
-  const overallScore = useMemo(() => {
-    const filled = radarAxes.filter(a => a.score > 0)
-    if (!filled.length) return 0
-    return Math.round(filled.reduce((s, a) => s + a.score, 0) / filled.length)
-  }, [radarAxes])
+  const overallScore = useMemo(() => computeOverallScore(radarAxes), [radarAxes])
 
   // ── KARNE ─────────────────────────────────────────────────────────────────
   if (isKarne) {

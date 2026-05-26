@@ -55,6 +55,17 @@ export function computeRadarAxes(cards, lifestyleAnswers) {
   return [{ label: 'Taramalar', icon: '🔬', score: taramalarScore }, ...lifeAxes]
 }
 
+// Taramalar = %50 ağırlık, 4 yaşam tarzı ekseni = %50 (eşit bölüşüm)
+// Cevaplanmayan yaşam tarzı eksenleri (score=0) hariç tutulur
+export function computeOverallScore(axes) {
+  if (!axes || axes.length === 0) return 0
+  const tarama = axes[0] // Taramalar
+  const lifestyle = axes.slice(1).filter(a => a.score > 0)
+  if (lifestyle.length === 0) return Math.round(tarama.score * 0.5)
+  const lifeAvg = lifestyle.reduce((s, a) => s + a.score, 0) / lifestyle.length
+  return Math.round(tarama.score * 0.5 + lifeAvg * 0.5)
+}
+
 export function computeGrade(score) {
   if (score >= 85) return 'A'
   if (score >= 70) return 'B'
