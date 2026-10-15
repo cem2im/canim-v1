@@ -16,6 +16,16 @@ const M = {
   goz_ayak: { q: 'en son ne zaman göz dibine damlayla baktırdın?', f: 'bu yıl göz doktoruna göz dibini, aile hekimine ayaklarını gösterir misin' },
   kemik: { q: 'hiç kemik ölçümü yaptırdın mı?', f: 'bir kemik ölçümü yaptırır mısın' },
   asi: { q: 'aşıların tam mı? En son ne zaman aşı oldun?', f: 'aile hekimine aşılarını sorar mısın' },
+  tarama_seker: { q: 'en son ne zaman şeker tahlili yaptırdın?', f: 'bu yıl bir şeker tahlili yaptırır mısın' },
+  psa: { q: 'prostat tahlilini (PSA) hiç doktorunla konuştun mu?', f: 'aile hekiminle prostat tahlilini (PSA) konuşur musun' },
+  dis: { q: 'en son ne zaman diş hekimine gittin?', f: 'bu yıl diş etlerini diş hekimine gösterir misin' },
+  karaciger: { q: 'kan tahlilinde karaciğer hesabına (FIB-4) baktılar mı?', f: 'aile hekimine karaciğer hesabını (FIB-4) sorar mısın' },
+  b12: { q: 'metformin kullanıyorsan en son ne zaman B12 tahlili yaptırdın?', f: 'bir sonraki tahlilde B12’ye de baktırır mısın' },
+  ilac_gozden: { q: 'kullandığın ilaçları en son ne zaman doktora gösterdin?', f: 'bütün ilaçlarını, ağrı kesiciler dahil, doktoruna gösterir misin' },
+  spirometri: { q: 'en son ne zaman nefes testi yaptırdın?', f: 'bu yıl bir nefes testi yaptırır mısın' },
+  hepb: { q: 'sarılık (hepatit B) aşın var mı?', f: 'aile hekimine sarılık aşını sorar mısın' },
+  zona: { q: 'zona aşısını hiç doktorunla konuştun mu?', f: 'aile hekimine zona aşısını sorar mısın' },
+  rsv: { q: 'RSV aşısını hiç doktorunla konuştun mu?', f: 'aile hekimine RSV aşısını sorar mısın' },
 }
 
 // Women-only checks: no message to fathers.

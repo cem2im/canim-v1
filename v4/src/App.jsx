@@ -178,7 +178,7 @@ function AskSheet({ item, who, onClose }) {
       <textarea id="msg" rows={4} value={text} onChange={(e) => setText(e.target.value)} />
       <a className="btn" style={{ marginTop: 12 }} href={waLink(text)} target="_blank" rel="noopener noreferrer">WhatsApp'ta gönder</a>
       <button className="btn2" onClick={onClose}>Kapat</button>
-      <p className="note">Mesaj sizin adınıza gider. Canım hiçbir şey kaydetmez.</p>
+      <p className="note">Mesajı siz gönderirsiniz. Canım cevaplarınızı kaydetmez.</p>
     </Sheet>
   )
 }
@@ -200,7 +200,7 @@ function GiftSheet({ who, s, onClose }) {
       <p className="meta" style={{ margin: '8px 0 12px' }}>Sayfada “{name.trim() || 'Biri'} bunu size gönderdi” yazar.</p>
       <a className="btn" href={waLink(text)} target="_blank" rel="noopener noreferrer">WhatsApp'ta gönder</a>
       <button className="btn2" onClick={onClose}>Kapat</button>
-      <p className="note">Bağlantıda hastalık bilgisi yoktur; yalnızca yaş aralığı.</p>
+      <p className="note">Bağlantıda hastalık bilgisi yok. Yalnızca yaş aralığı, kadın/erkek ve yazarsanız adınız var.</p>
     </Sheet>
   )
 }
@@ -240,7 +240,7 @@ function Foot() {
   return (
     <footer className="foot">
       <p>Canım bilgilendirme amaçlıdır, teşhis koymaz. Karar hekiminizindir.</p>
-      <p style={{ marginTop: 6 }}>Hiçbir bilgi kaydedilmez, hiçbir yere gönderilmez. <a href="#/kaynak">Hekimler için: kurallar ve kaynaklar</a></p>
+      <p style={{ marginTop: 6 }}>Cevaplarınız bu telefonda kalır. Canım bunları kaydetmez, kimseye göndermez. <a href="#/gizlilik">Gizlilik</a> · <a href="#/kaynak">Hekimler için: kurallar ve kaynaklar</a></p>
     </footer>
   )
 }
@@ -295,7 +295,7 @@ const WHO = [
   { id: 'baska', label: 'Başka biri' },
 ]
 const SEX = [{ id: 'K', label: 'Kadın' }, { id: 'E', label: 'Erkek' }]
-const NONE = { id: 'yok', label: 'Hiçbiri yok' }
+const NONE = { id: 'yok', label: 'Yok' }
 
 function pickConds(prev, id) {
   if (id === 'yok') return ['yok']
@@ -346,7 +346,7 @@ function ChildPage({ route }) {
   }
 
   const ageQ = { anne: 'Annenizin yaşı?', baba: 'Babanızın yaşı?', kendim: 'Yaşınız?', baska: 'Kaç yaşında?' }[who] || 'Yaşı?'
-  const condQ = who === 'kendim' ? 'Her gün ilaç içtiğiniz bir hastalık?' : 'Her gün ilaç içtiği bir hastalık?'
+  const condQ = who === 'kendim' ? 'Doktorun söylediği bir hastalığınız var mı? (İlaç, iğne ya da diyetle)' : 'Doktorun söylediği bir hastalığı var mı? (İlaç, iğne ya da diyetle)'
   const listTitle = { anne: 'Annenizin', baba: 'Babanızın', kendim: 'Sizin', baska: 'Onun' }[who]
 
   const openDoctor = () => setQuery('/', { d: 1 })
@@ -391,7 +391,7 @@ function ChildPage({ route }) {
               {who === 'anne' || who === 'baba' ? `Her kontrolü ${who === 'baba' ? 'babanıza' : 'annenize'} sorabilirsiniz. Hazır bir mesaj yazdık.` : 'Bir kontrole dokunun, ne olduğunu okuyun.'}
             </p>
             <ItemList items={items} who={who} onAsk={setAsk} />
-            {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığın kontrollerini onu takip eden doktor belirler.</p>}
+            {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığının kontrollerini ve aşılarını doktoruna sor.</p>}
           </section>
           {(who === 'anne' || who === 'baba') && (
             <section className="sec">
@@ -470,7 +470,7 @@ function ParentPage({ route }) {
       <section className="sec" style={{ border: 0, paddingTop: 12 }}>
         <Voice title="Önce dinleyin" sub="Sesli anlatım" text={introText} className={intro ? 'spot' : ''} />
         <div className={intro ? 'dim' : !answered ? 'spot' : ''} style={{ padding: '12px 12px 14px', margin: '0 -12px', borderRadius: 4 }}>
-          <div className="q">Her gün ilaç içtiğiniz bir hastalık var mı?</div>
+          <div className="q">Doktorun söylediği bir hastalığınız var mı? (İlaç, iğne ya da diyetle)</div>
           <Chips options={[NONE, ...CONDS]} value={conds} multi onPick={(id) => setConds(pickConds(conds, id))} />
         </div>
       </section>
@@ -478,7 +478,7 @@ function ParentPage({ route }) {
         <section className={`sec ${intro ? 'dim' : ''}`} style={{ border: 0, paddingTop: 0 }} aria-live="polite">
           <h2>Size uygun {items.length} kontrol</h2>
           <ItemList items={items} who="kendim" onFirstOpen={firstOpen} />
-          {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığınızın kontrollerini onu takip eden doktorunuz belirler.</p>}
+          {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığınızın kontrollerini ve aşılarını doktorunuza sorun.</p>}
         </section>
       ) : (
         <section className="sec dim" style={{ border: 0 }}><p className="meta" style={{ textAlign: 'center' }}>↓ Liste burada belirecek</p></section>
@@ -489,6 +489,24 @@ function ParentPage({ route }) {
         <a className={`btn ${ring ? 'ring' : ''}`} href="tel:182"><Tel />182'yi arayın, randevu alın</a>
       </div>
       {route.q.d && answered && <DoctorPage s={s} items={items} onBack={() => window.history.back()} />}
+    </>
+  )
+}
+
+/* ---------- privacy (PD15) ---------- */
+
+function PrivacyPage() {
+  return (
+    <>
+      <header className="top"><a className="geri" href="#/">‹ Geri</a><span className="wm">Canım</span></header>
+      <section className="sec">
+        <h1>Gizlilik</h1>
+        <p>Canım'ı Doç. Dr. Cem Şimşek hazırladı.</p>
+        <p>Cevaplarınız telefonunuzda kalır; hiçbir sunucuya gitmez. Çerez yok. Hesap yok.</p>
+        <p>Annenize ya da babanıza gönderdiğiniz bağlantıda hastalık bilgisi yoktur. Yalnızca yaş aralığı, kadın/erkek ve yazarsanız ad vardır.</p>
+        <p>Sitemizi barındıran GitHub, güvenlik için ziyaretçi IP adresini kaydeder.</p>
+      </section>
+      <Foot />
     </>
   )
 }
@@ -519,7 +537,7 @@ export default function App() {
   return (
     <div className="app">
       {!REVIEWED && <div className="draft">Deneme sürümü · hekim kontrolü bekliyor</div>}
-      {route.path === '/a' ? <ParentPage route={route} /> : route.path === '/kaynak' ? <RulesPage /> : <ChildPage route={route} />}
+      {route.path === '/a' ? <ParentPage route={route} /> : route.path === '/kaynak' ? <RulesPage /> : route.path === '/gizlilik' ? <PrivacyPage /> : <ChildPage route={route} />}
     </div>
   )
 }
