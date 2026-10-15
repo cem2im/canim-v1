@@ -205,7 +205,7 @@ function GiftSheet({ who, s, onClose }) {
       <p className="meta" style={{ margin: '8px 0 12px' }}>Sayfada “{name.trim() || 'Biri'} bunu size gönderdi” yazar.</p>
       <a className="btn" href={waLink(text)} target="_blank" rel="noopener noreferrer">WhatsApp'ta gönder</a>
       <button className="btn2" onClick={onClose}>Kapat</button>
-      <p className="note">Bağlantıda hastalık bilgisi yok. Yalnızca yaş aralığı, kadın/erkek ve yazarsanız adınız var.</p>
+      <p className="note">Bağlantıda sağlık bilgisi yok. Yalnızca yaş aralığı, kadın/erkek ve yazarsanız adınız var.</p>
     </Sheet>
   )
 }
@@ -281,7 +281,7 @@ function DoctorPage({ s, items, onBack }) {
               </div>
             </div>
           ))}
-          {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 8 }}>Ayrıca başka bir kronik hastalığı var; onun kontrolleri ayrıca değerlendirilmeli.</p>}
+          {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 8 }}>Ayrıca: {s.other || 'başka bir sağlık durumu'} (kendisi söyledi). Bu durumun kontrolleri ve aşıları ayrıca değerlendirilmeli.</p>}
           <p className="meta" style={{ marginTop: 12, fontSize: 16 }}>{footer}</p>
         </div>
       </div>
@@ -350,6 +350,17 @@ function Options({ options, value, multi, onPick }) {
 }
 const after = (fn) => setTimeout(fn, 220)
 
+// Free text for "Diğer". It stays on the phone and only appears on the doctor page.
+function OtherField({ value, onChange }) {
+  return (
+    <div style={{ marginTop: 6 }}>
+      <label className="lbl" htmlFor="diger">Hangisi? (isteğe bağlı)</label>
+      <input id="diger" type="text" maxLength={60} value={value} onChange={(e) => onChange(e.target.value)} placeholder="Örneğin: tiroid, astım, romatizma" autoComplete="off" />
+      <p className="meta" style={{ marginTop: 6 }}>Yalnızca doktor sayfasına yazılır. Hiçbir yere gönderilmez.</p>
+    </div>
+  )
+}
+
 /* ---------- intro ---------- */
 
 const INTRO_VOICE = 'Merhaba. Canım, annenize, babanıza ya da kendinize yaşa uygun sağlık kontrollerini bir dakikada gösterir. Üç soruya dokunursunuz. Devletin ücretsiz tarama programına ve doktor önerilerine göre bir liste çıkar. Listeyi annenize WhatsApptan gönderebilir, 182yi arayıp aile hekiminden randevu alabilirsiniz. Doktora gösterilecek sayfa da hazır. Üyelik yok, ücretsiz. Hiçbir bilgi kaydedilmez. Teşhis koymaz; karar her zaman doktorunuzundur.'
@@ -363,12 +374,12 @@ function IntroPage() {
       </div>
       <Cini />
       <section className="sec" style={{ border: 0 }}>
-        <p style={{ fontSize: 21 }}>Mamografi, bağırsak testi, tahliller, aşılar… Hangisi ne zaman, hangisi ücretsiz? Canım yaşa ve hastalığa göre listeyi çıkarır.</p>
+        <p style={{ fontSize: 21 }}>Mamografi, bağırsak testi, tahliller, aşılar… Hangisi ne zaman, hangisi ücretsiz? Canım yaşa ve sağlık durumuna göre listeyi çıkarır.</p>
       </section>
       <section className="sec">
         <h2>Nasıl çalışır?</h2>
         <ol className="steps">
-          <li><span className="n">1</span><div><b>Üç soruya dokunun</b><span>Kimin için, kaç yaşında, doktorun söylediği bir hastalığı var mı.</span></div></li>
+          <li><span className="n">1</span><div><b>Üç soruya dokunun</b><span>Kimin için, kaç yaşında, takip edilen bir sağlık durumu var mı.</span></div></li>
           <li><span className="n">2</span><div><b>Listeyi görün</b><span>Her kontrolü okuyun ya da sesli dinleyin: ne arar, nasıl yapılır, ücretsiz mi.</span></div></li>
           <li><span className="n">3</span><div><b>Gönderin, randevu alın</b><span>Annenize WhatsApp'tan gönderin. 182'yi arayın. Doktora gösterilecek sayfa hazır.</span></div></li>
         </ol>
@@ -396,17 +407,17 @@ function ChildFlow({ route, a, setA }) {
   const sex = who === 'anne' ? 'K' : who === 'baba' ? 'E' : sexPick
   const needSex = who === 'kendim' || who === 'baska'
   const parent = who === 'anne' || who === 'baba'
-  const s = { sex, band, conds: conds.filter((c) => c !== 'yok') }
+  const s = { sex, band, conds: conds.filter((c) => c !== 'yok'), other: conds.includes('baska') ? (a.other || '').trim() : '' }
   const done = who && sex && band && conds.length > 0
   const items = done ? buildList(s) : []
   const bands = parent ? BANDS.filter((b) => b.id >= 40) : BANDS
   const total = needSex ? 4 : 3
-  const nth = { kim: 1, cins: 2, yas: needSex ? 3 : 2, hastalik: needSex ? 4 : 3 }[step]
+  const nth = { kim: 1, cins: 2, yas: needSex ? 3 : 2, durum: needSex ? 4 : 3 }[step]
 
   // A deep link or reload into a later step goes back to the first unanswered one.
-  const missing = !who ? 'kim' : !sex ? 'cins' : !band ? 'yas' : !conds.length ? 'hastalik' : null
-  const order = ['kim', 'cins', 'yas', 'hastalik', 'liste', 'son']
-  const needs = { cins: who, yas: sex, hastalik: band, liste: done, son: done }
+  const missing = !who ? 'kim' : !sex ? 'cins' : !band ? 'yas' : !conds.length ? 'durum' : null
+  const order = ['kim', 'cins', 'yas', 'durum', 'liste', 'son']
+  const needs = { cins: who, yas: sex, durum: band, liste: done, son: done }
   useEffect(() => {
     if (step in needs && !needs[step] && missing) window.location.replace(`#/s/${missing}`)
   })
@@ -414,7 +425,7 @@ function ChildFlow({ route, a, setA }) {
 
   const go = (to) => { window.location.hash = `/s/${to}` }
   const ageQ = { anne: 'Annenizin yaşı?', baba: 'Babanızın yaşı?', kendim: 'Yaşınız?', baska: 'Kaç yaşında?' }[who] || 'Yaşı?'
-  const condQ = who === 'kendim' ? 'Doktorun söylediği bir hastalığınız var mı?' : 'Doktorun söylediği bir hastalığı var mı?'
+  const condQ = who === 'kendim' ? 'Doktorunuzun takip ettiği bir sağlık durumunuz var mı?' : 'Doktorunun takip ettiği bir sağlık durumu var mı?'
   const listTitle = { anne: 'Annenizin', baba: 'Babanızın', kendim: 'Sizin', baska: 'Onun' }[who]
   const toParent = who === 'baba' ? 'Babanıza' : 'Annenize'
   const openDoctor = () => setQuery(route.path, { d: 1 })
@@ -450,21 +461,22 @@ function ChildFlow({ route, a, setA }) {
         <section className="sec" style={{ border: 0 }}>
           <h1>{ageQ}</h1>
           <p className="meta" style={{ marginBottom: 14 }}>Kontroller yaşa göre değişir.</p>
-          <Options options={bands} value={band} onPick={(id) => { setA({ ...a, band: id }); after(() => go('hastalik')) }} />
+          <Options options={bands} value={band} onPick={(id) => { setA({ ...a, band: id }); after(() => go('durum')) }} />
         </section>
       </Screen>
     )
-  } else if (step === 'hastalik') {
+  } else if (step === 'durum') {
     const some = conds.length > 0 && !conds.includes('yok')
     screen = (
       <Screen progress={progress} action={some ? <button className="btn" onClick={() => go('liste')}>Listeyi göster</button> : null}>
         <section className="sec" style={{ border: 0 }}>
           <h1>{condQ}</h1>
-          <p className="meta" style={{ marginBottom: 14 }}>İlaç, iğne ya da diyetle takip edilen. Birden fazla seçebilirsiniz.</p>
+          <p className="meta" style={{ marginBottom: 14 }}>İlaç, iğne ya da diyetle. Birden fazla seçebilirsiniz.</p>
           <Options options={[NONE, ...CONDS]} value={conds} multi onPick={(id) => {
             setA({ ...a, conds: pickConds(conds, id) })
             if (id === 'yok') after(() => go('liste'))
           }} />
+          {conds.includes('baska') && <OtherField value={a.other} onChange={(v) => setA({ ...a, other: v })} />}
         </section>
       </Screen>
     )
@@ -479,7 +491,7 @@ function ChildFlow({ route, a, setA }) {
             {parent ? `Bir kontrole dokunun, okuyun. Her birini ${who === 'baba' ? 'babanıza' : 'annenize'} sorabilirsiniz; hazır bir mesaj yazdık.` : 'Bir kontrole dokunun, ne olduğunu okuyun ya da dinleyin.'}
           </p>
           <ItemList items={items} who={who} onAsk={setAsk} />
-          {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığının kontrollerini ve aşılarını doktoruna sor.</p>}
+          {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>{s.other ? `${s.other} için` : 'Diğer sağlık durumu için'} kontrolleri ve aşıları onu takip eden doktora sorun. Doktor sayfasına da yazdık.</p>}
         </section>
       </Screen>
     )
@@ -516,7 +528,7 @@ function ChildFlow({ route, a, setA }) {
 
 function doctorData(s, items) {
   return {
-    meta: `${bandLabel(s.band)} yaş · ${s.sex === 'K' ? 'kadın' : 'erkek'}${s.conds.length ? ` · ${condText(s.conds)} (kendisi söyledi)` : ''} · ${today()}`,
+    meta: `${bandLabel(s.band)} yaş · ${s.sex === 'K' ? 'kadın' : 'erkek'}${s.conds.length ? ` · ${condText(s.conds).replace('diğer', s.other || 'diğer')} (kendisi söyledi)` : ''} · ${today()}`,
     items,
     footer: `Bilgilendirme amaçlıdır; karar hekimindir. Kurallar: Sağlık Bakanlığı tarama programları ve güncel kılavuzlar, ${RULE_DATE}.`,
   }
@@ -531,9 +543,10 @@ function ParentPage({ route }) {
   const valid = BANDS.some((b) => b.id === band)
   const p = route.q.p || ''
   const [conds, setConds] = useState([])
+  const [other, setOther] = useState('')
   const [ring, fireRing] = useFlash(2600)
   const ringed = useRef(false)
-  const s = { sex, band, conds: conds.filter((c) => c !== 'yok') }
+  const s = { sex, band, conds: conds.filter((c) => c !== 'yok'), other: conds.includes('baska') ? other.trim() : '' }
   const answered = conds.length > 0
   const items = answered ? buildList(s) : []
   const base = { ...route.q }
@@ -586,12 +599,13 @@ function ParentPage({ route }) {
     screen = (
       <Screen progress="Tek soru" action={some ? <button className="btn" onClick={() => go('liste')}>Listemi göster</button> : null}>
         <section className="sec" style={{ border: 0 }}>
-          <h1>Doktorun söylediği bir hastalığınız var mı?</h1>
-          <p className="meta" style={{ marginBottom: 14 }}>İlaç, iğne ya da diyetle takip edilen. Birden fazla seçebilirsiniz.</p>
+          <h1>Doktorunuzun takip ettiği bir sağlık durumunuz var mı?</h1>
+          <p className="meta" style={{ marginBottom: 14 }}>İlaç, iğne ya da diyetle. Birden fazla seçebilirsiniz.</p>
           <Options options={[NONE, ...CONDS]} value={conds} multi onPick={(id) => {
             setConds(pickConds(conds, id))
             if (id === 'yok') after(() => go('liste'))
           }} />
+          {conds.includes('baska') && <OtherField value={other} onChange={setOther} />}
         </section>
       </Screen>
     )
@@ -602,7 +616,7 @@ function ParentPage({ route }) {
           <h1 style={{ fontSize: 29 }}>Size uygun {items.length} kontrol</h1>
           <p className="meta" style={{ marginBottom: 10 }}>Bir kontrole dokunun, okuyun ya da dinleyin.</p>
           <ItemList items={items} who="kendim" onFirstOpen={firstOpen} />
-          {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığınızın kontrollerini ve aşılarını doktorunuza sorun.</p>}
+          {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>{s.other ? `${s.other} için` : 'Diğer sağlık durumunuz için'} kontrolleri ve aşıları onu takip eden doktorunuza sorun. Doktor sayfasına da yazdık.</p>}
         </section>
       </Screen>
     )
@@ -636,7 +650,7 @@ function PrivacyPage() {
         <h1>Gizlilik</h1>
         <p>Canım'ı Doç. Dr. Cem Şimşek hazırladı.</p>
         <p>Cevaplarınız telefonunuzda kalır; hiçbir sunucuya gitmez. Çerez yok. Hesap yok.</p>
-        <p>Annenize ya da babanıza gönderdiğiniz bağlantıda hastalık bilgisi yoktur. Yalnızca yaş aralığı, kadın/erkek ve yazarsanız ad vardır.</p>
+        <p>Annenize ya da babanıza gönderdiğiniz bağlantıda sağlık bilgisi yoktur. Yalnızca yaş aralığı, kadın/erkek ve yazarsanız ad vardır.</p>
         <p>Sitemizi barındıran GitHub, güvenlik için ziyaretçi IP adresini kaydeder.</p>
       </section>
       <Foot />
@@ -668,7 +682,7 @@ function RulesPage() {
 export default function App() {
   const route = useHash()
   // Answers live here so moving between screens (and to Gizlilik and back) keeps them.
-  const [a, setA] = useState({ who: null, sexPick: null, band: null, conds: [] })
+  const [a, setA] = useState({ who: null, sexPick: null, band: null, conds: [], other: '' })
   const screenKey = `${route.path}?${route.q.p || ''}`
   useEffect(() => {
     window.scrollTo(0, 0)
