@@ -365,16 +365,27 @@ function OtherField({ value, onChange }) {
 /* ---------- intro ---------- */
 
 
-function IntroPage() {
+// First screen = first question: a one-line promise, then "Kimin için?".
+// The explanation sits below for those who scroll; the parent link keeps its own welcome.
+function IntroPage({ a, setA }) {
+  const pick = (id) => {
+    setA({ ...a, who: id, band: id !== a.who ? null : a.band })
+    after(() => { window.location.hash = `/s/${id === 'kendim' || id === 'baska' ? 'cins' : 'yas'}` })
+  }
   return (
-    <Screen back={false} action={<a className="btn" href="#/s/kim">Başlayın</a>}>
-      <div className="band hero">
-        <div style={{ fontSize: 20, fontWeight: 600 }}>Annenize, babanıza, kendinize</div>
+    <div className="screen">
+      <header className="top"><span className="wm">Canım</span><span className="meta" style={{ fontSize: 18 }}>Üyelik yok · ücretsiz</span></header>
+      <div className="band hero slim">
         <div className="t">Yaşa uygun sağlık kontrolleri, bir dakikada.</div>
+        <div className="sub">Annenize, babanıza ya da kendinize. Devletin tarama programına ve doktor önerilerine göre.</div>
       </div>
       <Cini />
-      <section className="sec" style={{ border: 0 }}>
-        <p style={{ fontSize: 21 }}>Mamografi, bağırsak testi, tahliller, aşılar… Hangisi ne zaman, hangisi ücretsiz? Canım yaşa ve sağlık durumuna göre listeyi çıkarır.</p>
+      <section className="sec" style={{ border: 0, paddingBottom: 6 }}>
+        <div className="qrow"><h1 style={{ margin: 0 }}>Kimin için?</h1><span className="meta">Soru 1</span></div>
+        <Options options={WHO} value={a.who} onPick={pick} />
+      </section>
+      <section className="sec" style={{ paddingTop: 4 }}>
+        <Voice small title="Sesli dinleyin" sub="Canım nedir? · 36 saniye" text={INTRO_VOICE} />
       </section>
       <section className="sec">
         <h2>Nasıl çalışır?</h2>
@@ -383,17 +394,14 @@ function IntroPage() {
           <li><span className="n">2</span><div><b>Listeyi görün</b><span>Her kontrolü okuyun ya da sesli dinleyin: ne arar, nasıl yapılır, ücretsiz mi.</span></div></li>
           <li><span className="n">3</span><div><b>Gönderin, randevu alın</b><span>Annenize WhatsApp'tan gönderin. 182'yi arayın. Doktora gösterilecek sayfa hazır.</span></div></li>
         </ol>
-      </section>
-      <section className="sec" style={{ border: 0 }}>
-        <Voice title="Sesli dinleyin" sub="Canım nedir? · 36 saniye" text={INTRO_VOICE} />
         <ul className="trust">
           <li>Devletin tarama programına ve kılavuzlara dayanır; hekim kontrolünden geçti.</li>
-          <li>Üyelik yok, ücretsiz. Cevaplarınız kaydedilmez.</li>
+          <li>Cevaplarınız kaydedilmez.</li>
           <li>Teşhis koymaz. Karar hekiminizindir.</li>
         </ul>
       </section>
       <Foot />
-    </Screen>
+    </div>
   )
 }
 
@@ -419,7 +427,7 @@ function ChildFlow({ route, a, setA }) {
   const order = ['kim', 'cins', 'yas', 'durum', 'liste', 'son']
   const needs = { cins: who, yas: sex, durum: band, liste: done, son: done }
   useEffect(() => {
-    if (step in needs && !needs[step] && missing) window.location.replace(`#/s/${missing}`)
+    if (step in needs && !needs[step] && missing) window.location.replace(missing === 'kim' ? '#/' : `#/s/${missing}`)
   })
   if (!order.includes(step)) return null
 
@@ -695,7 +703,7 @@ export default function App() {
         : route.path === '/kaynak' ? <RulesPage />
         : route.path === '/gizlilik' ? <PrivacyPage />
         : route.path.startsWith('/s/') ? <ChildFlow route={route} a={a} setA={setA} />
-        : <IntroPage />}
+        : <IntroPage a={a} setA={setA} />}
     </div>
   )
 }
