@@ -4,16 +4,16 @@
 
 const M = {
   kronik_kan: { q: 'en son ne zaman kan tahlili yaptırdın?', f: 'bu ay bir kan tahlili yaptırır mısın' },
-  tarama_kan: { q: 'en son ne zaman kan tahlili yaptırdın?', f: 'bu yıl bir kan tahlili yaptırır mısın' },
+  tarama_kan: { q: 'en son ne zaman şeker ve kolesterol tahlili yaptırdın?', f: 'bu yıl bir kan tahlili yaptırır mısın' },
   tansiyon: { q: 'en son ne zaman tansiyonunu ölçtürdün?', f: 'bir eczaneye uğrayıp tansiyonunu ölçtürür müsün' },
   ggk: { q: 'aile hekiminden evde yapılan bağırsak testini aldın mı? Ücretsizmiş.', f: 'aile hekiminden ücretsiz bağırsak testini alır mısın' },
-  mamografi: { q: 'en son ne zaman mamografi oldun?', f: 'bu yıl bir mamografi olur musun' },
+  mamografi: { q: 'en son ne zaman mamografi oldun?', f: 'son 2 yılda mamografi olmadıysan bu yıl olur musun' },
   hpv: {
     q0: 'rahim ağzı testini (HPV) en son ne zaman yaptırdın? Aile hekiminde ücretsiz.',
     q: 'rahim ağzı testini en son ne zaman yaptırdın?',
     f: 'son 5 yılda rahim ağzı testi olmadıysan aile hekiminde yaptırır mısın',
   },
-  goz_ayak: { q: 'en son ne zaman göz dibine damlayla baktırdın?', f: 'bu yıl gözlerini ve ayaklarını doktora gösterir misin' },
+  goz_ayak: { q: 'en son ne zaman göz dibine damlayla baktırdın?', f: 'bu yıl göz doktoruna göz dibini, aile hekimine ayaklarını gösterir misin' },
   kemik: { q: 'hiç kemik ölçümü yaptırdın mı?', f: 'bir kemik ölçümü yaptırır mısın' },
   asi: { q: 'aşıların tam mı? En son ne zaman aşı oldun?', f: 'aile hekimine aşılarını sorar mısın' },
 }
@@ -43,7 +43,7 @@ export function messagesFor(itemId, who) {
 
 export function giftMessage(who, url) {
   const h = who === 'baba' ? 'Babacım' : 'Anneciğim'
-  return `${h}, senin için yaşına uygun sağlık kontrollerini hazırladım. Dokun, istersen sesli dinle:\n${url}`
+  return `${h}, senin için bir sağlık kontrol listesi hazırladım. Ben gönderdim, açabilirsin. Dokun, istersen sesli dinle:\n${url}`
 }
 
 export const waLink = (text) => `https://wa.me/?text=${encodeURIComponent(text)}`

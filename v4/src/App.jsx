@@ -150,7 +150,7 @@ function ItemList({ items, who, onAsk, onFirstOpen }) {
           </div>
         )
       })}
-      <p className="source">Sağlık Bakanlığı tarama programları ve güncel kılavuzlara göre · {RULE_DATE}</p>
+      <p className="source">Devletin tarama programına ve doktor önerilerine dayanır ({RULE_DATE}). Bakanlık sitesi değildir.</p>
     </div>
   )
 }
@@ -208,15 +208,19 @@ function GiftSheet({ who, s, onClose }) {
 /* ---------- end of page: call, show, keep ---------- */
 
 function EndSection({ who, onDoctor, onSave }) {
-  const title = who === 'anne' || who === 'baba' ? 'Randevuyu birlikte alın' : 'Bu ay aile hekiminizden randevu alın'
+  const forParent = who === 'anne' || who === 'baba'
+  const title = forParent ? 'Randevuyu birlikte alın' : 'Bu ay aile hekiminize gidin'
   return (
     <>
       <section className="sec">
         <h2>{title}</h2>
+        {!forParent && <p className="meta">Randevu alabilir ya da randevusuz gidebilirsiniz.</p>}
         <a className="btn" href="tel:182"><Tel />182'yi arayın</a>
+        <p className="meta">Randevu hattı. Arama ücreti hattınızın tarifesine göre.</p>
         <div className="script">
-          <b>Telefonda şunu söyleyin:</b><br />“Aile hekimimden randevu almak istiyorum.”<br />
-          <span className="meta">T.C. kimlik numaranızı hazır tutun.</span>
+          <b>Telefonda:</b><br />“Aile hekiminden randevu istiyorum.”<br />
+          {forParent && <>{who === 'baba' ? 'Babanız' : 'Anneniz'} için arıyorsanız: “{who === 'baba' ? 'Babamın' : 'Annemin'} aile hekiminden.”<br /></>}
+          <span className="meta">Randevu alınacak kişinin T.C. kimlik numarası yanınızda olsun.</span>
         </div>
       </section>
       <section className="sec">
@@ -407,7 +411,7 @@ function ChildPage({ route }) {
 
 function doctorData(s, items) {
   return {
-    meta: `${bandLabel(s.band)} yaş · ${s.sex === 'K' ? 'kadın' : 'erkek'}${s.conds.length ? ` · ${condText(s.conds)} (kendi bildirimi)` : ''} · ${today()}`,
+    meta: `${bandLabel(s.band)} yaş · ${s.sex === 'K' ? 'kadın' : 'erkek'}${s.conds.length ? ` · ${condText(s.conds)} (kendisi söyledi)` : ''} · ${today()}`,
     items,
     footer: `Bilgilendirme amaçlıdır; karar hekimindir. Kurallar: Sağlık Bakanlığı tarama programları ve güncel kılavuzlar, ${RULE_DATE}.`,
   }
@@ -448,7 +452,7 @@ function ParentPage({ route }) {
     )
   }
 
-  const introText = `Merhaba. Bu sayfayı ${name || 'bir yakınınız'} sizin için hazırladı. Önce bir soruya cevap verin. Sonra yaşınıza uygun kontroller çıkacak. Her birine dokunun, okuyun ya da dinleyin. En altta aile hekiminizi aramak için bir düğme var. Karar her zaman doktorunuzundur.`
+  const introText = `Merhaba. Bu sayfayı ${name || 'bir yakınınız'} sizin için hazırladı. Önce bir soruya cevap verin. Sonra size uygun kontroller çıkacak. Her birine dokunun, okuyun ya da dinleyin. En altta randevu hattı 182'yi aramak için bir düğme var. Karar her zaman doktorunuzundur.`
   const openDoctor = () => setQuery('/a', { ...route.q, d: 1 })
   const firstOpen = () => {
     if (ringed.current) return
