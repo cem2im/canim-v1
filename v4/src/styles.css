@@ -122,3 +122,26 @@ table.rules { border-collapse: collapse; width: 100%; font-size: 16px }
 table.rules td, table.rules th { border-bottom: 1px solid var(--cizgi); padding: 8px 6px; vertical-align: top; text-align: left }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important } }
+
+/* step screens */
+.screen { min-height: calc(100dvh - 6px); display: flex; flex-direction: column }
+.screen-body { flex: 1 }
+.opt { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 64px; border: 1.5px solid var(--kenar); border-radius: var(--r); background: var(--kart); padding: 8px 18px; margin-bottom: 10px; font-size: 22px; font-weight: 600; box-shadow: 0 2px 0 var(--kenar); line-height: 1.25 }
+.opt[aria-checked="true"] { background: var(--cini); color: var(--kart); border-color: var(--cini); box-shadow: 0 3px 0 #0a1a33 }
+.opt .radio, .opt .box { width: 28px; height: 28px; border: 2.5px solid var(--murekkep); flex: none; margin: 0 }
+.opt .box { border-radius: 5px; position: relative }
+.opt[aria-checked="true"] .radio { border-color: var(--kart); background: radial-gradient(var(--kart) 42%, transparent 47%) }
+.opt[aria-checked="true"] .box { border-color: var(--kart) }
+.opt[aria-checked="true"] .box:after { content: ""; position: absolute; left: 7px; top: 1px; width: 8px; height: 15px; border: solid var(--kart); border-width: 0 3.5px 3.5px 0; transform: rotate(45deg) }
+.sticky .btn2 { margin-top: 10px }
+.band.hero { padding: 22px 20px 24px }
+.band.hero .t { font-size: 34px; margin-top: 6px }
+.steps { list-style: none }
+.steps li { display: grid; grid-template-columns: 48px 1fr; padding: 10px 0; border-top: 1.5px solid var(--cizgi) }
+.steps li:first-child { border-top: 0 }
+.steps b { font-family: Literata, serif; font-weight: 600; font-size: 22px; line-height: 1.2; display: block }
+.steps span:not(.n) { font-size: 19px; color: var(--ikincil); display: block; margin-top: 2px }
+.trust { list-style: none; margin-top: 6px }
+.trust li { font-size: 18px; color: var(--ikincil); padding: 6px 0 6px 22px; position: relative }
+.trust li:before { content: ""; position: absolute; left: 4px; top: 15px; width: 8px; height: 8px; background: var(--nar); transform: rotate(45deg) }
+.stepn { display: inline-block; font-family: Literata, serif; font-weight: 700; color: var(--nar); margin-right: 10px }

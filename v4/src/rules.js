@@ -23,7 +23,7 @@ export const CONDS = [
   { id: 'kalp', label: 'Kalp' },
   { id: 'bobrek', label: 'Böbrek' },
   { id: 'koah', label: 'Akciğer (KOAH)', low: 'KOAH' },
-  { id: 'baska', label: 'Başka' },
+  { id: 'baska', label: 'Diğer' },
 ]
 export const condText = (conds) =>
   conds.map((c) => { const x = CONDS.find((y) => y.id === c); return x?.low ?? x?.label.toLocaleLowerCase('tr') }).join(', ')
@@ -398,8 +398,8 @@ export function buildList(s) {
 // Table for the "Hekimler için" page.
 export const RULE_TABLE = [
   ['Kan ve idrar tahlili', 'Tansiyon, şeker, kolesterol, kalp veya böbrek', 'Şekerde HbA1c 3–6 ay; kalpte 6 ayda bir; böbrekte 3–6 ay; diğerleri yılda bir', `${SRC.hyp}; ${SRC.dm}; ${SRC.ht}; ${SRC.kalp}; ${SRC.lipid}; ${SRC.kdigo}`],
-  ['Kan şekeri', '30–39 yaş, kronik hastalık yok', '35 yaşından itibaren 3 yılda bir', 'TEMD Diabetes Mellitus Kılavuzu 2026'],
-  ['Kan şekeri ve kolesterol', '40 yaş ve üzeri, kronik hastalık yok', '2 yılda bir (düşük-orta risk; HSGM KVR 2025); yüksek riskte 6–24 ay. Yalnız şeker taraması: 3 yılda bir (HYP)', `${SRC.kvr}; ${SRC.hyp}; ${SRC.lipid}`],
+  ['Kan şekeri', '30–39 yaş, takip edilen sağlık durumu yok', '35 yaşından itibaren 3 yılda bir', 'TEMD Diabetes Mellitus Kılavuzu 2026'],
+  ['Kan şekeri ve kolesterol', '40 yaş ve üzeri, takip edilen sağlık durumu yok', '2 yılda bir (düşük-orta risk; HSGM KVR 2025); yüksek riskte 6–24 ay. Yalnız şeker taraması: 3 yılda bir (HYP)', `${SRC.kvr}; ${SRC.hyp}; ${SRC.lipid}`],
   ['Tansiyon ölçümü / kontrolü', 'Herkes', 'Tanısız: 40 yaş altı 3 yılda bir, 40+ yılda bir; diyabette her vizitte (≥6 ayda bir); kalp/böbrekte her vizitte. Hipertansiyonda yılda bir, yüksek KVR’de 6 ayda bir + ev KB', `${SRC.ht}; ${SRC.dm}; ${SRC.kdigo}`],
   ['Gaitada gizli kan (GGKT)', '50–70 yaş (dâhil)', "2 yılda bir; ayrıca 10 yılda bir kolonoskopi; 70'te son 2 test negatifse bırak", `${SRC.ketem}; ${SRC.hyp}`],
   ['Mamografi + klinik meme muayenesi', '40–69 yaş kadın (dâhil)', 'Mamografi 2 yılda bir; KMM yılda bir', `${SRC.ketem}; ${SRC.hyp}`],
