@@ -62,19 +62,6 @@ const Cini = () => (
   </svg>
 )
 
-function Chips({ options, value, multi, onPick }) {
-  const on = (id) => (multi ? value.includes(id) : value === id)
-  return (
-    <div className="chips">
-      {options.map((o) => (
-        <button key={o.id} className="chip" aria-pressed={on(o.id)} onClick={() => onPick(o.id)}>
-          {o.label}
-        </button>
-      ))}
-    </div>
-  )
-}
-
 function Voice({ title, sub, text, small, className = '' }) {
   const [on, setOn] = useState(false)
   useEffect(() => () => on && stopSpeak(), [on])
@@ -225,13 +212,14 @@ function GiftSheet({ who, s, onClose }) {
 
 /* ---------- end of page: call, show, keep ---------- */
 
-function EndSection({ who, onDoctor, onSave }) {
+function EndSection({ who, onDoctor, onSave, numbered }) {
   const forParent = who === 'anne' || who === 'baba'
   const title = forParent ? 'Randevuyu birlikte alın' : 'Bu ay aile hekiminize gidin'
+  const n = (i) => (numbered ? <span className="stepn">{numbered + i}</span> : null)
   return (
     <>
       <section className="sec">
-        <h2>{title}</h2>
+        <h2>{n(0)}{title}</h2>
         {!forParent && <p className="meta">Randevu alabilir ya da randevusuz gidebilirsiniz.</p>}
         <a className="btn" href="tel:182"><Tel />182'yi arayın</a>
         <p className="meta">Randevu hattı. Arama ücreti hattınızın tarifesine göre.</p>
@@ -242,12 +230,12 @@ function EndSection({ who, onDoctor, onSave }) {
         </div>
       </section>
       <section className="sec">
-        <h2>Doktorunuza gösterin</h2>
+        <h2>{n(1)}Doktorunuza gösterin</h2>
         <p className="meta">Doktorun okuyacağı büyük yazılı sayfa açılır.</p>
         <button className="btn2" onClick={onDoctor}>Doktora gösterilecek sayfa</button>
       </section>
       <section className="sec">
-        <h2>Kaybetmeyin</h2>
+        <h2>{n(2)}Kaybetmeyin</h2>
         <button className="btn2" onClick={onSave}>Resim olarak kaydet</button>
       </section>
     </>
@@ -304,7 +292,7 @@ function DoctorPage({ s, items, onBack }) {
   )
 }
 
-/* ---------- page 1: the person who prepares the list ---------- */
+/* ---------- shared pieces for the step screens ---------- */
 
 const WHO = [
   { id: 'kendim', label: 'Kendim' },
@@ -333,96 +321,195 @@ function useFlash(ms = 2500) {
   return [on, fire]
 }
 
-function ChildPage({ route }) {
-  const [who, setWho] = useState(null)
-  const [sexPick, setSexPick] = useState(null)
-  const [band, setBand] = useState(null)
-  const [conds, setConds] = useState([])
+// One screen: back button, wordmark, progress; the action sits at the bottom.
+function Screen({ back = true, progress, children, action }) {
+  return (
+    <div className="screen">
+      <header className="top">
+        {back ? <button className="geri" onClick={() => window.history.back()}>‹ Geri</button> : <span className="wm">Canım</span>}
+        {progress ? <span className="meta" style={{ fontSize: 18 }}>{progress}</span> : back ? <span className="wm">Canım</span> : <span className="meta" style={{ fontSize: 18 }}>Üyelik yok · ücretsiz</span>}
+      </header>
+      <div className="screen-body">{children}</div>
+      {action && <div className="sticky">{action}</div>}
+    </div>
+  )
+}
+
+// Full-width answer rows. A single choice moves on by itself after a short beat.
+function Options({ options, value, multi, onPick }) {
+  const on = (id) => (multi ? value.includes(id) : value === id)
+  return (
+    <div role={multi ? 'group' : 'radiogroup'}>
+      {options.map((o) => (
+        <button key={o.id} className="opt" role={multi ? 'checkbox' : 'radio'} aria-checked={on(o.id)} onClick={() => onPick(o.id)}>
+          <span className={multi ? 'box' : 'radio'} />{o.label}
+        </button>
+      ))}
+    </div>
+  )
+}
+const after = (fn) => setTimeout(fn, 220)
+
+/* ---------- intro ---------- */
+
+const INTRO_VOICE = 'Merhaba. Canım, annenize, babanıza ya da kendinize yaşa uygun sağlık kontrollerini bir dakikada gösterir. Üç soruya dokunursunuz. Devletin ücretsiz tarama programına ve doktor önerilerine göre bir liste çıkar. Listeyi annenize WhatsApptan gönderebilir, 182yi arayıp aile hekiminden randevu alabilirsiniz. Doktora gösterilecek sayfa da hazır. Üyelik yok, ücretsiz. Hiçbir bilgi kaydedilmez. Teşhis koymaz; karar her zaman doktorunuzundur.'
+
+function IntroPage() {
+  return (
+    <Screen back={false} action={<a className="btn" href="#/s/kim">Başlayın</a>}>
+      <div className="band hero">
+        <div style={{ fontSize: 20, fontWeight: 600 }}>Annenize, babanıza, kendinize</div>
+        <div className="t">Yaşa uygun sağlık kontrolleri, bir dakikada.</div>
+      </div>
+      <Cini />
+      <section className="sec" style={{ border: 0 }}>
+        <p style={{ fontSize: 21 }}>Mamografi, bağırsak testi, tahliller, aşılar… Hangisi ne zaman, hangisi ücretsiz? Canım yaşa ve hastalığa göre listeyi çıkarır.</p>
+      </section>
+      <section className="sec">
+        <h2>Nasıl çalışır?</h2>
+        <ol className="steps">
+          <li><span className="n">1</span><div><b>Üç soruya dokunun</b><span>Kimin için, kaç yaşında, doktorun söylediği bir hastalığı var mı.</span></div></li>
+          <li><span className="n">2</span><div><b>Listeyi görün</b><span>Her kontrolü okuyun ya da sesli dinleyin: ne arar, nasıl yapılır, ücretsiz mi.</span></div></li>
+          <li><span className="n">3</span><div><b>Gönderin, randevu alın</b><span>Annenize WhatsApp'tan gönderin. 182'yi arayın. Doktora gösterilecek sayfa hazır.</span></div></li>
+        </ol>
+      </section>
+      <section className="sec" style={{ border: 0 }}>
+        <Voice title="Sesli dinleyin" sub="Canım nedir? · 30 saniye" text={INTRO_VOICE} />
+        <ul className="trust">
+          <li>Devletin tarama programına ve kılavuzlara dayanır; hekim kontrolünden geçti.</li>
+          <li>Üyelik yok, ücretsiz. Cevaplarınız kaydedilmez.</li>
+          <li>Teşhis koymaz. Karar hekiminizindir.</li>
+        </ul>
+      </section>
+      <Foot />
+    </Screen>
+  )
+}
+
+/* ---------- child flow: one question per screen ---------- */
+
+function ChildFlow({ route, a, setA }) {
+  const step = route.path.split('/')[2] || 'kim'
   const [ask, setAsk] = useState(null)
   const [gift, setGift] = useState(false)
-  const [listLit, flashList] = useFlash()
-  const listRef = useRef(null)
-
+  const { who, sexPick, band, conds } = a
   const sex = who === 'anne' ? 'K' : who === 'baba' ? 'E' : sexPick
   const needSex = who === 'kendim' || who === 'baska'
+  const parent = who === 'anne' || who === 'baba'
   const s = { sex, band, conds: conds.filter((c) => c !== 'yok') }
   const done = who && sex && band && conds.length > 0
   const items = done ? buildList(s) : []
-  const bands = who === 'anne' || who === 'baba' ? BANDS.filter((b) => b.id >= 40) : BANDS
+  const bands = parent ? BANDS.filter((b) => b.id >= 40) : BANDS
+  const total = needSex ? 4 : 3
+  const nth = { kim: 1, cins: 2, yas: needSex ? 3 : 2, hastalik: needSex ? 4 : 3 }[step]
 
-  const step = !who ? 'who' : !sex ? 'sex' : !band ? 'band' : !conds.length ? 'cond' : 'list'
-  const cls = (q, answered) => (step === q ? 'spot' : answered ? '' : 'dim')
+  // A deep link or reload into a later step goes back to the first unanswered one.
+  const missing = !who ? 'kim' : !sex ? 'cins' : !band ? 'yas' : !conds.length ? 'hastalik' : null
+  const order = ['kim', 'cins', 'yas', 'hastalik', 'liste', 'son']
+  const needs = { cins: who, yas: sex, hastalik: band, liste: done, son: done }
+  useEffect(() => {
+    if (step in needs && !needs[step] && missing) window.location.replace(`#/s/${missing}`)
+  })
+  if (!order.includes(step)) return null
 
-  const showList = () => {
-    flashList()
-    setTimeout(() => listRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 60)
-  }
-  const onCond = (id) => {
-    const next = pickConds(conds, id)
-    setConds(next)
-    if (id === 'yok') showList()
-  }
-
+  const go = (to) => { window.location.hash = `/s/${to}` }
   const ageQ = { anne: 'Annenizin yaşı?', baba: 'Babanızın yaşı?', kendim: 'Yaşınız?', baska: 'Kaç yaşında?' }[who] || 'Yaşı?'
-  const condQ = who === 'kendim' ? 'Doktorun söylediği bir hastalığınız var mı? (İlaç, iğne ya da diyetle)' : 'Doktorun söylediği bir hastalığı var mı? (İlaç, iğne ya da diyetle)'
+  const condQ = who === 'kendim' ? 'Doktorun söylediği bir hastalığınız var mı?' : 'Doktorun söylediği bir hastalığı var mı?'
   const listTitle = { anne: 'Annenizin', baba: 'Babanızın', kendim: 'Sizin', baska: 'Onun' }[who]
+  const toParent = who === 'baba' ? 'Babanıza' : 'Annenize'
+  const openDoctor = () => setQuery(route.path, { d: 1 })
+  const progress = nth ? `Soru ${nth} / ${total}` : null
 
-  const openDoctor = () => setQuery('/', { d: 1 })
-  const closeDoctor = () => window.history.back()
+  let screen
+  if (step === 'kim') {
+    screen = (
+      <Screen progress={progress}>
+        <section className="sec" style={{ border: 0 }}>
+          <h1>Kimin için?</h1>
+          <p className="meta" style={{ marginBottom: 14 }}>Listeyi kimin için hazırlıyorsunuz?</p>
+          <Options options={WHO} value={who} onPick={(id) => {
+            setA({ ...a, who: id, band: id !== who ? null : band })
+            after(() => go(id === 'kendim' || id === 'baska' ? 'cins' : 'yas'))
+          }} />
+        </section>
+      </Screen>
+    )
+  } else if (step === 'cins') {
+    screen = (
+      <Screen progress={progress}>
+        <section className="sec" style={{ border: 0 }}>
+          <h1>Kadın mı, erkek mi?</h1>
+          <p className="meta" style={{ marginBottom: 14 }}>Bazı kontroller yalnızca kadınlar ya da erkekler için.</p>
+          <Options options={SEX} value={sexPick} onPick={(id) => { setA({ ...a, sexPick: id }); after(() => go('yas')) }} />
+        </section>
+      </Screen>
+    )
+  } else if (step === 'yas') {
+    screen = (
+      <Screen progress={progress}>
+        <section className="sec" style={{ border: 0 }}>
+          <h1>{ageQ}</h1>
+          <p className="meta" style={{ marginBottom: 14 }}>Kontroller yaşa göre değişir.</p>
+          <Options options={bands} value={band} onPick={(id) => { setA({ ...a, band: id }); after(() => go('hastalik')) }} />
+        </section>
+      </Screen>
+    )
+  } else if (step === 'hastalik') {
+    const some = conds.length > 0 && !conds.includes('yok')
+    screen = (
+      <Screen progress={progress} action={some ? <button className="btn" onClick={() => go('liste')}>Listeyi göster</button> : null}>
+        <section className="sec" style={{ border: 0 }}>
+          <h1>{condQ}</h1>
+          <p className="meta" style={{ marginBottom: 14 }}>İlaç, iğne ya da diyetle takip edilen. Birden fazla seçebilirsiniz.</p>
+          <Options options={[NONE, ...CONDS]} value={conds} multi onPick={(id) => {
+            setA({ ...a, conds: pickConds(conds, id) })
+            if (id === 'yok') after(() => go('liste'))
+          }} />
+        </section>
+      </Screen>
+    )
+  } else if (step === 'liste' && done) {
+    screen = (
+      <Screen action={parent
+        ? <><button className="btn" onClick={() => setGift(true)}>{toParent} gönderin</button><button className="btn2" onClick={() => go('son')}>Sonra ne yapmalı? →</button></>
+        : <button className="btn" onClick={() => go('son')}>Sonra ne yapmalı? →</button>}>
+        <section className="sec" style={{ border: 0 }} aria-live="polite">
+          <h1 style={{ fontSize: 29 }}>{listTitle} {items.length} kontrolü</h1>
+          <p className="meta" style={{ marginBottom: 10 }}>
+            {parent ? `Bir kontrole dokunun, okuyun. Her birini ${who === 'baba' ? 'babanıza' : 'annenize'} sorabilirsiniz; hazır bir mesaj yazdık.` : 'Bir kontrole dokunun, ne olduğunu okuyun ya da dinleyin.'}
+          </p>
+          <ItemList items={items} who={who} onAsk={setAsk} />
+          {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığının kontrollerini ve aşılarını doktoruna sor.</p>}
+        </section>
+      </Screen>
+    )
+  } else if (step === 'son' && done) {
+    screen = (
+      <Screen>
+        <section className="sec" style={{ border: 0, paddingBottom: 0 }}>
+          <h1>Şimdi ne yapmalı?</h1>
+        </section>
+        {parent && (
+          <section className="sec">
+            <h2><span className="stepn">1</span>{toParent} gönderin</h2>
+            <p className="meta">Kendi listesini görür, sesli dinler. Uygulama indirmesi gerekmez.</p>
+            <button className="btn" style={{ marginTop: 10 }} onClick={() => setGift(true)}>WhatsApp'ta gönderin</button>
+          </section>
+        )}
+        <EndSection who={who} onDoctor={openDoctor} onSave={() => saveDoctorImage(doctorData(s, items))} numbered={parent ? 2 : 1} />
+        <Foot />
+      </Screen>
+    )
+  } else {
+    return null
+  }
 
   return (
     <>
-      <header className="top"><span className="wm">Canım</span><span className="meta" style={{ fontSize: 18 }}>Üyelik yok · ücretsiz</span></header>
-      <section className="sec" style={{ paddingTop: 4 }}>
-        <h1>Hangi kontroller gerekli?</h1>
-        <p className="meta">Üç soruya dokunun, liste hemen aşağıda çıksın.</p>
-      </section>
-      <section className={`sec ${cls('who', who)}`}>
-        <div className="q">Kimin için?</div>
-        <Chips options={WHO} value={who} onPick={(id) => { setWho(id); setBand(null) }} />
-      </section>
-      {needSex && (
-        <section className={`sec ${cls('sex', sexPick)}`}>
-          <div className="q">Kadın mı, erkek mi?</div>
-          <Chips options={SEX} value={sexPick} onPick={setSexPick} />
-        </section>
-      )}
-      <section className={`sec ${cls('band', band)}`}>
-        <div className="q">{ageQ}</div>
-        <Chips options={bands} value={band} onPick={setBand} />
-      </section>
-      <section className={`sec ${cls('cond', conds.length)}`}>
-        <div className="q">{condQ}</div>
-        <Chips options={[NONE, ...CONDS]} value={conds} multi onPick={onCond} />
-        {conds.length > 0 && !conds.includes('yok') && (
-          <button className="btn" style={{ marginTop: 14 }} onClick={showList}>Listeyi göster ↓</button>
-        )}
-      </section>
-
-      {!done && <section className="sec dim" style={{ border: 0 }}><p className="meta" style={{ textAlign: 'center' }}>↓ Liste burada belirecek</p></section>}
-
-      {done && (
-        <>
-          <section ref={listRef} className={`sec ${listLit ? 'spot' : ''}`} style={{ border: 0, scrollMarginTop: 8 }} aria-live="polite">
-            <h1 style={{ fontSize: 29 }}>{listTitle} {items.length} kontrolü</h1>
-            <p className="meta" style={{ marginBottom: 10 }}>
-              {who === 'anne' || who === 'baba' ? `Her kontrolü ${who === 'baba' ? 'babanıza' : 'annenize'} sorabilirsiniz. Hazır bir mesaj yazdık.` : 'Bir kontrole dokunun, ne olduğunu okuyun.'}
-            </p>
-            <ItemList items={items} who={who} onAsk={setAsk} />
-            {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığının kontrollerini ve aşılarını doktoruna sor.</p>}
-          </section>
-          {(who === 'anne' || who === 'baba') && (
-            <section className="sec">
-              <button className="btn" onClick={() => setGift(true)}>{who === 'baba' ? 'Babanıza gönderin' : 'Annenize gönderin'}</button>
-            </section>
-          )}
-          <EndSection who={who} onDoctor={openDoctor} onSave={() => saveDoctorImage(doctorData(s, items))} />
-        </>
-      )}
-      <Foot />
+      {screen}
       {ask && <AskSheet item={ask} who={who} onClose={() => setAsk(null)} />}
       {gift && <GiftSheet who={who} s={s} onClose={() => setGift(false)} />}
-      {route.q.d && done && <DoctorPage s={s} items={items} onBack={closeDoctor} />}
+      {route.q.d && done && <DoctorPage s={s} items={items} onBack={() => window.history.back()} />}
     </>
   )
 }
@@ -435,77 +522,105 @@ function doctorData(s, items) {
   }
 }
 
-/* ---------- page 2: the parent who opens the link ---------- */
+/* ---------- parent flow: welcome → question → list → next steps ---------- */
 
 function ParentPage({ route }) {
   const band = Number(route.q.y)
   const sex = route.q.c === 'E' ? 'E' : 'K'
   const name = (route.q.n || '').slice(0, 20)
   const valid = BANDS.some((b) => b.id === band)
+  const p = route.q.p || ''
   const [conds, setConds] = useState([])
-  const [intro, setIntro] = useState(canSpeak)
   const [ring, fireRing] = useFlash(2600)
   const ringed = useRef(false)
   const s = { sex, band, conds: conds.filter((c) => c !== 'yok') }
   const answered = conds.length > 0
   const items = answered ? buildList(s) : []
+  const base = { ...route.q }
+  delete base.p
+  delete base.d
+  const go = (to) => setQuery('/a', to ? { ...base, p: to } : base)
 
   useEffect(() => {
-    if (!intro) return
-    const lift = () => setIntro(false)
-    const t = setTimeout(() => window.addEventListener('pointerdown', lift, { once: true }), 50)
-    return () => {
-      clearTimeout(t)
-      window.removeEventListener('pointerdown', lift)
-    }
-  }, [intro])
+    if ((p === 'liste' || p === 'son') && !answered) window.location.replace(`#/a?${new URLSearchParams({ ...base, p: 'soru' })}`)
+  })
 
   if (!valid) {
     return (
-      <section className="sec">
-        <h1>Bu bağlantı eksik</h1>
-        <p className="meta">Gönderen kişiden yeniden göndermesini isteyin ya da kendiniz başlayın.</p>
-        <a className="btn" style={{ marginTop: 12 }} href="#/">Kendim başlayayım</a>
-      </section>
+      <Screen back={false}>
+        <section className="sec">
+          <h1>Bu bağlantı eksik</h1>
+          <p className="meta">Gönderen kişiden yeniden göndermesini isteyin ya da kendiniz başlayın.</p>
+          <a className="btn" style={{ marginTop: 12 }} href="#/">Kendim başlayayım</a>
+        </section>
+      </Screen>
     )
   }
 
-  const introText = `Merhaba. Bu sayfayı ${name || 'bir yakınınız'} sizin için hazırladı. Önce bir soruya cevap verin. Sonra size uygun kontroller çıkacak. Her birine dokunun, okuyun ya da dinleyin. En altta randevu hattı 182'yi aramak için bir düğme var. Karar her zaman doktorunuzundur.`
-  const openDoctor = () => setQuery('/a', { ...route.q, d: 1 })
+  const introText = `Merhaba. Bu sayfayı ${name || 'bir yakınınız'} sizin için hazırladı. Önce bir soruya cevap vereceksiniz. Sonra size uygun kontroller çıkacak. Her birine dokunun, okuyun ya da dinleyin. Randevu hattı 182'yi aramak için bir düğme var. Karar her zaman doktorunuzundur.`
   const firstOpen = () => {
     if (ringed.current) return
     ringed.current = true
     fireRing()
   }
+  const call = <a className={`btn ${ring ? 'ring' : ''}`} href="tel:182"><Tel />182'yi arayın, randevu alın</a>
 
-  return (
-    <>
-      <div className="band">
-        <div style={{ fontSize: 20, fontWeight: 600 }}>{name ? `${name} bunu size gönderdi` : 'Bu sayfa size gönderildi'}</div>
-        <div className="t">Yaşınıza uygun kontroller</div>
-      </div>
-      <Cini />
-      <section className="sec" style={{ border: 0, paddingTop: 12 }}>
-        <Voice title="Önce dinleyin" sub="Sesli anlatım" text={introText} className={intro ? 'spot' : ''} />
-        <div className={intro ? 'dim' : !answered ? 'spot' : ''} style={{ padding: '12px 12px 14px', margin: '0 -12px', borderRadius: 4 }}>
-          <div className="q">Doktorun söylediği bir hastalığınız var mı? (İlaç, iğne ya da diyetle)</div>
-          <Chips options={[NONE, ...CONDS]} value={conds} multi onPick={(id) => setConds(pickConds(conds, id))} />
+  let screen
+  if (!p) {
+    screen = (
+      <Screen back={false} action={<button className="btn" onClick={() => go('soru')}>Başlayın</button>}>
+        <div className="band hero">
+          <div style={{ fontSize: 20, fontWeight: 600 }}>{name ? `${name} bunu size gönderdi` : 'Bu sayfa size gönderildi'}</div>
+          <div className="t">Yaşınıza uygun kontroller</div>
         </div>
-      </section>
-      {answered ? (
-        <section className={`sec ${intro ? 'dim' : ''}`} style={{ border: 0, paddingTop: 0 }} aria-live="polite">
-          <h2>Size uygun {items.length} kontrol</h2>
+        <Cini />
+        <section className="sec" style={{ border: 0 }}>
+          <Voice title="Önce dinleyin" sub="Sesli anlatım" text={introText} className="spot" />
+          <p style={{ fontSize: 21 }}>Bir soruya cevap verin, size uygun kontroller çıksın. Uygulama indirmeniz gerekmez.</p>
+        </section>
+        <Foot />
+      </Screen>
+    )
+  } else if (p === 'soru') {
+    const some = conds.length > 0 && !conds.includes('yok')
+    screen = (
+      <Screen progress="Tek soru" action={some ? <button className="btn" onClick={() => go('liste')}>Listemi göster</button> : null}>
+        <section className="sec" style={{ border: 0 }}>
+          <h1>Doktorun söylediği bir hastalığınız var mı?</h1>
+          <p className="meta" style={{ marginBottom: 14 }}>İlaç, iğne ya da diyetle takip edilen. Birden fazla seçebilirsiniz.</p>
+          <Options options={[NONE, ...CONDS]} value={conds} multi onPick={(id) => {
+            setConds(pickConds(conds, id))
+            if (id === 'yok') after(() => go('liste'))
+          }} />
+        </section>
+      </Screen>
+    )
+  } else if (p === 'liste' && answered) {
+    screen = (
+      <Screen action={<>{call}<button className="btn2" onClick={() => go('son')}>Sonra ne yapmalı? →</button></>}>
+        <section className="sec" style={{ border: 0 }} aria-live="polite">
+          <h1 style={{ fontSize: 29 }}>Size uygun {items.length} kontrol</h1>
+          <p className="meta" style={{ marginBottom: 10 }}>Bir kontrole dokunun, okuyun ya da dinleyin.</p>
           <ItemList items={items} who="kendim" onFirstOpen={firstOpen} />
           {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığınızın kontrollerini ve aşılarını doktorunuza sorun.</p>}
         </section>
-      ) : (
-        <section className="sec dim" style={{ border: 0 }}><p className="meta" style={{ textAlign: 'center' }}>↓ Liste burada belirecek</p></section>
-      )}
-      {answered && <EndSection who="kendim" onDoctor={openDoctor} onSave={() => saveDoctorImage(doctorData(s, items))} />}
-      <Foot />
-      <div className="sticky">
-        <a className={`btn ${ring ? 'ring' : ''}`} href="tel:182"><Tel />182'yi arayın, randevu alın</a>
-      </div>
+      </Screen>
+    )
+  } else if (p === 'son' && answered) {
+    screen = (
+      <Screen>
+        <section className="sec" style={{ border: 0, paddingBottom: 0 }}><h1>Şimdi ne yapmalı?</h1></section>
+        <EndSection who="kendim" onDoctor={() => setQuery('/a', { ...route.q, d: 1 })} onSave={() => saveDoctorImage(doctorData(s, items))} numbered={1} />
+        <Foot />
+      </Screen>
+    )
+  } else {
+    return null
+  }
+
+  return (
+    <>
+      {screen}
       {route.q.d && answered && <DoctorPage s={s} items={items} onBack={() => window.history.back()} />}
     </>
   )
@@ -516,7 +631,7 @@ function ParentPage({ route }) {
 function PrivacyPage() {
   return (
     <>
-      <header className="top"><a className="geri" href="#/">‹ Geri</a><span className="wm">Canım</span></header>
+      <header className="top"><button className="geri" onClick={() => (window.history.length > 1 ? window.history.back() : (window.location.hash = '/'))}>‹ Geri</button><span className="wm">Canım</span></header>
       <section className="sec">
         <h1>Gizlilik</h1>
         <p>Canım'ı Doç. Dr. Cem Şimşek hazırladı.</p>
@@ -534,7 +649,7 @@ function PrivacyPage() {
 function RulesPage() {
   return (
     <>
-      <header className="top"><a className="geri" href="#/">‹ Geri</a><span className="wm">Canım</span></header>
+      <header className="top"><button className="geri" onClick={() => (window.history.length > 1 ? window.history.back() : (window.location.hash = '/'))}>‹ Geri</button><span className="wm">Canım</span></header>
       <section className="sec">
         <h1>Hekimler için</h1>
         <p className="meta">Canım'ın önerdiği her kontrol aşağıdaki kurallardan gelir. Kural tarihi: {RULE_DATE}. {REVIEWED ? 'Hekim kontrolünden geçti.' : 'Hekim kontrolü bekliyor.'}</p>
@@ -552,10 +667,20 @@ function RulesPage() {
 
 export default function App() {
   const route = useHash()
+  // Answers live here so moving between screens (and to Gizlilik and back) keeps them.
+  const [a, setA] = useState({ who: null, sexPick: null, band: null, conds: [] })
+  const screenKey = `${route.path}?${route.q.p || ''}`
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [screenKey])
   return (
     <div className="app">
       {!REVIEWED && <div className="draft">Deneme sürümü · hekim kontrolü bekliyor</div>}
-      {route.path === '/a' ? <ParentPage route={route} /> : route.path === '/kaynak' ? <RulesPage /> : route.path === '/gizlilik' ? <PrivacyPage /> : <ChildPage route={route} />}
+      {route.path === '/a' ? <ParentPage route={route} />
+        : route.path === '/kaynak' ? <RulesPage />
+        : route.path === '/gizlilik' ? <PrivacyPage />
+        : route.path.startsWith('/s/') ? <ChildFlow route={route} a={a} setA={setA} />
+        : <IntroPage />}
     </div>
   )
 }
