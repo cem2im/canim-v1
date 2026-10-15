@@ -44,6 +44,7 @@ const SRC = {
   gold: 'GOLD 2025 KOAH Raporu',
   dxa: 'TEMD Osteoporoz Kılavuzu 2025 (65+ kadın, 70+ erkek); Sağlık Bakanlığı Yaşlı Değerlendirme Kılavuzu 2025',
   psa: 'EAU 2026 Prostat Kanseri Kılavuzu; USPSTF 2018 (55–69: C, 70+: D)',
+  hep: 'CDC 2023 Hepatit B taraması (18 yaş üstü herkese bir kez); USPSTF 2020 Hepatit C taraması (18–79 yaş, bir kez)',
 }
 
 const has = (s, ...ids) => ids.some((i) => s.conds.includes(i))
@@ -143,6 +144,22 @@ export const RULES = [
       : 'Yüksek çıkarsa birkaç gün evde ölçmeniz istenir. 180/110 üstü ya da şikâyet varsa hemen doktora.'),
     sor: (s) => (has(s, 'tansiyon') ? 'Tansiyonum hedefte mi?' : 'Tansiyonumu ölçer misiniz?'),
     src: (s) => [SRC.ht, has(s, 'seker') && SRC.dm, has(s, 'bobrek') && SRC.kdigo].filter(Boolean).join('; '),
+  },
+  {
+    // Owner decision (Oct 2026): one-time hepatitis B and C test for every adult.
+    // Not in the Turkish national programme; from CDC 2023 (HBV, all adults once)
+    // and USPSTF 2020 (HCV, 18–79 once).
+    id: 'hepatit',
+    when: () => true,
+    title: 'Hepatit B ve C testi',
+    freq: () => 'Hayatınızda bir kez (daha önce yapılmadıysa)',
+    tag: 'kılavuz',
+    doctor: () => 'HBsAg, anti-HBs, anti-HBc total ve anti-HCV; bir kez (CDC 2023; USPSTF 2020)',
+    ne: 'Yıllarca belirti vermeden karaciğere zarar veren sarılık virüslerini (hepatit B ve C).',
+    nasil: 'Aile hekiminiz ister. Koldan biraz kan verilir.',
+    sonra: 'Pozitifse tedavi ve takip için yönlendirilirsiniz. Hepatit C bugün ilaçla tamamen iyileşebiliyor.',
+    sor: 'Hiç hepatit B ve C testim yapıldı mı?',
+    src: () => SRC.hep,
   },
   {
     id: 'ggk',
@@ -405,6 +422,7 @@ export const RULE_TABLE = [
   ['Gaitada gizli kan (GGKT)', '50–70 yaş (dâhil)', "2 yılda bir; ayrıca 10 yılda bir kolonoskopi; 70'te son 2 test negatifse bırak", `${SRC.ketem}; ${SRC.hyp}`],
   ['Mamografi + klinik meme muayenesi', '40–69 yaş kadın (dâhil)', 'Mamografi 2 yılda bir; KMM yılda bir', `${SRC.ketem}; ${SRC.hyp}`],
   ['HPV / smear', '30–65 yaş kadın', '5 yılda bir', SRC.ketem],
+  ['Hepatit B ve C testi', '18 yaş ve üzeri herkes (hekim kararı; ulusal programda yok)', 'Hayatta bir kez', SRC.hep],
   ['PSA (ortak karar)', '50–69 yaş erkek; 70+ rutin önerilmez', 'Doktorla konuşarak', SRC.psa],
   ['Göz dibi ve ayak muayenesi', 'Diyabet', 'Yılda bir', SRC.goz_ayak],
   ['Diş muayenesi, FIB-4, B12', 'Diyabet (B12: metformin)', 'Yılda bir', `${SRC.hyp}; ${SRC.dm}`],

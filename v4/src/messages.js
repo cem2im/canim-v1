@@ -19,6 +19,7 @@ const M = {
   kemik: { q: 'hiç kemik ölçümü yaptırdın mı?', f: 'bir kemik ölçümü yaptırır mısın' },
   asi: { q: 'aşıların tam mı? En son ne zaman aşı oldun?', f: 'aile hekimine aşılarını sorar mısın' },
   tarama_seker: { q: 'en son ne zaman şeker tahlili yaptırdın?', f: 'bu yıl bir şeker tahlili yaptırır mısın' },
+  hepatit: { q: 'hiç hepatit B ve C testi yaptırdın mı?', f: 'bir sonraki tahlilde hepatit B ve C testine de baktırır mısın' },
   psa: { q: 'prostat tahlilini (PSA) hiç doktorunla konuştun mu?', f: 'aile hekiminle prostat tahlilini (PSA) konuşur musun' },
   dis: { q: 'en son ne zaman diş hekimine gittin?', f: 'bu yıl diş etlerini diş hekimine gösterir misin' },
   karaciger: { q: 'kan tahlilinde karaciğer hesabına (FIB-4) baktılar mı?', f: 'aile hekimine karaciğer hesabını (FIB-4) sorar mısın' },
