@@ -377,7 +377,7 @@ function IntroPage({ a, setA }) {
       <header className="top"><span className="wm">Canım</span><span className="meta" style={{ fontSize: 18 }}>Üyelik yok · ücretsiz</span></header>
       <div className="band hero slim">
         <div className="t">Yaşa uygun sağlık kontrolleri, bir dakikada.</div>
-        <div className="sub">Annenize, babanıza ya da kendinize. Devletin tarama programına ve doktor önerilerine göre.</div>
+        <div className="sub">Mamografi, bağırsak testi, tahliller, aşılar: hangisi ne zaman, hangisi ücretsiz?</div>
       </div>
       <Cini />
       <section className="sec" style={{ border: 0, paddingBottom: 6 }}>
