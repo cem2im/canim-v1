@@ -115,48 +115,66 @@ function Sheet({ onClose, children, label }) {
 
 /* ---------- the list ---------- */
 
+// Extra diabetes checks (PD8, PD14) stay list items but sit behind one row,
+// so the core list stays short. The doctor page always shows everything.
+const GROUPS = { seker_ek: (n) => `Şekere bağlı diğer ${n} kontrol` }
+
 function ItemList({ items, who, onAsk, onFirstOpen }) {
   const [open, setOpen] = useState(null)
+  const [showGroup, setShowGroup] = useState(false)
   const toggle = (id) => {
     setOpen((o) => (o === id ? null : id))
     onFirstOpen?.()
   }
   const canAsk = who === 'anne' || who === 'baba'
+  const main = items.filter((it) => !it.group)
+  const extra = items.filter((it) => it.group)
+  const row = (it, i) => {
+    const isOpen = open === it.id
+    return (
+      <div key={it.id} className={`li ${isOpen ? 'open' : ''}`}>
+        <button className="lihead" aria-expanded={isOpen} onClick={() => toggle(it.id)}>
+          <span className="n">{i + 1}</span>
+          <span><b>{it.title}</b><span className="f">{it.freq}</span></span>
+          <Chev />
+        </button>
+        {isOpen && (
+          <div className="libody qa">
+            <Voice small title="Sesli dinleyin" sub="Bu kontrol" text={`${it.title}. Ne arar? ${it.ne} Nasıl yapılır? ${it.nasil} Sonra ne olur? ${it.sonra}`} />
+            <p><b>Ne arar?</b> {it.ne}</p>
+            <p><b>Nasıl?</b> {it.nasil}</p>
+            <p><b>Sonra?</b> {it.sonra}</p>
+            <div className="say"><span className="meta" style={{ fontWeight: 700 }}>Doktorunuza sorun:</span><br />“{it.sor}”</div>
+          </div>
+        )}
+        {canAsk && (
+          <button className="ask" onClick={() => onAsk(it)}>
+            <Bubble />{who === 'baba' ? 'Babana sor' : 'Annene sor'}
+          </button>
+        )}
+      </div>
+    )
+  }
   return (
     <div className="sheet">
-      {items.map((it, i) => {
-        const isOpen = open === it.id
-        return (
-          <div key={it.id} className={`li ${isOpen ? 'open' : ''}`}>
-            <button className="lihead" aria-expanded={isOpen} onClick={() => toggle(it.id)}>
-              <span className="n">{i + 1}</span>
-              <span><b>{it.title}</b><span className="f">{it.freq}</span></span>
-              <Chev />
-            </button>
-            {isOpen && (
-              <div className="libody qa">
-                <Voice small title="Sesli dinleyin" sub="Bu kontrol" text={`${it.title}. Ne arar? ${it.ne} Nasıl yapılır? ${it.nasil} Sonra ne olur? ${it.sonra}`} />
-                <p><b>Ne arar?</b> {it.ne}</p>
-                <p><b>Nasıl?</b> {it.nasil}</p>
-                <p><b>Sonra?</b> {it.sonra}</p>
-                <div className="say"><span className="meta" style={{ fontWeight: 700 }}>Doktorunuza sorun:</span><br />“{it.sor}”</div>
-              </div>
-            )}
-            {canAsk && (
-              <button className="ask" onClick={() => onAsk(it)}>
-                <Bubble />{who === 'baba' ? 'Babana sor' : 'Annene sor'}
-              </button>
-            )}
-          </div>
-        )
-      })}
+      {main.map(row)}
+      {extra.length > 0 && (
+        <div className={`li ${showGroup ? 'open' : ''}`}>
+          <button className="lihead" aria-expanded={showGroup} onClick={() => setShowGroup((v) => !v)}>
+            <span className="n">+</span>
+            <span><b>{GROUPS[extra[0].group](extra.length)}</b><span className="f">{extra.map((it) => it.title).join(', ')}</span></span>
+            <Chev />
+          </button>
+        </div>
+      )}
+      {showGroup && extra.map((it, i) => row(it, main.length + i))}
       <p className="source">Devletin tarama programına ve doktor önerilerine dayanır ({RULE_DATE}). Bakanlık sitesi değildir.</p>
     </div>
   )
 }
 
 function AskSheet({ item, who, onClose }) {
-  const alts = messagesFor(item.id, who)
+  const alts = messagesFor(item.msg ?? item.id, who)
   const [pick, setPick] = useState(0)
   const [text, setText] = useState(alts[0])
   const choose = (i) => {

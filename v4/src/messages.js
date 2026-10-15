@@ -7,6 +7,8 @@ const M = {
   tarama_kan: { q: 'en son ne zaman şeker ve kolesterol tahlili yaptırdın?', f: 'bu yıl bir kan tahlili yaptırır mısın' },
   tansiyon: { q: 'en son ne zaman tansiyonunu ölçtürdün?', f: 'bir eczaneye uğrayıp tansiyonunu ölçtürür müsün' },
   ggk: { q: 'aile hekiminden evde yapılan bağırsak testini aldın mı? Ücretsizmiş.', f: 'aile hekiminden ücretsiz bağırsak testini alır mısın' },
+  // 70+: the programme ends at 70, so ask the family doctor instead of nudging toward the test.
+  ggk70: { q: 'bağırsak testini (dışkıda gizli kan) en son ne zaman yaptırdın?', f: 'aile hekimine bağırsak testine devam gerekip gerekmediğini sorar mısın' },
   mamografi: { q: 'en son ne zaman mamografi oldun?', f: 'son 2 yılda mamografi olmadıysan bu yıl olur musun' },
   hpv: {
     q0: 'rahim ağzı testini (HPV) en son ne zaman yaptırdın? Aile hekiminde ücretsiz.',

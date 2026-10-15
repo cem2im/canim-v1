@@ -123,13 +123,24 @@ export const RULES = [
       if (has(s, 'tansiyon')) return 'Yılda bir kontrol; evde düzenli ölçüm'
       return s.band >= 40 ? 'Yılda bir' : '3 yılda bir'
     },
-    tag: 'ulusal tarama',
-    doctor: (s) => (has(s, 'tansiyon') ? 'Ofis KB; hedefte yılda bir, yüksek KVR’de 6 ayda bir izlem (HSGM HT 2025); ev KB ölçümü' : 'Ofis kan basıncı ölçümü'),
-    ne: 'Belirti vermeyen yüksek tansiyonu.',
-    nasil: 'Aile hekiminde ya da eczanede, oturarak, iki kez ölçülür.',
+    tag: (s) => (has(s, 'tansiyon') ? 'ulusal program (HYP)' : 'ulusal tarama'),
+    // Same branches as freq, so the doctor page never contradicts the list.
+    doctor: (s) => {
+      const home = has(s, 'tansiyon') ? '; ev KB ölçümü' : ''
+      if (has(s, 'seker')) return 'Ofis KB her vizitte, en az 6 ayda bir (TEMD/ADA 2026)' + home
+      if (has(s, 'kalp', 'bobrek')) return 'Ofis KB her vizitte, en az yılda bir' + home
+      if (has(s, 'tansiyon')) return 'Ofis KB; hedefte yılda bir, yüksek KVR’de 6 ayda bir izlem (HSGM HT 2025); ev KB ölçümü'
+      return 'Ofis kan basıncı ölçümü'
+    },
+    ne: (s) => (has(s, 'tansiyon') ? 'Tansiyonunuzun hedefte olup olmadığını.' : 'Belirti vermeyen yüksek tansiyonu.'),
+    nasil: (s) => (has(s, 'tansiyon')
+      ? 'Aile hekiminizde ölçülür. Evde de düzenli ölçün, değerleri yazıp kontrole götürün.'
+      : 'Aile hekiminde ya da eczanede, oturarak, iki kez ölçülür.'),
     // CH05/CH06, PD16 approved (emergency warning): ESC 2024 I/C; HSGM HT 2025 s. 6.
-    sonra: 'Yüksek çıkarsa birkaç gün evde ölçmeniz istenir. 180/110 üstü ya da şikâyet varsa hemen doktora.',
-    sor: 'Tansiyonumu ölçer misiniz?',
+    sonra: (s) => (has(s, 'tansiyon')
+      ? 'Hedefte değilse ilacınız ayarlanır. 180/110 üstü ya da şikâyet varsa hemen doktora.'
+      : 'Yüksek çıkarsa birkaç gün evde ölçmeniz istenir. 180/110 üstü ya da şikâyet varsa hemen doktora.'),
+    sor: (s) => (has(s, 'tansiyon') ? 'Tansiyonum hedefte mi?' : 'Tansiyonumu ölçer misiniz?'),
     src: (s) => [SRC.ht, has(s, 'seker') && SRC.dm, has(s, 'bobrek') && SRC.kdigo].filter(Boolean).join('; '),
   },
   {
@@ -139,10 +150,15 @@ export const RULES = [
     // PD5: the programme ends at 70 when the last two tests were negative.
     freq: (s) => (s.band === 70 ? 'Son iki testiniz negatif değilse aile hekiminize sorun' : '2 yılda bir · ücretsiz'),
     tag: 'ulusal tarama',
-    doctor: () => 'Gaitada gizli kan testi (GGKT), 2 yılda bir; 10 yılda bir kolonoskopi önerisi',
-    doctorSub: (s) => (s.band === 70 ? '70 yaşında son iki test negatifse tarama biter (HSGM)' : 'Pozitifse kolonoskopi; ayrıca 10 yılda bir kolonoskopi (HSGM)'),
+    doctor: (s) => (s.band === 70
+      ? 'Gaitada gizli kan testi (GGKT): program 70 yaşında biter'
+      : 'Gaitada gizli kan testi (GGKT), 2 yılda bir; 10 yılda bir kolonoskopi önerisi'),
+    doctorSub: (s) => (s.band === 70 ? '70 yaşında son iki test negatifse tarama biter; sonrası hekim kararı (HSGM)' : 'Pozitifse kolonoskopi; ayrıca 10 yılda bir kolonoskopi (HSGM)'),
     ne: 'Dışkıda gözle görülmeyen kanı.',
-    nasil: 'Aile hekiminizden kiti ücretsiz alın, evde yapın, geri götürün.',
+    nasil: (s) => (s.band === 70
+      ? 'Devam gerekip gerekmediğine aile hekiminiz karar verir. Gerekirse kiti verir; evde yapıp geri götürürsünüz.'
+      : 'Aile hekiminizden kiti ücretsiz alın, evde yapın, geri götürün.'),
+    msg: (s) => (s.band === 70 ? 'ggk70' : 'ggk'),
     // CH01/CH02: minimizing sentence removed; final tone ("mutlaka", "Ertelemeyin") awaits PD16.
     sonra: 'Kan çıkarsa ince bir kamerayla bağırsağa bakılır (kolonoskopi).',
     sor: 'Dışkıda gizli kan (bağırsak) testi zamanım geldi mi?',
@@ -180,8 +196,8 @@ export const RULES = [
     // PD13: men 50–69 talk it over with the doctor; not shown at 70+ (USPSTF D).
     id: 'psa',
     when: (s) => s.sex === 'E' && s.band >= 50 && s.band <= 60,
-    title: 'Prostat: doktorunuzla konuşun',
-    freq: () => 'Doktorunuzla konuşun',
+    title: 'Prostat tahlili (PSA)',
+    freq: () => 'Yapılıp yapılmayacağına doktorunuzla birlikte karar verin',
     tag: 'kılavuz',
     doctor: () => 'PSA ile erken tanı: bilgilendirilmiş ortak karar (EAU 2026; USPSTF 55–69 C)',
     ne: 'Prostatta erken dönemde başlayan değişiklikleri, kandaki PSA ile.',
@@ -207,6 +223,7 @@ export const RULES = [
   {
     // PD14: diabetes extras as their own items.
     id: 'dis',
+    group: 'seker_ek',
     when: (s) => has(s, 'seker'),
     title: 'Diş ve diş eti muayenesi',
     freq: () => 'Yılda bir',
@@ -220,6 +237,7 @@ export const RULES = [
   },
   {
     id: 'karaciger',
+    group: 'seker_ek',
     when: (s) => has(s, 'seker'),
     title: 'Karaciğer yağlanması hesabı',
     freq: () => 'Yılda bir',
@@ -233,6 +251,7 @@ export const RULES = [
   },
   {
     id: 'b12',
+    group: 'seker_ek',
     when: (s) => has(s, 'seker'),
     title: 'B12 vitamini tahlili',
     freq: () => 'Metformin kullanıyorsanız yılda bir',
@@ -299,14 +318,19 @@ export const RULES = [
     tag: 'ulusal program + SGK',
     doctor: (s) => (vaxRisk(s) ? 'İnfluenza (yıllık), pnömokok (PCV20 tek doz), Td (10 yılda bir)' : 'Td (10 yılda bir)'),
     ne: 'Yaşla ve kronik hastalıkla ağırlaşan enfeksiyonlara karşı korur.',
-    nasil: 'Aile hekiminiz yapar. Grip aşısı reçeteyle eczaneden alınır. Tetanoz ve zatürre ücretsiz; grip aşısını SGK karşılar.',
-    sonra: 'Grip aşısı her sonbahar tekrarlanır.',
+    nasil: (s) => (vaxRisk(s)
+      ? 'Aile hekiminiz yapar. Tetanoz ve zatürre aşısı ücretsiz. Grip aşısı reçeteyle eczaneden alınır; sizin grubunuzda SGK karşılar.'
+      : s.band === 60
+        ? 'Aile hekiminiz yapar, tetanoz aşısı ücretsiz. 65 yaşından sonra grip ve zatürre aşısı da ücretsiz ya da SGK kapsamında.'
+        : 'Aile hekiminiz yapar, tetanoz aşısı ücretsiz.'),
+    sonra: (s) => (vaxRisk(s) ? 'Grip aşısı her sonbahar tekrarlanır.' : 'Tetanoz aşısı 10 yılda bir tekrarlanır.'),
     sor: 'Hangi aşılarım eksik?',
     src: () => SRC.asi,
   },
   {
     // PD8 + PD14: extra vaccines for people with diabetes (TEMD 2026), as their own items.
     id: 'hepb',
+    group: 'seker_ek',
     when: (s) => has(s, 'seker') && s.band <= 50,
     title: 'Sarılık (hepatit B) aşısı',
     freq: () => 'Daha önce olmadıysanız bir kez (3 doz)',
@@ -320,6 +344,7 @@ export const RULES = [
   },
   {
     id: 'zona',
+    group: 'seker_ek',
     when: (s) => has(s, 'seker') && s.band >= 50,
     title: 'Zona aşısı',
     freq: () => 'Bir kez (2 doz) · ücretli',
@@ -333,6 +358,7 @@ export const RULES = [
   },
   {
     id: 'rsv',
+    group: 'seker_ek',
     when: (s) => has(s, 'seker') && s.band >= 60,
     title: 'RSV aşısı',
     freq: () => 'Bir kez · ücretli',
@@ -350,17 +376,21 @@ const val = (v, s) => (typeof v === 'function' ? v(s) : v)
 
 export function buildList(s) {
   if (!s.sex || !s.band || !s.conds) return []
-  return RULES.filter((r) => r.when(s)).map((r) => ({
+  // Grouped items go last, so the list and the doctor page number them the same way.
+  const rules = RULES.filter((r) => r.when(s))
+  return [...rules.filter((r) => !r.group), ...rules.filter((r) => r.group)].map((r) => ({
     id: r.id,
     title: val(r.title, s),
+    msg: r.msg ? r.msg(s) : r.id,
+    group: r.group ?? null,
     freq: r.freq(s),
-    tag: r.tag,
+    tag: val(r.tag, s),
     doctor: r.doctor(s),
     doctorSub: r.doctorSub ? r.doctorSub(s) : '',
-    ne: r.ne,
-    nasil: r.nasil,
-    sonra: r.sonra,
-    sor: r.sor,
+    ne: val(r.ne, s),
+    nasil: val(r.nasil, s),
+    sonra: val(r.sonra, s),
+    sor: val(r.sor, s),
     src: r.src(s),
   }))
 }
