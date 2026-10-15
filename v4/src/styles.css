@@ -145,3 +145,7 @@ table.rules td, table.rules th { border-bottom: 1px solid var(--cizgi); padding:
 .trust li { font-size: 18px; color: var(--ikincil); padding: 6px 0 6px 22px; position: relative }
 .trust li:before { content: ""; position: absolute; left: 4px; top: 15px; width: 8px; height: 8px; background: var(--nar); transform: rotate(45deg) }
 .stepn { display: inline-block; font-family: Literata, serif; font-weight: 700; color: var(--nar); margin-right: 10px }
+.band.hero.slim { padding: 16px 20px 18px }
+.band.hero.slim .t { font-size: 30px; margin-top: 0 }
+.band .sub { font-size: 18px; margin-top: 6px; opacity: .95; line-height: 1.4 }
+.qrow { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px }
