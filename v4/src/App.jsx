@@ -537,7 +537,7 @@ function RulesPage() {
       <header className="top"><a className="geri" href="#/">‹ Geri</a><span className="wm">Canım</span></header>
       <section className="sec">
         <h1>Hekimler için</h1>
-        <p className="meta">Canım'ın önerdiği her kontrol aşağıdaki kurallardan gelir. Kural tarihi: {RULE_DATE}. {REVIEWED ? '' : 'Hekim kontrolü bekliyor.'}</p>
+        <p className="meta">Canım'ın önerdiği her kontrol aşağıdaki kurallardan gelir. Kural tarihi: {RULE_DATE}. {REVIEWED ? 'Hekim kontrolünden geçti.' : 'Hekim kontrolü bekliyor.'}</p>
       </section>
       <section className="sec" style={{ overflowX: 'auto' }}>
         <table className="rules">

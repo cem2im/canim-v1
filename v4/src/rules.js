@@ -1,10 +1,10 @@
 // Canım v4 — clinical rules.
 // One source of truth: every item says who it is for, how often, and which
-// programme or guideline it comes from. DRAFT: awaiting physician review.
+// programme or guideline it comes from. Reviewed by the physician (REVIEWED below).
 // Physician decisions PD1–PD17 (guideline review, Ekim 2026) are noted where they apply.
 
 export const RULE_DATE = 'Ekim 2026'
-export const REVIEWED = false
+export const REVIEWED = true // Physician sign-off: 16 Oct 2026
 
 export const BANDS = [
   { id: 30, label: '30–39' },
