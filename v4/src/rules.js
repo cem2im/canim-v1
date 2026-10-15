@@ -392,15 +392,22 @@ export const RULES = [
 
 const val = (v, s) => (typeof v === 'function' ? v(s) : v)
 
+// Free national screenings: bowel test, mammography, cervical test.
+const PRIO = ['ggk', 'mamografi', 'hpv']
+
 export function buildList(s) {
   if (!s.sex || !s.band || !s.conds) return []
-  // Grouped items go last, so the list and the doctor page number them the same way.
+  // Order: the free national screenings first ("Önce bunlar"), then the rest, then
+  // grouped extras, so the list and the doctor page number them the same way.
   const rules = RULES.filter((r) => r.when(s))
-  return [...rules.filter((r) => !r.group), ...rules.filter((r) => r.group)].map((r) => ({
+  const prio = rules.filter((r) => PRIO.includes(r.id))
+  const rest = rules.filter((r) => !PRIO.includes(r.id) && !r.group)
+  return [...prio, ...rest, ...rules.filter((r) => r.group)].map((r) => ({
     id: r.id,
     title: val(r.title, s),
     msg: r.msg ? r.msg(s) : r.id,
     group: r.group ?? null,
+    prio: PRIO.includes(r.id),
     freq: r.freq(s),
     tag: val(r.tag, s),
     doctor: r.doctor(s),

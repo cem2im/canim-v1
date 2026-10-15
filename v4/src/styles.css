@@ -149,3 +149,7 @@ table.rules td, table.rules th { border-bottom: 1px solid var(--cizgi); padding:
 .band.hero.slim .t { font-size: 30px; margin-top: 0 }
 .band .sub { font-size: 18px; margin-top: 6px; opacity: .95; line-height: 1.4 }
 .qrow { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 14px }
+.listlabel { font-size: 17px; font-weight: 700; color: var(--nar); padding: 12px 0 2px 16px; letter-spacing: .01em }
+.chk { display: flex; align-items: flex-start; gap: 10px; font-size: 18px; line-height: 1.35; margin-top: 10px; cursor: pointer }
+.chk input { width: 24px; height: 24px; flex: none; margin-top: 1px; accent-color: var(--cini) }
+.stickynote { font-size: 16px; color: var(--ikincil); margin: 0 0 8px; line-height: 1.35 }
