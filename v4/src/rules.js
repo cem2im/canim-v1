@@ -78,14 +78,16 @@ export const RULES = [
     id: 'tansiyon',
     when: (s) => !has(s, 'tansiyon'),
     title: 'Tansiyon ölçümü',
-    freq: (s) => (s.band >= 40 ? 'Yılda bir' : '3 yılda bir'),
+    // Diabetes/heart disease: every visit (ADA). Any other risk factor or age ≥40: at least yearly.
+    // Only <40 with no risk factor: every 3 years (ESC 2024).
+    freq: (s) => (has(s, 'seker', 'kalp') ? 'Her doktor kontrolünde' : s.band >= 40 || chronic(s) ? 'Yılda bir' : '3 yılda bir'),
     tag: 'kılavuz',
     doctor: () => 'Ofis kan basıncı ölçümü',
     ne: 'Belirti vermeyen yüksek tansiyonu.',
     nasil: 'Aile hekiminde ya da eczanede, oturarak, iki kez ölçülür.',
     sonra: 'Yüksek çıkarsa birkaç gün evde ölçmeniz istenebilir.',
     sor: 'Tansiyonumu ölçer misiniz?',
-    src: () => SRC.esc_ht,
+    src: (s) => (has(s, 'seker') ? `${SRC.esc_ht}; ${SRC.ada}` : SRC.esc_ht),
   },
   {
     id: 'ggk',
@@ -189,7 +191,7 @@ export function buildList(s) {
 export const RULE_TABLE = [
   ['Kan ve idrar tahlili', 'Tansiyon, şeker, kolesterol veya kalp', 'Şekerde HbA1c 3–6 ay; diğerleri yılda bir', `${SRC.ada}; ${SRC.esc_ht}; ${SRC.lipid}; ${SRC.kdigo}`],
   ['Kan şekeri ve kolesterol', '40 yaş ve üzeri, kronik hastalık yok', '3 yılda bir', `${SRC.ada}; ${SRC.lipid}`],
-  ['Tansiyon ölçümü', 'Tansiyon hastası olmayan herkes', '40 yaş üstü yılda bir, altı 3 yılda bir', SRC.esc_ht],
+  ['Tansiyon ölçümü', 'Tansiyon hastası olmayan herkes', 'Şeker veya kalp hastalığında her kontrolde; 40 yaş üstü ya da kolesterol yüksekliğinde en az yılda bir; 40 yaş altı, risk faktörü yoksa 3 yılda bir', `${SRC.esc_ht}; ${SRC.ada}`],
   ['Gaitada gizli kan', '50–70 yaş', '2 yılda bir', SRC.ketem],
   ['Mamografi', '40–69 yaş kadın', '2 yılda bir', SRC.ketem],
   ['HPV / smear', '30–65 yaş kadın', '5 yılda bir', SRC.ketem],
