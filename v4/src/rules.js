@@ -85,8 +85,8 @@ export const RULES = [
     doctor: () => 'Ofis kan basıncı ölçümü',
     ne: 'Belirti vermeyen yüksek tansiyonu.',
     nasil: 'Aile hekiminde ya da eczanede, oturarak, iki kez ölçülür.',
-    // CH05/CH06: the "180/110 üstü ya da şikâyet varsa hemen doktora" sentence awaits PD16.
-    sonra: 'Yüksek çıkarsa birkaç gün evde ölçmeniz istenir.',
+    // CH05/CH06, PD16 approved (emergency warning): ESC 2024 I/C; HSGM HT 2025 s. 6.
+    sonra: 'Yüksek çıkarsa birkaç gün evde ölçmeniz istenir. 180/110 üstü ya da şikâyet varsa hemen doktora.',
     sor: 'Tansiyonumu ölçer misiniz?',
     src: () => SRC.ht,
   },
