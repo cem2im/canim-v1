@@ -491,6 +491,7 @@ function ChildFlow({ route, a, setA }) {
             {parent ? `Bir kontrole dokunun, okuyun. Her birini ${who === 'baba' ? 'babanıza' : 'annenize'} sorabilirsiniz; hazır bir mesaj yazdık.` : 'Bir kontrole dokunun, ne olduğunu okuyun ya da dinleyin.'}
           </p>
           <ItemList items={items} who={who} onAsk={setAsk} />
+          {band === 18 && <p className="meta" style={{ marginTop: 10 }}>Bu yaşta liste kısa: taramaların çoğu ileride başlar{sex === 'K' ? ' (rahim ağzı testi 30, kan şekeri 35, kolesterol 40 yaşında)' : ' (kan şekeri 35, kolesterol 40 yaşında)'}. Takip edilen bir sağlık durumu varsa onun kontrolleri yaşa bakmaz.</p>}
           {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>{s.other ? `${s.other} için` : 'Diğer sağlık durumu için'} kontrolleri ve aşıları onu takip eden doktora sorun. Doktor sayfasına da yazdık.</p>}
         </section>
       </Screen>
