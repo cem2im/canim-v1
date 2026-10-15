@@ -1,0 +1,16 @@
+{
+  "name": "Canım",
+  "short_name": "Canım",
+  "description": "Yaşa uygun sağlık kontrolleri",
+  "lang": "tr",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#FAF5EA",
+  "theme_color": "#8E2F1C",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
