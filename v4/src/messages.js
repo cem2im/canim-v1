@@ -59,4 +59,23 @@ export function giftMessage(who, url) {
   return `${h}, senin için bir sağlık kontrol listesi hazırladım. Ben gönderdim, açabilirsin. Dokun, istersen sesli dinle:\n${url}`
 }
 
+// "Randevuyu aldım" variant of the gift: the child booked it, the parent only has to go.
+export function bookedMessage(who, url) {
+  const h = who === 'baba' ? 'Babacım' : 'Anneciğim'
+  return `${h}, seni aile hekimine yazdırdım. Ne yapılacağı burada, istersen sesli dinle:\n${url}`
+}
+
+// Optional last line of an "Annene sor" message: the parent's list (age band, sex only).
+export const listLine = (url) => `\n\nSenin için hazırladığım liste burada, sesli de dinleyebilirsin: ${url}`
+
+// Passing it on. The link is the start page: it carries nothing about anyone.
+export function shareMessage(kind, who, url) {
+  if (kind === 'kardes') {
+    const p = who === 'baba' ? 'Babamın' : 'Annemin'
+    return `${p} kontrol listesine baktım, birlikte halledelim mi? Sen de bak, bir dakika sürüyor:\n${url}`
+  }
+  if (kind === 'arkadas') return `Canım'da yaşıma uygun sağlık kontrollerine baktım. Ücretsiz, bir dakika sürüyor. Sen de bak:\n${url}`
+  return `Yaşa uygun sağlık kontrollerine baktım. Ücretsiz, bir dakika sürüyor:\n${url}`
+}
+
 export const waLink = (text) => `https://wa.me/?text=${encodeURIComponent(text)}`

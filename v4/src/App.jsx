@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react'
 import { BANDS, CONDS, RULE_DATE, RULE_TABLE, REVIEWED, bandLabel, buildList, condText } from './rules'
-import { giftMessage, messagesFor, waLink } from './messages'
+import { bookedMessage, giftMessage, listLine, messagesFor, shareMessage, waLink } from './messages'
 import { canSpeak, speak, stopSpeak } from './speak'
 import { INTRO_VOICE, PARENT_INTRO_AUDIO, narration, parentIntro } from './narration'
 import { saveDoctorImage } from './image'
@@ -21,6 +21,12 @@ const setQuery = (path, q) => {
   const qs = new URLSearchParams(q).toString()
   window.location.hash = `${path}${qs ? `?${qs}` : ''}`
 }
+const giftUrl = (s, who, name = '') => {
+  const q = new URLSearchParams({ y: s.band, c: s.sex, k: who })
+  if (name.trim()) q.set('n', name.trim().slice(0, 20))
+  return `${window.location.origin}${window.location.pathname}#/a?${q}`
+}
+const startUrl = () => `${window.location.origin}${window.location.pathname}`
 const today = () => new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
 
 /* ---------- small pieces ---------- */
@@ -116,6 +122,7 @@ function ItemList({ items, who, onAsk, onFirstOpen }) {
   }
   const canAsk = who === 'anne' || who === 'baba'
   const main = items.filter((it) => !it.group)
+  const nPrio = main.filter((it) => it.prio).length
   const extra = items.filter((it) => it.group)
   const row = (it, i) => {
     const isOpen = open === it.id
@@ -145,7 +152,13 @@ function ItemList({ items, who, onAsk, onFirstOpen }) {
   }
   return (
     <div className="sheet">
-      {main.map(row)}
+      {main.map((it, i) => (
+        <Fragment key={it.id}>
+          {nPrio > 0 && i === 0 && <div className="listlabel">Önce bunlar: devletin ücretsiz taramaları</div>}
+          {nPrio > 0 && i === nPrio && <div className="listlabel">Diğer kontroller</div>}
+          {row(it, i)}
+        </Fragment>
+      ))}
       {extra.length > 0 && (
         <div className={`li ${showGroup ? 'open' : ''}`}>
           <button className="lihead" aria-expanded={showGroup} onClick={() => setShowGroup((v) => !v)}>
@@ -161,10 +174,12 @@ function ItemList({ items, who, onAsk, onFirstOpen }) {
   )
 }
 
-function AskSheet({ item, who, onClose }) {
+function AskSheet({ item, who, s, onClose }) {
   const alts = messagesFor(item.msg ?? item.id, who)
   const [pick, setPick] = useState(0)
   const [text, setText] = useState(alts[0])
+  const [withLink, setWithLink] = useState(true)
+  const out = withLink ? text + listLine(giftUrl(s, who)) : text
   const choose = (i) => {
     setPick(i)
     setText(alts[i])
@@ -182,7 +197,8 @@ function AskSheet({ item, who, onClose }) {
       </div>
       <label className="lbl" htmlFor="msg">Gidecek mesaj</label>
       <textarea id="msg" rows={4} value={text} onChange={(e) => setText(e.target.value)} />
-      <a className="btn" style={{ marginTop: 12 }} href={waLink(text)} target="_blank" rel="noopener noreferrer">WhatsApp'ta gönder</a>
+      <label className="chk"><input type="checkbox" checked={withLink} onChange={(e) => setWithLink(e.target.checked)} />{who === 'baba' ? 'Babanızın' : 'Annenizin'} listesinin bağlantısını da ekle</label>
+      <a className="btn" style={{ marginTop: 12 }} href={waLink(out)} target="_blank" rel="noopener noreferrer">WhatsApp'ta gönder</a>
       <button className="btn2" onClick={onClose}>Kapat</button>
       <p className="note">Mesajı siz gönderirsiniz. Canım cevaplarınızı kaydetmez.</p>
     </Sheet>
@@ -191,19 +207,17 @@ function AskSheet({ item, who, onClose }) {
 
 function GiftSheet({ who, s, onClose }) {
   const [name, setName] = useState('')
-  const url = useMemo(() => {
-    const q = new URLSearchParams({ y: s.band, c: s.sex, k: who })
-    if (name.trim()) q.set('n', name.trim().slice(0, 20))
-    return `${window.location.origin}${window.location.pathname}#/a?${q}`
-  }, [name, s, who])
-  const text = giftMessage(who, url)
+  const [booked, setBooked] = useState(false)
+  const url = useMemo(() => giftUrl(s, who, name), [name, s, who])
+  const text = booked ? bookedMessage(who, url) : giftMessage(who, url)
   return (
     <Sheet onClose={onClose} label="Gönder">
       <h2>{who === 'baba' ? 'Babanıza gönderin' : 'Annenize gönderin'}</h2>
       <p className="meta" style={{ marginBottom: 10 }}>Açtığı sayfada kendi listesini görür, sesli dinler. Uygulama indirmesi gerekmez.</p>
       <label className="lbl" htmlFor="ad">Adınız (isteğe bağlı)</label>
       <input id="ad" type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Örneğin: Elif" autoComplete="given-name" />
-      <p className="meta" style={{ margin: '8px 0 12px' }}>Sayfada “{name.trim() || 'Biri'} bunu size gönderdi” yazar.</p>
+      <p className="meta" style={{ margin: '8px 0 6px' }}>Sayfada “{name.trim() || 'Biri'} bunu size gönderdi” yazar.</p>
+      <label className="chk" style={{ marginBottom: 12 }}><input type="checkbox" checked={booked} onChange={(e) => setBooked(e.target.checked)} />Randevuyu ben aldım (mesaj buna göre yazılsın)</label>
       <a className="btn" href={waLink(text)} target="_blank" rel="noopener noreferrer">WhatsApp'ta gönder</a>
       <button className="btn2" onClick={onClose}>Kapat</button>
       <p className="note">Bağlantıda sağlık bilgisi yok. Yalnızca yaş aralığı, kadın/erkek ve yazarsanız adınız var.</p>
@@ -240,6 +254,16 @@ function EndSection({ who, onDoctor, onSave, numbered }) {
         <button className="btn2" onClick={onSave}>Resim olarak kaydet</button>
       </section>
     </>
+  )
+}
+
+function ShareOn({ kind, who, title, sub, n }) {
+  return (
+    <section className="sec">
+      <h2>{n ? <span className="stepn">{n}</span> : null}{title}</h2>
+      <p className="meta">{sub}</p>
+      <a className="btn2" href={waLink(shareMessage(kind, who, startUrl()))} target="_blank" rel="noopener noreferrer">WhatsApp'ta paylaşın</a>
+    </section>
   )
 }
 
@@ -491,8 +515,12 @@ function ChildFlow({ route, a, setA }) {
   } else if (step === 'liste' && done) {
     screen = (
       <Screen action={parent
-        ? <><button className="btn" onClick={() => setGift(true)}>{toParent} gönderin</button><button className="btn2" onClick={() => go('son')}>Sonra ne yapmalı? →</button></>
-        : <button className="btn" onClick={() => go('son')}>Sonra ne yapmalı? →</button>}>
+        ? <>
+            <p className="stickynote">182’de: “{who === 'baba' ? 'Babamın' : 'Annemin'} aile hekiminden randevu istiyorum.” {who === 'baba' ? 'Babanızın' : 'Annenizin'} T.C. kimlik no’su hazır olsun.</p>
+            <a className="btn" href="tel:182"><Tel />Randevuyu siz alın: 182</a>
+            <button className="btn2" onClick={() => setGift(true)}>{toParent} gönderin</button>
+          </>
+        : <><a className="btn" href="tel:182"><Tel />182'yi arayın, randevu alın</a><button className="btn2" onClick={() => go('son')}>Sonra ne yapmalı? →</button></>}>
         <section className="sec" style={{ border: 0 }} aria-live="polite">
           <h1 style={{ fontSize: 29 }}>{listTitle} {items.length} kontrolü</h1>
           <p className="meta" style={{ marginBottom: 10 }}>
@@ -501,7 +529,17 @@ function ChildFlow({ route, a, setA }) {
           <ItemList items={items} who={who} onAsk={setAsk} />
           {band === 18 && <p className="meta" style={{ marginTop: 10 }}>Bu yaşta liste kısa: taramaların çoğu ileride başlar{sex === 'K' ? ' (rahim ağzı testi 30, kan şekeri 35, kolesterol 40 yaşında)' : ' (kan şekeri 35, kolesterol 40 yaşında)'}. Takip edilen bir sağlık durumu varsa onun kontrolleri yaşa bakmaz.</p>}
           {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>{s.other ? `${s.other} için` : 'Diğer sağlık durumu için'} kontrolleri ve aşıları onu takip eden doktora sorun. Doktor sayfasına da yazdık.</p>}
+          {parent && <button className="btn2" style={{ marginTop: 16 }} onClick={() => go('son')}>Doktor sayfası ve diğer adımlar →</button>}
         </section>
+        {who === 'kendim' && (
+          <section className="sec">
+            <h2>Anneniz ve babanız için de bakın</h2>
+            <p className="meta">Onların listesi genellikle daha uzun.</p>
+            {['anne', 'baba'].map((w) => (
+              <button key={w} className="btn2" onClick={() => { setA({ who: w, sexPick: null, band: null, conds: [], other: '' }); go('yas') }}>{w === 'anne' ? 'Annem için' : 'Babam için'}</button>
+            ))}
+          </section>
+        )}
       </Screen>
     )
   } else if (step === 'son' && done) {
@@ -518,6 +556,9 @@ function ChildFlow({ route, a, setA }) {
           </section>
         )}
         <EndSection who={who} onDoctor={openDoctor} onSave={() => saveDoctorImage(doctorData(s, items))} numbered={parent ? 2 : 1} />
+        {parent
+          ? <ShareOn kind="kardes" who={who} n={5} title="Kardeşlerinize haber verin" sub="Birlikte halletmek daha kolay. Bağlantı başlangıç sayfasını açar; kimsenin bilgisi gitmez." />
+          : <ShareOn kind="genel" who={who} n={4} title="Bir yakınınıza gönderin" sub="Bağlantı başlangıç sayfasını açar; sizin bilginiz gitmez." />}
         <Foot />
       </Screen>
     )
@@ -528,7 +569,7 @@ function ChildFlow({ route, a, setA }) {
   return (
     <>
       {screen}
-      {ask && <AskSheet item={ask} who={who} onClose={() => setAsk(null)} />}
+      {ask && <AskSheet item={ask} who={who} s={s} onClose={() => setAsk(null)} />}
       {gift && <GiftSheet who={who} s={s} onClose={() => setGift(false)} />}
       {route.q.d && done && <DoctorPage s={s} items={items} onBack={() => window.history.back()} />}
     </>
@@ -634,6 +675,7 @@ function ParentPage({ route }) {
       <Screen>
         <section className="sec" style={{ border: 0, paddingBottom: 0 }}><h1>Şimdi ne yapmalı?</h1></section>
         <EndSection who="kendim" onDoctor={() => setQuery('/a', { ...route.q, d: 1 })} onSave={() => saveDoctorImage(doctorData(s, items))} numbered={1} />
+        <ShareOn kind="arkadas" who="kendim" n={4} title="Kardeşinize, arkadaşınıza gönderin" sub="Onlar da kendi listelerine baksın. Bağlantı başlangıç sayfasını açar; sizin bilginiz gitmez." />
         <Foot />
       </Screen>
     )
