@@ -115,48 +115,66 @@ function Sheet({ onClose, children, label }) {
 
 /* ---------- the list ---------- */
 
+// Extra diabetes checks (PD8, PD14) stay list items but sit behind one row,
+// so the core list stays short. The doctor page always shows everything.
+const GROUPS = { seker_ek: (n) => `Şekere bağlı diğer ${n} kontrol` }
+
 function ItemList({ items, who, onAsk, onFirstOpen }) {
   const [open, setOpen] = useState(null)
+  const [showGroup, setShowGroup] = useState(false)
   const toggle = (id) => {
     setOpen((o) => (o === id ? null : id))
     onFirstOpen?.()
   }
   const canAsk = who === 'anne' || who === 'baba'
+  const main = items.filter((it) => !it.group)
+  const extra = items.filter((it) => it.group)
+  const row = (it, i) => {
+    const isOpen = open === it.id
+    return (
+      <div key={it.id} className={`li ${isOpen ? 'open' : ''}`}>
+        <button className="lihead" aria-expanded={isOpen} onClick={() => toggle(it.id)}>
+          <span className="n">{i + 1}</span>
+          <span><b>{it.title}</b><span className="f">{it.freq}</span></span>
+          <Chev />
+        </button>
+        {isOpen && (
+          <div className="libody qa">
+            <Voice small title="Sesli dinleyin" sub="Bu kontrol" text={`${it.title}. Ne arar? ${it.ne} Nasıl yapılır? ${it.nasil} Sonra ne olur? ${it.sonra}`} />
+            <p><b>Ne arar?</b> {it.ne}</p>
+            <p><b>Nasıl?</b> {it.nasil}</p>
+            <p><b>Sonra?</b> {it.sonra}</p>
+            <div className="say"><span className="meta" style={{ fontWeight: 700 }}>Doktorunuza sorun:</span><br />“{it.sor}”</div>
+          </div>
+        )}
+        {canAsk && (
+          <button className="ask" onClick={() => onAsk(it)}>
+            <Bubble />{who === 'baba' ? 'Babana sor' : 'Annene sor'}
+          </button>
+        )}
+      </div>
+    )
+  }
   return (
     <div className="sheet">
-      {items.map((it, i) => {
-        const isOpen = open === it.id
-        return (
-          <div key={it.id} className={`li ${isOpen ? 'open' : ''}`}>
-            <button className="lihead" aria-expanded={isOpen} onClick={() => toggle(it.id)}>
-              <span className="n">{i + 1}</span>
-              <span><b>{it.title}</b><span className="f">{it.freq}</span></span>
-              <Chev />
-            </button>
-            {isOpen && (
-              <div className="libody qa">
-                <Voice small title="Sesli dinleyin" sub="Bu kontrol" text={`${it.title}. Ne arar? ${it.ne} Nasıl yapılır? ${it.nasil} Sonra ne olur? ${it.sonra}`} />
-                <p><b>Ne arar?</b> {it.ne}</p>
-                <p><b>Nasıl?</b> {it.nasil}</p>
-                <p><b>Sonra?</b> {it.sonra}</p>
-                <div className="say"><span className="meta" style={{ fontWeight: 700 }}>Doktorunuza sorun:</span><br />“{it.sor}”</div>
-              </div>
-            )}
-            {canAsk && (
-              <button className="ask" onClick={() => onAsk(it)}>
-                <Bubble />{who === 'baba' ? 'Babana sor' : 'Annene sor'}
-              </button>
-            )}
-          </div>
-        )
-      })}
-      <p className="source">Sağlık Bakanlığı tarama programları ve güncel kılavuzlara göre · {RULE_DATE}</p>
+      {main.map(row)}
+      {extra.length > 0 && (
+        <div className={`li ${showGroup ? 'open' : ''}`}>
+          <button className="lihead" aria-expanded={showGroup} onClick={() => setShowGroup((v) => !v)}>
+            <span className="n">+</span>
+            <span><b>{GROUPS[extra[0].group](extra.length)}</b><span className="f">{extra.map((it) => it.title).join(', ')}</span></span>
+            <Chev />
+          </button>
+        </div>
+      )}
+      {showGroup && extra.map((it, i) => row(it, main.length + i))}
+      <p className="source">Devletin tarama programına ve doktor önerilerine dayanır ({RULE_DATE}). Bakanlık sitesi değildir.</p>
     </div>
   )
 }
 
 function AskSheet({ item, who, onClose }) {
-  const alts = messagesFor(item.id, who)
+  const alts = messagesFor(item.msg ?? item.id, who)
   const [pick, setPick] = useState(0)
   const [text, setText] = useState(alts[0])
   const choose = (i) => {
@@ -178,7 +196,7 @@ function AskSheet({ item, who, onClose }) {
       <textarea id="msg" rows={4} value={text} onChange={(e) => setText(e.target.value)} />
       <a className="btn" style={{ marginTop: 12 }} href={waLink(text)} target="_blank" rel="noopener noreferrer">WhatsApp'ta gönder</a>
       <button className="btn2" onClick={onClose}>Kapat</button>
-      <p className="note">Mesaj sizin adınıza gider. Canım hiçbir şey kaydetmez.</p>
+      <p className="note">Mesajı siz gönderirsiniz. Canım cevaplarınızı kaydetmez.</p>
     </Sheet>
   )
 }
@@ -200,7 +218,7 @@ function GiftSheet({ who, s, onClose }) {
       <p className="meta" style={{ margin: '8px 0 12px' }}>Sayfada “{name.trim() || 'Biri'} bunu size gönderdi” yazar.</p>
       <a className="btn" href={waLink(text)} target="_blank" rel="noopener noreferrer">WhatsApp'ta gönder</a>
       <button className="btn2" onClick={onClose}>Kapat</button>
-      <p className="note">Bağlantıda hastalık bilgisi yoktur; yalnızca yaş aralığı.</p>
+      <p className="note">Bağlantıda hastalık bilgisi yok. Yalnızca yaş aralığı, kadın/erkek ve yazarsanız adınız var.</p>
     </Sheet>
   )
 }
@@ -208,15 +226,19 @@ function GiftSheet({ who, s, onClose }) {
 /* ---------- end of page: call, show, keep ---------- */
 
 function EndSection({ who, onDoctor, onSave }) {
-  const title = who === 'anne' || who === 'baba' ? 'Randevuyu birlikte alın' : 'Bu ay aile hekiminizden randevu alın'
+  const forParent = who === 'anne' || who === 'baba'
+  const title = forParent ? 'Randevuyu birlikte alın' : 'Bu ay aile hekiminize gidin'
   return (
     <>
       <section className="sec">
         <h2>{title}</h2>
+        {!forParent && <p className="meta">Randevu alabilir ya da randevusuz gidebilirsiniz.</p>}
         <a className="btn" href="tel:182"><Tel />182'yi arayın</a>
+        <p className="meta">Randevu hattı. Arama ücreti hattınızın tarifesine göre.</p>
         <div className="script">
-          <b>Telefonda şunu söyleyin:</b><br />“Aile hekimimden randevu almak istiyorum.”<br />
-          <span className="meta">T.C. kimlik numaranızı hazır tutun.</span>
+          <b>Telefonda:</b><br />“Aile hekiminden randevu istiyorum.”<br />
+          {forParent && <>{who === 'baba' ? 'Babanız' : 'Anneniz'} için arıyorsanız: “{who === 'baba' ? 'Babamın' : 'Annemin'} aile hekiminden.”<br /></>}
+          <span className="meta">Randevu alınacak kişinin T.C. kimlik numarası yanınızda olsun.</span>
         </div>
       </section>
       <section className="sec">
@@ -236,7 +258,7 @@ function Foot() {
   return (
     <footer className="foot">
       <p>Canım bilgilendirme amaçlıdır, teşhis koymaz. Karar hekiminizindir.</p>
-      <p style={{ marginTop: 6 }}>Hiçbir bilgi kaydedilmez, hiçbir yere gönderilmez. <a href="#/kaynak">Hekimler için: kurallar ve kaynaklar</a></p>
+      <p style={{ marginTop: 6 }}>Cevaplarınız bu telefonda kalır. Canım bunları kaydetmez, kimseye göndermez. <a href="#/gizlilik">Gizlilik</a> · <a href="#/kaynak">Hekimler için: kurallar ve kaynaklar</a></p>
     </footer>
   )
 }
@@ -291,7 +313,7 @@ const WHO = [
   { id: 'baska', label: 'Başka biri' },
 ]
 const SEX = [{ id: 'K', label: 'Kadın' }, { id: 'E', label: 'Erkek' }]
-const NONE = { id: 'yok', label: 'Hiçbiri yok' }
+const NONE = { id: 'yok', label: 'Yok' }
 
 function pickConds(prev, id) {
   if (id === 'yok') return ['yok']
@@ -342,7 +364,7 @@ function ChildPage({ route }) {
   }
 
   const ageQ = { anne: 'Annenizin yaşı?', baba: 'Babanızın yaşı?', kendim: 'Yaşınız?', baska: 'Kaç yaşında?' }[who] || 'Yaşı?'
-  const condQ = who === 'kendim' ? 'Her gün ilaç içtiğiniz bir hastalık?' : 'Her gün ilaç içtiği bir hastalık?'
+  const condQ = who === 'kendim' ? 'Doktorun söylediği bir hastalığınız var mı? (İlaç, iğne ya da diyetle)' : 'Doktorun söylediği bir hastalığı var mı? (İlaç, iğne ya da diyetle)'
   const listTitle = { anne: 'Annenizin', baba: 'Babanızın', kendim: 'Sizin', baska: 'Onun' }[who]
 
   const openDoctor = () => setQuery('/', { d: 1 })
@@ -387,7 +409,7 @@ function ChildPage({ route }) {
               {who === 'anne' || who === 'baba' ? `Her kontrolü ${who === 'baba' ? 'babanıza' : 'annenize'} sorabilirsiniz. Hazır bir mesaj yazdık.` : 'Bir kontrole dokunun, ne olduğunu okuyun.'}
             </p>
             <ItemList items={items} who={who} onAsk={setAsk} />
-            {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığın kontrollerini onu takip eden doktor belirler.</p>}
+            {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığının kontrollerini ve aşılarını doktoruna sor.</p>}
           </section>
           {(who === 'anne' || who === 'baba') && (
             <section className="sec">
@@ -407,7 +429,7 @@ function ChildPage({ route }) {
 
 function doctorData(s, items) {
   return {
-    meta: `${bandLabel(s.band)} yaş · ${s.sex === 'K' ? 'kadın' : 'erkek'}${s.conds.length ? ` · ${condText(s.conds)} (kendi bildirimi)` : ''} · ${today()}`,
+    meta: `${bandLabel(s.band)} yaş · ${s.sex === 'K' ? 'kadın' : 'erkek'}${s.conds.length ? ` · ${condText(s.conds)} (kendisi söyledi)` : ''} · ${today()}`,
     items,
     footer: `Bilgilendirme amaçlıdır; karar hekimindir. Kurallar: Sağlık Bakanlığı tarama programları ve güncel kılavuzlar, ${RULE_DATE}.`,
   }
@@ -448,7 +470,7 @@ function ParentPage({ route }) {
     )
   }
 
-  const introText = `Merhaba. Bu sayfayı ${name || 'bir yakınınız'} sizin için hazırladı. Önce bir soruya cevap verin. Sonra yaşınıza uygun kontroller çıkacak. Her birine dokunun, okuyun ya da dinleyin. En altta aile hekiminizi aramak için bir düğme var. Karar her zaman doktorunuzundur.`
+  const introText = `Merhaba. Bu sayfayı ${name || 'bir yakınınız'} sizin için hazırladı. Önce bir soruya cevap verin. Sonra size uygun kontroller çıkacak. Her birine dokunun, okuyun ya da dinleyin. En altta randevu hattı 182'yi aramak için bir düğme var. Karar her zaman doktorunuzundur.`
   const openDoctor = () => setQuery('/a', { ...route.q, d: 1 })
   const firstOpen = () => {
     if (ringed.current) return
@@ -466,7 +488,7 @@ function ParentPage({ route }) {
       <section className="sec" style={{ border: 0, paddingTop: 12 }}>
         <Voice title="Önce dinleyin" sub="Sesli anlatım" text={introText} className={intro ? 'spot' : ''} />
         <div className={intro ? 'dim' : !answered ? 'spot' : ''} style={{ padding: '12px 12px 14px', margin: '0 -12px', borderRadius: 4 }}>
-          <div className="q">Her gün ilaç içtiğiniz bir hastalık var mı?</div>
+          <div className="q">Doktorun söylediği bir hastalığınız var mı? (İlaç, iğne ya da diyetle)</div>
           <Chips options={[NONE, ...CONDS]} value={conds} multi onPick={(id) => setConds(pickConds(conds, id))} />
         </div>
       </section>
@@ -474,7 +496,7 @@ function ParentPage({ route }) {
         <section className={`sec ${intro ? 'dim' : ''}`} style={{ border: 0, paddingTop: 0 }} aria-live="polite">
           <h2>Size uygun {items.length} kontrol</h2>
           <ItemList items={items} who="kendim" onFirstOpen={firstOpen} />
-          {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığınızın kontrollerini onu takip eden doktorunuz belirler.</p>}
+          {s.conds.includes('baska') && <p className="meta" style={{ marginTop: 10 }}>Diğer hastalığınızın kontrollerini ve aşılarını doktorunuza sorun.</p>}
         </section>
       ) : (
         <section className="sec dim" style={{ border: 0 }}><p className="meta" style={{ textAlign: 'center' }}>↓ Liste burada belirecek</p></section>
@@ -489,6 +511,24 @@ function ParentPage({ route }) {
   )
 }
 
+/* ---------- privacy (PD15) ---------- */
+
+function PrivacyPage() {
+  return (
+    <>
+      <header className="top"><a className="geri" href="#/">‹ Geri</a><span className="wm">Canım</span></header>
+      <section className="sec">
+        <h1>Gizlilik</h1>
+        <p>Canım'ı Doç. Dr. Cem Şimşek hazırladı.</p>
+        <p>Cevaplarınız telefonunuzda kalır; hiçbir sunucuya gitmez. Çerez yok. Hesap yok.</p>
+        <p>Annenize ya da babanıza gönderdiğiniz bağlantıda hastalık bilgisi yoktur. Yalnızca yaş aralığı, kadın/erkek ve yazarsanız ad vardır.</p>
+        <p>Sitemizi barındıran GitHub, güvenlik için ziyaretçi IP adresini kaydeder.</p>
+      </section>
+      <Foot />
+    </>
+  )
+}
+
 /* ---------- for physicians ---------- */
 
 function RulesPage() {
@@ -497,7 +537,7 @@ function RulesPage() {
       <header className="top"><a className="geri" href="#/">‹ Geri</a><span className="wm">Canım</span></header>
       <section className="sec">
         <h1>Hekimler için</h1>
-        <p className="meta">Canım'ın önerdiği her kontrol aşağıdaki kurallardan gelir. Kural tarihi: {RULE_DATE}. {REVIEWED ? '' : 'Hekim kontrolü bekliyor.'}</p>
+        <p className="meta">Canım'ın önerdiği her kontrol aşağıdaki kurallardan gelir. Kural tarihi: {RULE_DATE}. {REVIEWED ? 'Hekim kontrolünden geçti.' : 'Hekim kontrolü bekliyor.'}</p>
       </section>
       <section className="sec" style={{ overflowX: 'auto' }}>
         <table className="rules">
@@ -515,7 +555,7 @@ export default function App() {
   return (
     <div className="app">
       {!REVIEWED && <div className="draft">Deneme sürümü · hekim kontrolü bekliyor</div>}
-      {route.path === '/a' ? <ParentPage route={route} /> : route.path === '/kaynak' ? <RulesPage /> : <ChildPage route={route} />}
+      {route.path === '/a' ? <ParentPage route={route} /> : route.path === '/kaynak' ? <RulesPage /> : route.path === '/gizlilik' ? <PrivacyPage /> : <ChildPage route={route} />}
     </div>
   )
 }
