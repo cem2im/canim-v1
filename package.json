@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "dev:yeni": "vite --config vite.v4.config.js",
-    "build:yeni": "vite build --config vite.v4.config.js"
+    "build:yeni": "vite build --config vite.v4.config.js",
+    "tts:yeni": "node v4/scripts/tts.mjs"
   },
   "dependencies": {
     "@fontsource/atkinson-hyperlegible-next": "^5.3.0",

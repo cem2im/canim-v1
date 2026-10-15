@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { BANDS, CONDS, RULE_DATE, RULE_TABLE, REVIEWED, bandLabel, buildList, condText } from './rules'
 import { giftMessage, messagesFor, waLink } from './messages'
 import { canSpeak, speak, stopSpeak } from './speak'
+import { INTRO_VOICE, PARENT_INTRO_AUDIO, narration, parentIntro } from './narration'
 import { saveDoctorImage } from './image'
 
 /* ---------- routing: everything lives in the hash, nothing is sent anywhere ---------- */
@@ -62,7 +63,7 @@ const Cini = () => (
   </svg>
 )
 
-function Voice({ title, sub, text, small, className = '' }) {
+function Voice({ title, sub, text, audioText, small, className = '' }) {
   const [on, setOn] = useState(false)
   useEffect(() => () => on && stopSpeak(), [on])
   if (!canSpeak) return null
@@ -72,7 +73,7 @@ function Voice({ title, sub, text, small, className = '' }) {
       setOn(false)
     } else {
       setOn(true)
-      speak(text, () => setOn(false))
+      speak(text, () => setOn(false), audioText ?? text)
     }
   }
   return (
@@ -127,7 +128,7 @@ function ItemList({ items, who, onAsk, onFirstOpen }) {
         </button>
         {isOpen && (
           <div className="libody qa">
-            <Voice small title="Sesli dinleyin" sub="Bu kontrol" text={`${it.title}. Ne arar? ${it.ne} Nasıl yapılır? ${it.nasil} Sonra ne olur? ${it.sonra}`} />
+            <Voice small title="Sesli dinleyin" sub="Bu kontrol" text={narration(it)} />
             <p><b>Ne arar?</b> {it.ne}</p>
             <p><b>Nasıl?</b> {it.nasil}</p>
             <p><b>Sonra?</b> {it.sonra}</p>
@@ -363,7 +364,6 @@ function OtherField({ value, onChange }) {
 
 /* ---------- intro ---------- */
 
-const INTRO_VOICE = 'Merhaba. Canım, annenize, babanıza ya da kendinize yaşa uygun sağlık kontrollerini bir dakikada gösterir. Üç soruya dokunursunuz. Devletin ücretsiz tarama programına ve doktor önerilerine göre bir liste çıkar. Listeyi annenize WhatsApptan gönderebilir, 182yi arayıp aile hekiminden randevu alabilirsiniz. Doktora gösterilecek sayfa da hazır. Üyelik yok, ücretsiz. Hiçbir bilgi kaydedilmez. Teşhis koymaz; karar her zaman doktorunuzundur.'
 
 function IntroPage() {
   return (
@@ -385,7 +385,7 @@ function IntroPage() {
         </ol>
       </section>
       <section className="sec" style={{ border: 0 }}>
-        <Voice title="Sesli dinleyin" sub="Canım nedir? · 30 saniye" text={INTRO_VOICE} />
+        <Voice title="Sesli dinleyin" sub="Canım nedir? · 36 saniye" text={INTRO_VOICE} />
         <ul className="trust">
           <li>Devletin tarama programına ve kılavuzlara dayanır; hekim kontrolünden geçti.</li>
           <li>Üyelik yok, ücretsiz. Cevaplarınız kaydedilmez.</li>
@@ -570,7 +570,7 @@ function ParentPage({ route }) {
     )
   }
 
-  const introText = `Merhaba. Bu sayfayı ${name || 'bir yakınınız'} sizin için hazırladı. Önce bir soruya cevap vereceksiniz. Sonra size uygun kontroller çıkacak. Her birine dokunun, okuyun ya da dinleyin. Randevu hattı 182'yi aramak için bir düğme var. Karar her zaman doktorunuzundur.`
+  const introText = parentIntro(name)
   const firstOpen = () => {
     if (ringed.current) return
     ringed.current = true
@@ -588,7 +588,7 @@ function ParentPage({ route }) {
         </div>
         <Cini />
         <section className="sec" style={{ border: 0 }}>
-          <Voice title="Önce dinleyin" sub="Sesli anlatım" text={introText} className="spot" />
+          <Voice title="Önce dinleyin" sub="Sesli anlatım" text={introText} audioText={PARENT_INTRO_AUDIO} className="spot" />
           <p style={{ fontSize: 21 }}>Bir soruya cevap verin, size uygun kontroller çıksın. Uygulama indirmeniz gerekmez.</p>
         </section>
         <Foot />

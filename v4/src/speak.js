@@ -1,11 +1,25 @@
-// Narration placeholder: the device's own Turkish voice (no audio leaves the phone).
-// To be replaced by recorded narration once the voice decision is made.
+// Narration: a recorded clip (public/ses/<id>.mp3, made by scripts/tts.mjs)
+// when there is one; otherwise the phone's own Turkish voice.
+// Nothing is sent anywhere: clips are static files of this site.
+import { clipId } from './narration'
+import CLIPS from './clips.json'
 
-export const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window
+const have = new Set(CLIPS.clips)
+const hasSynth = typeof window !== 'undefined' && 'speechSynthesis' in window
+let audio = null
 
-export function speak(text, onEnd) {
-  if (!canSpeak) return
-  window.speechSynthesis.cancel()
+export const canSpeak = hasSynth || have.size > 0
+
+export function speak(text, onEnd, audioText = text) {
+  stopSpeak()
+  const id = clipId(audioText)
+  if (have.has(id)) {
+    audio = new Audio(`ses/${id}.mp3`)
+    audio.onended = audio.onerror = () => onEnd && onEnd()
+    audio.play().catch(() => onEnd && onEnd())
+    return
+  }
+  if (!hasSynth) return
   const u = new SpeechSynthesisUtterance(text)
   u.lang = 'tr-TR'
   u.rate = 0.9
@@ -16,5 +30,10 @@ export function speak(text, onEnd) {
 }
 
 export function stopSpeak() {
-  if (canSpeak) window.speechSynthesis.cancel()
+  if (audio) {
+    audio.onended = audio.onerror = null
+    audio.pause()
+    audio = null
+  }
+  if (hasSynth) window.speechSynthesis.cancel()
 }
