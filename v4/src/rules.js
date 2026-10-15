@@ -7,6 +7,7 @@ export const RULE_DATE = 'Ekim 2026'
 export const REVIEWED = true // Physician sign-off: 16 Oct 2026
 
 export const BANDS = [
+  { id: 18, label: '18–29' },
   { id: 30, label: '30–39' },
   { id: 40, label: '40–49' },
   { id: 50, label: '50–59' },
